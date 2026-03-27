@@ -1,0 +1,53 @@
+<% content_for :title, "Backoffice | Sistema de Gestion Logial" %>
+
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-ink">Dashboard de Backoffice</h1>
+      <p class="mt-1 text-sm text-slate-600">Vista ejecutiva inicial para control operativo de la logia.</p>
+    </div>
+    <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Estado: Base V1</span>
+  </div>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-xs uppercase tracking-wide text-slate-500">Hermanos activos</p>
+      <p class="mt-2 text-3xl font-semibold text-ink">128</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-xs uppercase tracking-wide text-slate-500">Cuotas vencidas</p>
+      <p class="mt-2 text-3xl font-semibold text-ink">31</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-xs uppercase tracking-wide text-slate-500">Pagos recientes</p>
+      <p class="mt-2 text-3xl font-semibold text-ink">22</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-xs uppercase tracking-wide text-slate-500">Trabajos pendientes</p>
+      <p class="mt-2 text-3xl font-semibold text-ink">14</p>
+    </article>
+  </div>
+
+  <div class="mt-8 grid gap-4 lg:grid-cols-3">
+    <a href="/backoffice/cuadro-logial" class="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand">
+      <h2 class="font-semibold text-ink">Cuadro logial</h2>
+      <p class="mt-2 text-sm text-slate-600">Gestion de fichas, grados, cargos e historial.</p>
+    </a>
+    <a href="/backoffice/tesoreria" class="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand">
+      <h2 class="font-semibold text-ink">Tesoreria</h2>
+      <p class="mt-2 text-sm text-slate-600">Control de cuotas, cargos, pagos y reportes.</p>
+    </a>
+    <a href="/backoffice/secretaria" class="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand">
+      <h2 class="font-semibold text-ink">Secretaria</h2>
+      <p class="mt-2 text-sm text-slate-600">Actas, correspondencia y repositorio documental.</p>
+    </a>
+    <a href="/backoffice/trabajos" class="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand">
+      <h2 class="font-semibold text-ink">Trabajos masonicos</h2>
+      <p class="mt-2 text-sm text-slate-600">Asignacion, seguimiento y presentaciones.</p>
+    </a>
+    <a href="/backoffice/administracion" class="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand">
+      <h2 class="font-semibold text-ink">Administracion</h2>
+      <p class="mt-2 text-sm text-slate-600">Usuarios, roles, permisos y auditoria.</p>
+    </a>
+  </div>
+</section>

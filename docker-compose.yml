@@ -1,0 +1,64 @@
+services:
+  web:
+    build:
+      context: .
+    command: bash -lc "bundle install && ./bin/rails db:prepare && ./bin/rails server -b 0.0.0.0 -p 3000"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - storage_data:/rails/storage
+      - tmp_data:/rails/tmp
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/masonic_lodge_manager_development
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: 45e05757010dfb82cb13e3883ced4bd8
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+    profiles:
+      - worker
+    command: bash -lc "bundle install && ./bin/rake solid_queue:start"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - storage_data:/rails/storage
+      - tmp_data:/rails/tmp
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/masonic_lodge_manager_development
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: 45e05757010dfb82cb13e3883ced4bd8
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: masonic_lodge_manager_development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d masonic_lodge_manager_development"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  bundle_cache:
+  storage_data:
+  tmp_data:

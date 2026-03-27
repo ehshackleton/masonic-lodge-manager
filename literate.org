@@ -1,0 +1,1116 @@
+#+TITLE: Sistema de Gestión Logial
+#+SUBTITLE: Contexto técnico inicial para implementación con Ruby on Rails + PostgreSQL
+#+AUTHOR: OpenAI
+#+DATE: 2026-03-26
+#+LANGUAGE: es
+#+OPTIONS: toc:t num:t ^:{}
+#+STARTUP: overview
+#+PROPERTY: header-args :results output :exports both
+
+* 1. Resumen ejecutivo
+
+Se propone construir un *Sistema de Gestión Logial* orientado inicialmente a una logia,
+implementado como una aplicación web monolítica modular sobre *Ruby on Rails* y *PostgreSQL*,
+con un *portal público moderno* y un *backoffice privado* con autenticación, autorización por roles
+y manejo estricto de datos sensibles.
+
+La solución debe cubrir dos grandes superficies:
+
+1. *Portal público institucional*
+   - Inicio
+   - Sobre nosotros
+   - Contacto
+   - Sobre el sistema de administración masónica
+   - Inicio de sesión
+
+2. *Backoffice privado*
+   - Gestión del cuadro logial
+   - Tesorería
+   - Secretaría
+   - Trabajos masónicos
+   - Administración de usuarios, roles, auditoría y parámetros
+
+La estrategia técnica recomendada es un *monolito Rails modular* por las siguientes razones:
+
+- reduce complejidad operativa en etapa inicial;
+- acelera el desarrollo del dominio;
+- facilita seguridad, auditoría y trazabilidad;
+- disminuye el costo de integración entre módulos altamente relacionados;
+- permite contenerización simple con Docker y Docker Compose;
+- deja abierta la evolución futura hacia APIs o microservicios si el producto crece.
+
+* 2. Objetivos del sistema
+
+** 2.1 Objetivo general
+
+Construir una plataforma segura, mantenible y extensible para la administración integral de una logia
+masónica, centralizando la gestión de hermanos, cuotas, documentación, correspondencia, trabajos
+académicos y contenidos institucionales.
+
+** 2.2 Objetivos específicos
+
+- Disponer de un portal público moderno, sobrio e institucional.
+- Digitalizar el cuadro logial y el historial administrativo de cada hermano.
+- Gestionar cuotas logiales, estados de pago, cargos, descuentos y registros contables básicos.
+- Mantener actas, correspondencia oficial y documentos con control de acceso.
+- Administrar trabajos masónicos, planchas, revisiones, avances y presentaciones.
+- Implementar trazabilidad, auditoría y protección de datos sensibles.
+- Dejar el sistema preparado para crecimiento funcional y multi-logia en el futuro.
+
+* 3. Decisión arquitectónica
+
+** 3.1 Stack base recomendado
+
+- *Backend principal:* Ruby on Rails
+- *Base de datos:* PostgreSQL
+- *Frontend web:* Hotwire (Turbo + Stimulus) + Tailwind CSS
+- *Renderizado principal:* server-side rendering con mejoras progresivas
+- *Autenticación:* sesión web tradicional
+- *Autorización:* policies por rol y módulo
+- *Archivos adjuntos:* almacenamiento mediante Active Storage
+- *Jobs asíncronos:* Active Job
+- *Correo:* Action Mailer
+- *Procesamiento de correo entrante futuro:* Action Mailbox
+- *Contenerización:* Docker + Docker Compose
+
+** 3.2 Enfoque de frontend recomendado
+
+Se recomienda *NO separar* el frontend público en un proyecto JavaScript independiente en la V1.
+La mejor relación entre velocidad, mantenibilidad y experiencia de usuario la entrega:
+
+- Rails como aplicación principal
+- vistas server-rendered
+- Turbo para navegación fluida
+- Stimulus para interacciones ricas
+- Tailwind CSS para diseño moderno, responsivo y consistente
+
+Esto evita complejidad innecesaria como:
+
+- duplicación de autenticación entre frontend y backend
+- CORS
+- dos pipelines distintos
+- divergencia entre portal público y backoffice
+- sobrecosto cognitivo y operativo
+
+** 3.3 Patrón de aplicación
+
+Se propone un *Monolito Modular* con separación clara por dominios:
+
+- Public
+- Authentication
+- Backoffice
+- Lodge Registry
+- Treasury
+- Secretariat
+- Masonic Works
+- Administration
+- Shared/Audit
+
+Cada módulo tendrá:
+
+- modelos
+- controladores
+- servicios
+- policies
+- formularios
+- consultas
+- vistas
+- jobs
+- adjuntos
+- auditoría
+
+* 4. Alcance funcional de la V1
+
+** 4.1 Portal público
+
+El portal público debe incluir:
+
+*** Inicio
+- presentación institucional
+- mensaje de bienvenida
+- destacados
+- acceso visible a inicio de sesión
+- noticias o publicaciones destacadas opcionales
+
+*** Sobre nosotros
+- historia de la logia
+- principios
+- misión y visión
+- autoridades o cuadro resumido visible según decisión institucional
+- símbolos o imágenes institucionales autorizadas
+
+*** Contacto
+- formulario de contacto
+- correo institucional
+- teléfono
+- dirección o referencia geográfica si corresponde
+- redes sociales si existen
+
+*** Sobre el sistema de administración masónica
+- explicación general del propósito del sistema
+- beneficios administrativos
+- foco en orden, trazabilidad y resguardo documental
+- aclaración de que el acceso privado es restringido a usuarios autorizados
+
+*** Inicio de sesión
+- acceso a usuarios registrados
+- recuperación de contraseña
+- mensajes de seguridad
+- bloqueo temporal por intentos fallidos (recomendado)
+
+** 4.2 Backoffice
+
+El backoffice debe ser accesible solo a usuarios autenticados y autorizados.
+
+Módulos iniciales:
+
+*** Dashboard
+- indicadores resumidos
+- hermanos activos/inactivos
+- cuotas vencidas
+- pagos recientes
+- trabajos pendientes
+- correspondencia pendiente
+- actas recientes
+- alertas administrativas
+
+*** Cuadro logial
+Gestión integral de hermanos de la logia:
+
+- ficha completa del hermano
+- información personal y administrativa
+- estado actual en la logia
+- grado
+- fecha de iniciación
+- fechas de ascenso
+- cargos u oficios ejercidos
+- observaciones restringidas
+- historial documental
+- adjuntos
+- contactos de emergencia
+- pertenencia a comisiones
+- estado de regularidad
+
+*** Tesorería
+- definición de cuotas
+- periodicidad
+- registro de pagos
+- deuda vigente
+- condonaciones o ajustes
+- recibos
+- observaciones
+- estado financiero individual por hermano
+- reportes por período
+- reporte de morosidad
+- exportaciones administrativas
+
+*** Secretaría
+- gestión de actas
+- gestión de correspondencia enviada
+- gestión de correspondencia recibida
+- almacenamiento documental
+- clasificación por tipo
+- folio o numeración
+- estado del documento
+- visibilidad y permisos
+- adjuntos y versiones
+
+*** Trabajos masónicos
+- creación y seguimiento de trabajos
+- planchas
+- asignaciones
+- tutor o revisor
+- estado de avance
+- observaciones
+- fecha de presentación
+- historial de revisiones
+- archivos adjuntos
+- clasificación por grado, tema y período
+
+*** Administración
+- usuarios
+- roles
+- permisos
+- bitácora de auditoría
+- parámetros del sistema
+- configuración del portal público
+- categorías y catálogos
+
+* 5. Roles y control de acceso
+
+** 5.1 Roles iniciales sugeridos
+
+- *Superadmin*
+  - control total del sistema
+
+- *Administrador logial*
+  - administración operativa general
+  - gestión del cuadro logial
+  - configuración funcional
+
+- *Secretario*
+  - actas
+  - correspondencia
+  - documentación institucional
+
+- *Tesorero*
+  - cuotas
+  - pagos
+  - reportes financieros
+
+- *Director de estudios / encargado de trabajos*
+  - control de trabajos masónicos
+  - revisión y seguimiento
+
+- *Usuario hermano*
+  - acceso restringido a su propio perfil
+  - consulta de su estado de pagos
+  - consulta de trabajos asignados o propios
+  - descarga de ciertos documentos habilitados
+
+- *Auditor / consulta*
+  - solo lectura sobre módulos específicos
+
+** 5.2 Política de autorización
+
+La autorización debe ser por combinación de:
+
+- rol global
+- permisos por módulo
+- permisos por acción
+- alcance por registro
+
+Ejemplos:
+
+- un hermano común no debe ver fichas completas de otros hermanos;
+- tesorería puede ver datos financieros, pero no necesariamente observaciones privadas de secretaría;
+- secretaría puede ver y editar actas, pero no modificar cuotas;
+- dirección de estudios puede ver trabajos y estados académicos, no toda la información civil sensible.
+
+* 6. Requerimientos de seguridad y privacidad
+
+Dado que el sistema manejará información sensible y de carácter reservado, la seguridad es una prioridad de diseño.
+
+** 6.1 Principios
+
+- mínimo privilegio
+- necesidad de saber
+- segmentación por rol
+- cifrado de datos sensibles
+- trazabilidad completa
+- respaldo y recuperación
+- no exponer información privada en el portal público
+- protección de archivos adjuntos
+- sesiones seguras
+- políticas de retención
+
+** 6.2 Datos sensibles a proteger especialmente
+
+- RUT o identificador nacional
+- domicilio
+- teléfonos
+- correos personales
+- fecha de nacimiento
+- estado civil
+- antecedentes familiares
+- observaciones privadas
+- información económica individual
+- archivos reservados
+- datos de emergencia
+- información bancaria, solo si realmente es indispensable
+
+** 6.3 Recomendaciones técnicas de seguridad
+
+- cifrar atributos sensibles a nivel de aplicación
+- separar claramente datos públicos y datos privados
+- implementar auditoría de accesos y cambios
+- usar HTTPS en todos los ambientes no locales
+- usar cookies seguras, httpOnly y sameSite
+- política de contraseñas robustas
+- recuperación de contraseña controlada
+- bloqueo temporal ante intentos fallidos
+- expiración de sesión por inactividad
+- filtrado de parámetros sensibles en logs
+- protección CSRF
+- validaciones de autorización en controlador y policy
+- copias de seguridad cifradas
+- control de acceso a archivos mediante autorización, no por URL pública
+
+** 6.4 Decisión sobre minimización de datos
+
+Aunque el sistema pueda soportar muchos campos, la recomendación es almacenar únicamente la información
+realmente necesaria para la operación de la logia. En particular, los *datos bancarios* no deberían ser
+parte de la V1 salvo que exista una necesidad institucional clara y aprobación explícita.
+
+* 7. Modelo conceptual del dominio
+
+** 7.1 Entidades núcleo recomendadas
+
+*** Lodge
+Representa la logia.
+Campos sugeridos:
+- name
+- number
+- orient
+- rite
+- jurisdiction
+- legal_name
+- public_email
+- public_phone
+- address
+- description
+- active
+
+*** User
+Cuenta de acceso al sistema.
+Campos:
+- email
+- password_digest
+- active
+- last_sign_in_at
+- failed_attempts
+- locked_at
+- brother_id (opcional)
+- locale
+- time_zone
+
+*** Role
+Rol del usuario.
+Campos:
+- key
+- name
+- description
+
+*** UserRole
+Relación N:N entre usuarios y roles.
+
+*** Brother
+Entidad central del cuadro logial.
+Campos sugeridos:
+- lodge_id
+- registry_number
+- symbolic_name
+- first_name
+- last_name
+- national_id
+- birth_date
+- marital_status
+- profession
+- employer
+- email
+- phone
+- mobile_phone
+- address
+- city
+- emergency_contact_name
+- emergency_contact_phone
+- spouse_name
+- father_name
+- mother_name
+- initiation_date
+- exaltation_date
+- raising_date
+- current_degree_id
+- membership_status
+- status_since
+- notes_private
+- deceased_at
+- active
+
+*** Degree
+Catálogo de grados.
+Campos:
+- key
+- name
+- rank_order
+
+*** BrotherDegreeHistory
+Historial de evolución de grado.
+Campos:
+- brother_id
+- degree_id
+- ceremony_date
+- notes
+
+*** Office
+Cargos logiales.
+Campos:
+- key
+- name
+- description
+
+*** BrotherOfficeAssignment
+Asignación histórica de cargos.
+Campos:
+- brother_id
+- office_id
+- start_date
+- end_date
+- notes
+
+*** DuesPlan
+Definición de cuota.
+Campos:
+- lodge_id
+- name
+- description
+- amount
+- currency
+- periodicity
+- active
+- starts_on
+- ends_on
+
+*** Charge
+Cargo generado a un hermano.
+Campos:
+- brother_id
+- dues_plan_id
+- period_year
+- period_month
+- amount
+- due_on
+- status
+- notes
+
+*** Payment
+Pago registrado.
+Campos:
+- brother_id
+- paid_on
+- amount
+- currency
+- payment_method
+- reference
+- received_by_user_id
+- notes
+
+*** PaymentAllocation
+Aplicación del pago a uno o más cargos.
+Campos:
+- payment_id
+- charge_id
+- applied_amount
+
+*** Receipt
+Comprobante de pago.
+Campos:
+- payment_id
+- receipt_number
+- issued_on
+- status
+
+*** MinuteBook
+Libro o clasificación de actas.
+Campos:
+- lodge_id
+- name
+- year
+- active
+
+*** Minute
+Acta.
+Campos:
+- minute_book_id
+- title
+- session_date
+- folio
+- summary
+- body
+- status
+- visibility
+- created_by_user_id
+- approved_at
+
+*** Correspondence
+Correspondencia institucional.
+Campos:
+- lodge_id
+- direction (incoming/outgoing)
+- document_type
+- folio
+- subject
+- sender_name
+- recipient_name
+- sent_on
+- received_on
+- status
+- summary
+- body
+- confidentiality_level
+- created_by_user_id
+
+*** MasonicWork
+Trabajo masónico o plancha.
+Campos:
+- lodge_id
+- brother_id
+- title
+- topic
+- degree_id
+- status
+- assigned_on
+- due_on
+- presented_on
+- reviewer_user_id
+- abstract
+- body
+- private_notes
+
+*** WorkReview
+Revisión o retroalimentación de un trabajo.
+Campos:
+- masonic_work_id
+- reviewer_user_id
+- reviewed_on
+- status
+- comments
+
+*** Attachment
+Adjuntos documentales.
+Campos:
+- attachable_type
+- attachable_id
+- category
+- visibility
+- uploaded_by_user_id
+
+*** AuditLog
+Bitácora de auditoría.
+Campos:
+- user_id
+- action
+- auditable_type
+- auditable_id
+- metadata
+- ip_address
+- user_agent
+- created_at
+
+*** PublicPage
+Páginas administrables del portal público.
+Campos:
+- slug
+- title
+- body
+- published
+- published_at
+- seo_title
+- seo_description
+
+*** ContactMessage
+Mensajes enviados desde el formulario de contacto.
+Campos:
+- name
+- email
+- phone
+- subject
+- message
+- status
+- handled_by_user_id
+
+** 7.2 Consideración de extensibilidad
+
+Aunque la primera versión puede operar para una sola logia, es recomendable incluir *lodge_id*
+en las entidades de negocio desde el principio. Esto deja preparada la base para:
+
+- múltiples logias en el futuro;
+- segregación lógica de datos;
+- reportes por logia;
+- evolución posterior a un producto multi-tenant.
+
+* 8. Diseño funcional por módulo
+
+** 8.1 Cuadro logial
+
+*** Casos de uso principales
+- registrar hermano
+- editar ficha del hermano
+- consultar ficha
+- registrar iniciación y ascensos
+- asignar grado actual
+- registrar cargos históricos
+- asociar documentos
+- consultar historial completo
+- desactivar o marcar retiro/fallecimiento
+- exportar listados
+
+*** Vista principal
+- tabla filtrable por nombre, grado, estado, cargo, antigüedad
+- búsqueda rápida
+- filtros avanzados
+- acceso a ficha individual
+
+*** Ficha individual del hermano
+Secciones sugeridas:
+- información general
+- antecedentes civiles
+- antecedentes logiales
+- grado e historial
+- cargos desempeñados
+- estado económico resumido
+- documentos asociados
+- observaciones privadas
+- auditoría de cambios
+
+** 8.2 Tesorería
+
+*** Casos de uso
+- definir plan de cuotas
+- generar cargos periódicos
+- registrar pago manual
+- imputar pago a períodos
+- emitir comprobante
+- consultar deuda por hermano
+- reportar morosidad
+- reportar recaudación por período
+- registrar observaciones
+
+*** Reglas funcionales
+- un pago puede cubrir uno o varios cargos
+- un cargo puede quedar parcial o totalmente pagado
+- debe existir historial de quién registró el pago
+- los ajustes deben ser auditables
+- toda anulación debe quedar trazada
+
+** 8.3 Secretaría
+
+*** Casos de uso
+- redactar acta
+- adjuntar documento
+- clasificar acta
+- registrar correspondencia recibida
+- registrar correspondencia enviada
+- marcar estado de respuesta
+- controlar visibilidad por confidencialidad
+- buscar por folio, fecha, tipo o asunto
+
+*** Reglas
+- actas y correspondencia deben soportar adjuntos
+- los documentos confidenciales no deben ser accesibles por usuarios no autorizados
+- se debe conservar historial de edición y publicación
+
+** 8.4 Trabajos masónicos
+
+*** Casos de uso
+- asignar trabajo a hermano
+- subir borrador
+- revisar y comentar
+- aprobar o devolver
+- programar presentación
+- adjuntar versión final
+- consultar historial académico
+
+*** Reglas
+- cada trabajo tiene responsable, estado y grado asociado
+- deben existir fechas clave
+- debe soportar múltiples revisiones
+- un hermano puede ver solo sus trabajos salvo permisos especiales
+
+* 9. Experiencia de usuario y estilo visual
+
+** 9.1 Portal público
+
+El portal debe proyectar una estética:
+
+- sobria
+- elegante
+- institucional
+- moderna
+- responsiva
+- accesible
+
+Características:
+- hero principal en inicio
+- cards o bloques informativos
+- navegación clara
+- formulario de contacto simple
+- versión móvil bien resuelta
+- carga rápida
+- tipografía seria y limpia
+- paleta de colores discreta
+
+** 9.2 Backoffice
+
+Debe priorizar:
+
+- claridad
+- densidad informativa controlada
+- formularios bien estructurados
+- filtros efectivos
+- tablas robustas
+- breadcrumbs
+- acciones visibles según permisos
+- mensajes de validación comprensibles
+
+* 10. Estructura lógica del proyecto Rails
+
+** 10.1 Organización sugerida
+
+#+begin_example
+app/
+  controllers/
+    public/
+      home_controller.rb
+      about_controller.rb
+      contact_controller.rb
+      system_controller.rb
+      sessions_controller.rb
+    backoffice/
+      dashboard_controller.rb
+      brothers_controller.rb
+      dues_plans_controller.rb
+      charges_controller.rb
+      payments_controller.rb
+      minutes_controller.rb
+      correspondences_controller.rb
+      masonic_works_controller.rb
+      users_controller.rb
+      roles_controller.rb
+      settings_controller.rb
+
+  models/
+    lodge.rb
+    user.rb
+    role.rb
+    user_role.rb
+    brother.rb
+    degree.rb
+    brother_degree_history.rb
+    office.rb
+    brother_office_assignment.rb
+    dues_plan.rb
+    charge.rb
+    payment.rb
+    payment_allocation.rb
+    receipt.rb
+    minute_book.rb
+    minute.rb
+    correspondence.rb
+    masonic_work.rb
+    work_review.rb
+    public_page.rb
+    contact_message.rb
+    audit_log.rb
+
+  policies/
+    application_policy.rb
+    brother_policy.rb
+    payment_policy.rb
+    minute_policy.rb
+    correspondence_policy.rb
+    masonic_work_policy.rb
+    user_policy.rb
+
+  services/
+    brothers/
+    treasury/
+    secretariat/
+    masonic_works/
+    public_site/
+    security/
+
+  jobs/
+    notifications/
+    treasury/
+    secretariat/
+
+  views/
+    public/
+    backoffice/
+
+  helpers/
+  forms/
+  queries/
+  presenters/
+
+config/
+  routes.rb
+  locales/
+  initializers/
+
+db/
+  migrate/
+  seeds.rb
+
+storage/
+tmp/
+docker/
+#+end_example
+
+** 10.2 Namespacing de rutas
+
+#+begin_example
+/
+ /sobre-nosotros
+ /contacto
+ /sobre-el-sistema
+ /iniciar-sesion
+
+ /backoffice
+ /backoffice/cuadro-logial
+ /backoffice/tesoreria
+ /backoffice/secretaria
+ /backoffice/trabajos
+ /backoffice/administracion
+#+end_example
+
+* 11. Diseño de base de datos
+
+** 11.1 Convenciones
+
+- claves primarias estándar
+- foreign keys explícitas
+- índices en campos de búsqueda
+- timestamps en todas las tablas
+- soft-delete o desactivación lógica en entidades sensibles
+- constraints de integridad
+- catálogos normalizados
+- auditoría para operaciones críticas
+
+** 11.2 Índices recomendados
+
+- brothers on registry_number
+- brothers on symbolic_name
+- brothers on current_degree_id
+- brothers on membership_status
+- users on email
+- charges on brother_id + status + due_on
+- payments on brother_id + paid_on
+- correspondences on folio
+- minutes on session_date
+- masonic_works on brother_id + status
+
+** 11.3 Estrategia de cifrado
+
+Los atributos especialmente sensibles deben cifrarse a nivel de aplicación.
+Se recomienda:
+
+- cifrado determinístico para campos que requieran búsqueda exacta controlada
+- cifrado no determinístico para campos altamente sensibles no buscables
+- filtrado de logs para estos parámetros
+- separación entre credenciales, claves y datos operativos
+
+* 12. Flujos clave del sistema
+
+** 12.1 Registro de hermano
+1. administrador crea ficha
+2. asigna estado inicial
+3. registra grado y fecha de iniciación
+4. adjunta documentos si corresponde
+5. opcionalmente crea usuario asociado
+
+** 12.2 Registro de pago
+1. tesorero busca hermano
+2. visualiza deuda vigente
+3. registra pago
+4. imputa a uno o varios cargos
+5. emite comprobante
+6. sistema registra auditoría
+
+** 12.3 Gestión de acta
+1. secretario crea borrador
+2. redacta contenido
+3. adjunta archivos
+4. cambia estado
+5. publica internamente según permisos
+
+** 12.4 Flujo de trabajo masónico
+1. director de estudios asigna trabajo
+2. hermano sube borrador
+3. revisor comenta
+4. hermano corrige
+5. trabajo se aprueba o agenda presentación
+6. versión final queda archivada
+
+* 13. Contenerización
+
+** 13.1 Objetivo
+
+Asegurar consistencia entre ambientes de desarrollo y despliegue,
+facilitando levantamiento local, pruebas y evolución posterior a staging/producción.
+
+** 13.2 Servicios mínimos en Docker Compose
+
+*** web
+Servicio principal Rails:
+- servidor Puma
+- aplicación web
+- render del portal y backoffice
+
+*** worker
+Proceso separado para jobs:
+- notificaciones
+- tareas periódicas
+- procesamiento documental futuro
+
+*** db
+Instancia PostgreSQL:
+- persistencia principal
+- volumen dedicado
+
+*** opcional futuro
+- reverse proxy
+- servicio SMTP de pruebas
+- almacenamiento compatible S3
+- observabilidad
+
+** 13.3 Volúmenes recomendados
+
+- postgres_data
+- bundle_cache
+- storage_data
+- tmp_data
+
+** 13.4 Variables de entorno mínimas
+
+- RAILS_ENV
+- DATABASE_URL
+- POSTGRES_DB
+- POSTGRES_USER
+- POSTGRES_PASSWORD
+- RAILS_MASTER_KEY
+- SECRET_KEY_BASE
+- APP_HOST
+- SMTP_ADDRESS
+- SMTP_PORT
+- SMTP_USERNAME
+- SMTP_PASSWORD
+- ACTIVE_STORAGE_SERVICE
+
+** 13.5 Dockerfile: lineamientos
+
+- imagen base oficial de Ruby
+- instalación de dependencias del sistema
+- instalación de gems
+- caché de Bundler
+- usuario no root en tiempo de ejecución
+- precompilación de assets para producción
+- entrypoint para preparar base de datos y arrancar servicio
+- imagen lo más liviana posible
+
+** 13.6 docker-compose.yml: lineamientos
+
+- levantar app + db + worker
+- dependencias explícitas
+- healthchecks
+- redes internas
+- puertos expuestos solo cuando corresponda
+- persistencia con volúmenes
+- uso de archivo .env para configuración local
+
+* 14. Estrategia de ambientes
+
+** 14.1 Ambientes mínimos
+
+- development
+- test
+- staging
+- production
+
+** 14.2 Reglas
+
+- nunca usar credenciales hardcoded
+- secretos por variables de entorno
+- migraciones versionadas
+- backups periódicos en ambientes persistentes
+- archivos de entorno separados
+- logs con sanitización
+
+* 15. Roadmap técnico sugerido
+
+** Fase 0 — Fundación
+- crear proyecto Rails
+- configurar PostgreSQL
+- configurar autenticación
+- configurar autorización
+- configurar layout base
+- configurar Dockerfile y Compose
+- crear estructura de módulos
+- definir seeds mínimos
+
+** Fase 1 — Portal público
+- menú principal
+- páginas públicas
+- formulario de contacto
+- inicio de sesión
+- diseño visual institucional
+
+** Fase 2 — Cuadro logial
+- CRUD de hermanos
+- grados
+- cargos
+- historial
+- documentos
+- filtros y búsquedas
+
+** Fase 3 — Tesorería
+- planes de cuota
+- cargos
+- pagos
+- imputación
+- recibos
+- reportes básicos
+
+** Fase 4 — Secretaría
+- actas
+- correspondencia
+- adjuntos
+- permisos documentales
+
+** Fase 5 — Trabajos masónicos
+- asignación
+- seguimiento
+- revisiones
+- presentación
+- historial
+
+** Fase 6 — Hardening
+- auditoría
+- cifrado
+- controles de acceso refinados
+- backups
+- monitoreo
+- mejoras de rendimiento
+
+* 16. Riesgos y decisiones importantes
+
+** 16.1 Riesgos
+- sobrecargar la V1 con demasiados campos y procesos
+- almacenar datos innecesariamente sensibles
+- no definir bien permisos por rol
+- mezclar contenidos públicos con privados
+- dejar documentos privados accesibles por URL
+
+** 16.2 Decisiones recomendadas
+- comenzar con una sola logia, pero modelo preparado para varias
+- priorizar seguridad antes que complejidad visual
+- evitar arquitectura distribuida en la V1
+- dejar pagos externos como integración futura
+- construir auditoría desde el inicio
+- separar contenido público editable del núcleo transaccional
+
+* 17. Definición de éxito de la V1
+
+La V1 será exitosa si permite:
+
+- publicar un portal institucional moderno y estable;
+- autenticar usuarios de forma segura;
+- mantener el cuadro logial completo y trazable;
+- registrar cuotas y pagos con consistencia;
+- administrar actas y correspondencia con control de acceso;
+- gestionar trabajos masónicos con seguimiento claro;
+- operar localmente mediante Docker Compose;
+- evolucionar sin rediseño total de la arquitectura.
+
+* 18. Siguiente entregable técnico recomendado
+
+Con este contexto aprobado, el siguiente paso natural es producir:
+
+1. estructura inicial del repositorio;
+2. árbol de directorios Rails;
+3. modelo de datos inicial;
+4. rutas base;
+5. Dockerfile;
+6. docker-compose.yml;
+7. backlog técnico priorizado para el Sprint 1.

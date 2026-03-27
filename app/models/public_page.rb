@@ -1,0 +1,2 @@
+class PublicPage < ApplicationRecord
+end

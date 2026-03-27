@@ -1,0 +1,2 @@
+class MasonicWork < ApplicationRecord
+end

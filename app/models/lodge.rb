@@ -1,0 +1,2 @@
+class Lodge < ApplicationRecord
+end

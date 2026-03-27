@@ -1,0 +1,8 @@
+{
+  "name": "masonic-lodge-manager",
+  "private": true,
+  "scripts": {
+    "build": "echo \"No JavaScript build configured\"",
+    "build:css": "echo \"No CSS build configured\""
+  }
+}

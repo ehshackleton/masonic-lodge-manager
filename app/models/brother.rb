@@ -1,0 +1,2 @@
+class Brother < ApplicationRecord
+end
