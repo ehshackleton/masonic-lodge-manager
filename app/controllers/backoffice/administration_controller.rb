@@ -3,7 +3,8 @@ module Backoffice
     ROLE_MATRIX = {
       "Secretaria" => %w[secretario secretariat_manager minute_editor minute_approver correspondence_editor correspondence_approver],
       "Tesoreria" => %w[tesoreria_manager tesoreria_operator tesoreria_closer tesoreria_exporter],
-      "Trabajos" => %w[work_reviewer work_approver work_presenter work_archiver]
+      "Trabajos" => %w[work_reviewer work_approver work_presenter work_archiver],
+      "Hospitalario" => %w[hospitalario_manager hospitalario_operator hospitalario_exporter]
     }.freeze
     ROLE_TEMPLATES = {
       "secretario" => {
@@ -20,6 +21,10 @@ module Backoffice
       "revisor" => {
         name: "Plantilla Revisor",
         role_keys: %w[work_reviewer]
+      },
+      "hospitalario" => {
+        name: "Plantilla Hospitalario",
+        role_keys: %w[hospitalario_manager hospitalario_operator hospitalario_exporter]
       }
     }.freeze
     MANAGEABLE_ROLE_KEYS = ROLE_MATRIX.values.flatten.freeze

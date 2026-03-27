@@ -1,0 +1,192 @@
+<% content_for :title, "Hospitalario | Backoffice" %>
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-bold text-zinc-100">Saco Hospitalario</h1>
+    <div class="flex gap-2">
+      <a href="/backoffice/hospitalario/export/excel?from=<%= ERB::Util.url_encode(@from.to_s) %>&to=<%= ERB::Util.url_encode(@to.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar Excel</a>
+      <a href="/backoffice/hospitalario/export/pdf?from=<%= ERB::Util.url_encode(@from.to_s) %>&to=<%= ERB::Util.url_encode(@to.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar PDF</a>
+    </div>
+  </div>
+
+  <%= form_with url: "/backoffice/hospitalario", method: :get, class: "mt-4 grid gap-3 md:grid-cols-2" do %>
+    <%= date_field_tag :from, @from, class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    <%= date_field_tag :to, @to, class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  <% end %>
+
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Balance actual</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= number_to_currency(@balance, unit: "$", precision: 0) %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Ingresos del periodo</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= number_to_currency(@total_income, unit: "$", precision: 0) %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Egresos del periodo</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= number_to_currency(@total_expense, unit: "$", precision: 0) %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Pagos de defuncion</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= @death_benefits_count %></p>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-3">
+    <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <h2 class="text-lg font-semibold text-zinc-100">Configuracion del fondo</h2>
+      <%= form_with url: "/backoffice/hospitalario/settings", method: :post, class: "mt-4 space-y-3" do %>
+        <%= number_field_tag "hospital_fund_setting[contribution_amount]", @hospital_setting.contribution_amount, step: "0.01", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Aporte sugerido por hermano" %>
+        <%= number_field_tag "hospital_fund_setting[death_benefit_amount]", @hospital_setting.death_benefit_amount, step: "0.01", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Monto de fondo por defuncion" %>
+        <%= text_field_tag "hospital_fund_setting[currency]", @hospital_setting.currency, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Moneda" %>
+        <label class="inline-flex items-center gap-2 text-zinc-300">
+          <%= check_box_tag "hospital_fund_setting[active]", "1", @hospital_setting.active, class: "rounded border-zinc-700 bg-zinc-900 text-amber-300" %>
+          Fondo activo
+        </label>
+        <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Guardar configuracion</button>
+      <% end %>
+    </section>
+
+    <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <h2 class="text-lg font-semibold text-zinc-100">Generacion masiva mensual</h2>
+      <p class="mt-2 text-sm text-zinc-400">Genera aportes para todos los hermanos activos del periodo seleccionado.</p>
+      <%= form_with url: "/backoffice/hospitalario/generate-contributions", method: :post, class: "mt-4 space-y-3" do %>
+        <%= month_field_tag :period, Date.current.strftime("%Y-%m"), class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        <p class="text-xs text-zinc-500">Monto por hermano: <%= number_to_currency(@hospital_setting.contribution_amount, unit: "$", precision: 0) %></p>
+        <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Generar aportes del mes</button>
+      <% end %>
+    </section>
+
+    <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <h2 class="text-lg font-semibold text-zinc-100">Registrar aporte</h2>
+      <%= form_with url: "/backoffice/hospitalario/contributions", method: :post, class: "mt-4 space-y-3" do %>
+        <%= date_field_tag :occurred_on, Date.current, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        <%= number_field_tag :amount, @hospital_setting.contribution_amount, step: "0.01", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Monto aporte" %>
+        <%= text_field_tag :reference, "", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Referencia (ej: aporte mensual marzo)" %>
+        <%= text_area_tag :notes, "", rows: 3, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Notas" %>
+        <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Registrar aporte</button>
+      <% end %>
+    </section>
+
+    <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <h2 class="text-lg font-semibold text-zinc-100">Pago fondo defuncion</h2>
+      <%= form_with url: "/backoffice/hospitalario/death-benefits", method: :post, class: "mt-4 space-y-3" do %>
+        <%= select_tag :brother_id, options_for_select(@deceased_brothers.map { |b| [b.full_name, b.id] }), include_blank: "Seleccionar hermano fallecido", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        <%= date_field_tag :occurred_on, Date.current, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        <%= number_field_tag :amount, @hospital_setting.death_benefit_amount, step: "0.01", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Monto a pagar" %>
+        <%= text_field_tag :reference, "", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Referencia del pago" %>
+        <%= text_area_tag :notes, "", rows: 3, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Notas del pago" %>
+        <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Registrar pago</button>
+      <% end %>
+    </section>
+  </div>
+
+  <section class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+    <h2 class="text-lg font-semibold text-zinc-100">Ajuste manual del fondo</h2>
+    <%= form_with url: "/backoffice/hospitalario/adjustments", method: :post, class: "mt-4 grid gap-3 md:grid-cols-5" do %>
+      <%= select_tag :entry_type, options_for_select([["Ingreso", "income"], ["Egreso", "expense"]]), class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+      <%= date_field_tag :occurred_on, Date.current, class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+      <%= number_field_tag :amount, nil, step: "0.01", class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Monto ajuste" %>
+      <%= text_field_tag :reference, "", class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Referencia" %>
+      <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Registrar ajuste</button>
+      <%= text_area_tag :notes, "", rows: 2, class: "md:col-span-5 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100", placeholder: "Notas del ajuste" %>
+    <% end %>
+  </section>
+
+  <section class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-lg font-semibold text-zinc-100">Cobertura mensual de aportes</h2>
+      <div class="flex flex-wrap items-center gap-2">
+        <%= form_with url: "/backoffice/hospitalario", method: :get, class: "flex items-center gap-2" do %>
+          <%= hidden_field_tag :from, @from %>
+          <%= hidden_field_tag :to, @to %>
+          <%= month_field_tag :coverage_period, @coverage_month.strftime("%Y-%m"), class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+          <%= select_tag :coverage_filter, options_for_select([["Todos", "all"], ["Solo aportantes", "contributed"], ["Solo pendientes", "pending"]], @coverage_filter), class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+          <button type="submit" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Actualizar cobertura</button>
+        <% end %>
+        <a href="/backoffice/hospitalario/export/cobertura/excel?coverage_period=<%= ERB::Util.url_encode(@coverage_month.to_s) %>&coverage_filter=<%= ERB::Util.url_encode(@coverage_filter.to_s) %>&from=<%= ERB::Util.url_encode(@from.to_s) %>&to=<%= ERB::Util.url_encode(@to.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Cobertura Excel</a>
+        <a href="/backoffice/hospitalario/export/cobertura/pdf?coverage_period=<%= ERB::Util.url_encode(@coverage_month.to_s) %>&coverage_filter=<%= ERB::Util.url_encode(@coverage_filter.to_s) %>&from=<%= ERB::Util.url_encode(@from.to_s) %>&to=<%= ERB::Util.url_encode(@to.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Cobertura PDF</a>
+      </div>
+    </div>
+    <p class="mt-2 text-sm text-zinc-400">Mes analizado: <%= @coverage_month.strftime("%m/%Y") %> | Cobertura: <%= @coverage_percentage %>% | Filtro: <%= @coverage_filter == "contributed" ? "Solo aportantes" : (@coverage_filter == "pending" ? "Solo pendientes" : "Todos") %></p>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-3">
+      <article class="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <p class="text-xs uppercase tracking-wide text-zinc-500">Hermanos activos</p>
+        <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= @coverage_total_active %></p>
+      </article>
+      <article class="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <p class="text-xs uppercase tracking-wide text-zinc-500">Aportaron</p>
+        <p class="mt-2 text-2xl font-semibold text-emerald-300"><%= @coverage_contributed_count %></p>
+      </article>
+      <article class="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <p class="text-xs uppercase tracking-wide text-zinc-500">Pendientes</p>
+        <p class="mt-2 text-2xl font-semibold text-amber-300"><%= @coverage_pending_count %></p>
+      </article>
+    </div>
+
+    <div class="mt-4 overflow-x-auto rounded-xl border border-zinc-800">
+      <table class="min-w-full divide-y divide-zinc-800 text-sm">
+        <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+          <tr>
+            <th class="px-4 py-3">Hermano</th>
+            <th class="px-4 py-3">Registro</th>
+            <th class="px-4 py-3">Estado aporte</th>
+            <th class="px-4 py-3">Monto aportado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800">
+          <% @coverage_rows.each do |row| %>
+            <tr>
+              <td class="px-4 py-3 text-zinc-200"><%= row[:brother].full_name %></td>
+              <td class="px-4 py-3 text-zinc-400"><%= row[:brother].registry_number %></td>
+              <td class="px-4 py-3">
+                <% if row[:contributed] %>
+                  <span class="rounded-full border border-emerald-800 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300">Aporto</span>
+                <% else %>
+                  <span class="rounded-full border border-amber-800 bg-amber-950/40 px-2 py-1 text-xs font-semibold text-amber-300">Pendiente</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-zinc-300"><%= number_to_currency(row[:contributed_amount], unit: "$", precision: 0) %></td>
+            </tr>
+          <% end %>
+          <% if @coverage_rows.empty? %>
+            <tr><td colspan="4" class="px-4 py-6 text-zinc-500">Sin hermanos activos para el reporte.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mt-6 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
+    <table class="min-w-full divide-y divide-zinc-800 text-sm">
+      <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+        <tr>
+          <th class="px-4 py-3">Fecha</th>
+          <th class="px-4 py-3">Tipo</th>
+          <th class="px-4 py-3">Categoria</th>
+          <th class="px-4 py-3">Hermano</th>
+          <th class="px-4 py-3">Monto</th>
+          <th class="px-4 py-3">Referencia</th>
+          <th class="px-4 py-3">Registrado por</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800">
+        <% @transactions.each do |tx| %>
+          <tr>
+            <td class="px-4 py-3 text-zinc-400"><%= tx.occurred_on %></td>
+            <td class="px-4 py-3 text-zinc-300"><%= tx.entry_type.humanize %></td>
+            <td class="px-4 py-3 text-zinc-300"><%= tx.category.humanize %></td>
+            <td class="px-4 py-3 text-zinc-300"><%= tx.brother&.full_name.presence || "-" %></td>
+            <td class="px-4 py-3 text-zinc-300"><%= number_to_currency(tx.amount, unit: "$", precision: 0) %></td>
+            <td class="px-4 py-3 text-zinc-400"><%= tx.reference.presence || "-" %></td>
+            <td class="px-4 py-3 text-zinc-400"><%= tx.recorded_by_user&.email.presence || "-" %></td>
+          </tr>
+        <% end %>
+        <% if @transactions.empty? %>
+          <tr><td colspan="7" class="px-4 py-6 text-zinc-500">Sin movimientos en el periodo.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</section>

@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :registered_payments, class_name: "Payment", foreign_key: :received_by_user_id, dependent: :nullify
   has_many :monthly_closures, class_name: "MonthlyClosure", foreign_key: :closed_by_user_id, dependent: :nullify
+  has_many :hospital_fund_transactions, class_name: "HospitalFundTransaction", foreign_key: :recorded_by_user_id, dependent: :nullify
   has_many :review_assigned_works, class_name: "MasonicWork", foreign_key: :reviewer_user_id, dependent: :nullify
   has_many :work_reviews, class_name: "WorkReview", foreign_key: :reviewer_user_id, dependent: :nullify
   has_many :user_roles, dependent: :destroy
@@ -51,6 +52,8 @@ class User < ApplicationRecord
       has_role?(:secretario) || has_role?(:secretariat_manager) || has_role?(:minute_editor) || has_role?(:minute_approver) || has_role?(:correspondence_editor) || has_role?(:correspondence_approver)
     when "treasury"
       has_role?(:tesoreria_manager) || has_role?(:tesoreria_operator) || has_role?(:tesoreria_closer) || has_role?(:tesoreria_exporter)
+    when "hospital"
+      has_role?(:hospitalario_manager) || has_role?(:hospitalario_operator) || has_role?(:hospitalario_exporter)
     else
       false
     end
@@ -96,6 +99,22 @@ class User < ApplicationRecord
 
   def can_manage_work_approval?
     can_manage_masonic_work_action?(:approve) && can_manage_masonic_work_action?(:archive)
+  end
+
+  def can_manage_hospital_action?(action)
+    key = action.to_s
+    return true if has_role?(:superadmin) || has_role?(:hospitalario_manager)
+
+    case key
+    when "read"
+      has_role?(:hospitalario_operator) || has_role?(:hospitalario_exporter)
+    when "operate"
+      has_role?(:hospitalario_operator)
+    when "export"
+      has_role?(:hospitalario_exporter)
+    else
+      false
+    end
   end
 
   private

@@ -7,6 +7,7 @@ class Brother < ApplicationRecord
   has_many :charges, dependent: :restrict_with_error
   has_many :payments, dependent: :restrict_with_error
   has_many :masonic_works, dependent: :restrict_with_error
+  has_many :hospital_fund_transactions, dependent: :nullify
   has_many_attached :documents
 
   enum :membership_status, {

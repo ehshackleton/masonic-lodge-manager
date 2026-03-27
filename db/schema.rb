@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -174,6 +174,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_110000) do
     t.integer "rank_order", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_degrees_on_key", unique: true
+  end
+
+  create_table "hospital_fund_settings", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.decimal "contribution_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "CLP", null: false
+    t.decimal "death_benefit_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.bigint "lodge_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lodge_id"], name: "index_hospital_fund_settings_on_lodge_id"
+  end
+
+  create_table "hospital_fund_transactions", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.bigint "brother_id"
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.string "entry_type", null: false
+    t.bigint "lodge_id", null: false
+    t.text "notes"
+    t.date "occurred_on", null: false
+    t.bigint "recorded_by_user_id"
+    t.string "reference"
+    t.datetime "updated_at", null: false
+    t.index ["brother_id"], name: "index_hospital_fund_transactions_on_brother_id"
+    t.index ["lodge_id", "category"], name: "index_hospital_fund_transactions_on_lodge_id_and_category"
+    t.index ["lodge_id", "entry_type"], name: "index_hospital_fund_transactions_on_lodge_id_and_entry_type"
+    t.index ["lodge_id", "occurred_on"], name: "index_hospital_fund_transactions_on_lodge_id_and_occurred_on"
+    t.index ["lodge_id"], name: "index_hospital_fund_transactions_on_lodge_id"
+    t.index ["recorded_by_user_id"], name: "index_hospital_fund_transactions_on_recorded_by_user_id"
   end
 
   create_table "ledger_entries", force: :cascade do |t|
@@ -377,6 +408,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_110000) do
   add_foreign_key "contact_messages", "users", column: "handled_by_user_id"
   add_foreign_key "correspondences", "lodges"
   add_foreign_key "correspondences", "users", column: "created_by_user_id"
+  add_foreign_key "hospital_fund_settings", "lodges"
+  add_foreign_key "hospital_fund_transactions", "brothers"
+  add_foreign_key "hospital_fund_transactions", "lodges"
+  add_foreign_key "hospital_fund_transactions", "users", column: "recorded_by_user_id"
   add_foreign_key "ledger_entries", "lodges"
   add_foreign_key "masonic_works", "brothers"
   add_foreign_key "masonic_works", "degrees"
