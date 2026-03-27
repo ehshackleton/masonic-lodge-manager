@@ -38,6 +38,7 @@ Rails.application.routes.draw do
     get "/secretaria", to: "secretariat#index"
     get "/trabajos", to: redirect("/backoffice/masonic_works")
     get "/administracion", to: "administration#index"
+    patch "/administracion/logia", to: "administration#update_lodge"
     patch "/administracion/usuarios/:id/roles", to: "administration#update_user_roles", as: :administration_user_roles
     patch "/administracion/usuarios/:id/roles-plantilla", to: "administration#apply_role_template", as: :administration_user_role_template
     resources :brothers do

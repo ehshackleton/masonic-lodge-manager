@@ -7,6 +7,31 @@
     </div>
   </div>
 
+  <section class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+    <h2 class="text-lg font-semibold text-zinc-100">Configuracion de la logia</h2>
+    <% if @lodge.present? %>
+      <%= form_with model: @lodge, url: "/backoffice/administracion/logia", method: :patch, class: "mt-4 grid gap-3 md:grid-cols-2" do |f| %>
+        <div class="md:col-span-2">
+          <%= f.label :name, "Nombre de la logia", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.text_field :name, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :anniversary_date, "Fecha de aniversario", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.date_field :anniversary_date, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div class="md:col-span-2">
+          <%= f.label :description, "Historia / descripcion", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.text_area :description, rows: 4, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div class="md:col-span-2">
+          <%= f.submit "Guardar configuracion", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="mt-3 text-sm text-zinc-500">No existe una logia para configurar.</p>
+    <% end %>
+  </section>
+
   <div class="mt-6 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
     <table class="min-w-full divide-y divide-zinc-800 text-sm">
       <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">

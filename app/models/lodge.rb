@@ -8,4 +8,5 @@ class Lodge < ApplicationRecord
   has_many :hospital_fund_transactions, dependent: :destroy
 
   validates :name, presence: true
+  validates :description, length: { maximum: 10_000 }, allow_blank: true
 end

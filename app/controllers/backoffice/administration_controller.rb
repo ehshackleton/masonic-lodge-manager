@@ -34,6 +34,7 @@ module Backoffice
     before_action :set_target_user, only: %i[update_user_roles apply_role_template]
 
     def index
+      @lodge = Lodge.first
       @users = User.includes(:roles).order(:email)
       @manageable_roles = Role.where(key: MANAGEABLE_ROLE_KEYS).order(:name)
       @role_matrix = ROLE_MATRIX.transform_values { |keys| @manageable_roles.select { |role| keys.include?(role.key) } }
@@ -42,6 +43,31 @@ module Backoffice
                                    .includes(:user)
                                    .order(created_at: :desc)
                                    .limit(20)
+    end
+
+    def update_lodge
+      @lodge = Lodge.first
+      unless @lodge
+        redirect_to "/backoffice/administracion", alert: "No existe una logia configurada."
+        return
+      end
+
+      if @lodge.update(lodge_params)
+        AuditLog.record!(
+          user: current_user,
+          action: "administration.lodge.update",
+          auditable: @lodge,
+          metadata: {
+            name: @lodge.name,
+            anniversary_date: @lodge.anniversary_date&.to_s
+          },
+          ip_address: request.remote_ip,
+          user_agent: request.user_agent
+        )
+        redirect_to "/backoffice/administracion", notice: "Configuracion de la logia actualizada."
+      else
+        redirect_to "/backoffice/administracion", alert: @lodge.errors.full_messages.to_sentence
+      end
     end
 
     def update_user_roles
@@ -120,6 +146,10 @@ module Backoffice
         user_agent: request.user_agent
       )
       redirect_to "/backoffice", alert: "No tienes permisos para administrar roles."
+    end
+
+    def lodge_params
+      params.require(:lodge).permit(:name, :description, :anniversary_date)
     end
   end
 end
