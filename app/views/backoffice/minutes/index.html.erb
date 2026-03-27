@@ -1,0 +1,26 @@
+<% content_for :title, "Actas | Secretaria" %>
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-bold text-zinc-100">Actas</h1>
+    <div class="flex gap-2">
+      <a href="/backoffice/minutes/export_excel?q=<%= ERB::Util.url_encode(@q.to_s) %>&status=<%= ERB::Util.url_encode(@status.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar Excel</a>
+      <a href="/backoffice/minutes/export_pdf?q=<%= ERB::Util.url_encode(@q.to_s) %>&status=<%= ERB::Util.url_encode(@status.to_s) %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar PDF</a>
+      <a href="/backoffice/minutes/new" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Nueva acta</a>
+    </div>
+  </div>
+  <%= form_with url: "/backoffice/minutes", method: :get, class: "mt-4 grid gap-3 md:grid-cols-3" do %>
+    <%= text_field_tag :q, @q, placeholder: "Buscar por titulo o folio", class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 md:col-span-2" %>
+    <%= select_tag :status, options_for_select([["Todos",""]] + Minute.statuses.keys.map{|k| [k.humanize,k]}, @status), class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  <% end %>
+  <div class="mt-4 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
+    <table class="min-w-full divide-y divide-zinc-800 text-sm">
+      <thead class="text-left text-xs uppercase tracking-wide text-zinc-500"><tr><th class="px-4 py-3">Fecha</th><th class="px-4 py-3">Titulo</th><th class="px-4 py-3">Folio</th><th class="px-4 py-3">Estado</th><th class="px-4 py-3">Visibilidad</th><th class="px-4 py-3"></th></tr></thead>
+      <tbody class="divide-y divide-zinc-800">
+      <% @minutes.each do |m| %>
+        <tr><td class="px-4 py-3 text-zinc-400"><%= m.session_date %></td><td class="px-4 py-3 text-zinc-200"><%= m.title %></td><td class="px-4 py-3 text-zinc-400"><%= m.folio.presence || '-' %></td><td class="px-4 py-3 text-zinc-300"><%= m.status.humanize %></td><td class="px-4 py-3 text-zinc-400"><%= m.visibility.humanize %></td><td class="px-4 py-3"><a class="text-amber-300 hover:underline" href="/backoffice/minutes/<%= m.id %>">Ver</a></td></tr>
+      <% end %>
+      <% if @minutes.empty? %><tr><td colspan="6" class="px-4 py-6 text-zinc-500">Sin actas.</td></tr><% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

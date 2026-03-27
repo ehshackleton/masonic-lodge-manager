@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     get "/tesoreria/export/pdf", to: "treasury#export_pdf"
     get "/tesoreria/export/morosidad/excel", to: "treasury#export_delinquency_excel"
     get "/tesoreria/export/morosidad/pdf", to: "treasury#export_delinquency_pdf"
-    get "/secretaria", to: "dashboard#secretariat"
+    get "/secretaria", to: "secretariat#index"
     get "/trabajos", to: "dashboard#works"
     get "/administracion", to: "dashboard#administration"
     resources :brothers do
@@ -32,6 +32,29 @@ Rails.application.routes.draw do
 
       resources :brother_degree_histories, only: %i[create destroy]
       resources :brother_office_assignments, only: %i[create destroy]
+    end
+    resources :minutes do
+      collection do
+        get :export_excel
+        get :export_pdf
+      end
+      member do
+        patch :submit_review
+        patch :approve
+        patch :publish
+      end
+    end
+
+    resources :correspondences do
+      collection do
+        get :export_excel
+        get :export_pdf
+      end
+      member do
+        patch :submit_review
+        patch :approve
+        patch :publish
+      end
     end
   end
 end

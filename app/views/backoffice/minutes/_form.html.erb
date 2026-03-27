@@ -1,0 +1,27 @@
+<% if @minute.errors.any? %>
+  <div class="mb-6 rounded-lg border border-amber-800 bg-amber-950/50 p-4 text-sm text-amber-300">
+    <ul class="list-disc pl-5">
+      <% @minute.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [:backoffice, @minute], class: "space-y-6" do |f| %>
+  <div class="rounded-xl border border-zinc-800 bg-zinc-900 p-6 grid gap-4 md:grid-cols-2">
+    <label class="text-sm text-zinc-400">Titulo<%= f.text_field :title, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400">Fecha de sesion<%= f.date_field :session_date, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400">Folio<%= f.text_field :folio, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <div class="text-sm text-zinc-400">
+      Estado actual
+      <div class="mt-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-zinc-200"><%= @minute.status.humanize %></div>
+    </div>
+    <label class="text-sm text-zinc-400 md:col-span-2">Visibilidad<%= f.select :visibility, Minute.visibilities.keys.map{|k| [k.humanize,k]}, {}, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400 md:col-span-2">Resumen<%= f.text_area :summary, rows: 3, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400 md:col-span-2">Cuerpo del acta<%= f.text_area :body, rows: 8, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400 md:col-span-2">Adjuntos<%= f.file_field :documents, multiple: true, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+  </div>
+  <div class="flex gap-2">
+    <%= f.submit(@minute.persisted? ? "Actualizar acta" : "Crear acta", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700") %>
+    <a href="/backoffice/minutes" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Cancelar</a>
+  </div>
+<% end %>

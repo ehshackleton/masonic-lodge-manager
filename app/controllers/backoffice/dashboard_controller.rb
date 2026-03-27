@@ -7,7 +7,9 @@ module Backoffice
     def treasury
       redirect_to "/backoffice/tesoreria"
     end
-    def secretariat; render :index; end
+    def secretariat
+      redirect_to "/backoffice/secretaria"
+    end
     def works; render :index; end
     def administration; render :index; end
   end

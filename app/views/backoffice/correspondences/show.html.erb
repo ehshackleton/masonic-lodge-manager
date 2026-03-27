@@ -1,0 +1,29 @@
+<% content_for :title, "Detalle correspondencia | Secretaria" %>
+<section class="mx-auto max-w-5xl px-6 py-10">
+  <div class="flex items-center justify-between gap-3">
+    <h1 class="text-3xl font-bold text-zinc-100"><%= @correspondence.subject %></h1>
+    <div class="flex flex-wrap gap-2">
+      <% if @correspondence.can_submit_review? %>
+        <%= button_to "Enviar a revision", submit_review_backoffice_correspondence_path(@correspondence), method: :patch, class: "rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300" %>
+      <% end %>
+      <% if @correspondence.can_approve? %>
+        <%= button_to "Aprobar", approve_backoffice_correspondence_path(@correspondence), method: :patch, class: "rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300" %>
+      <% end %>
+      <% if @correspondence.can_publish? %>
+        <%= button_to "Publicar", publish_backoffice_correspondence_path(@correspondence), method: :patch, class: "rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300" %>
+      <% end %>
+      <a href="/backoffice/correspondences/<%= @correspondence.id %>/edit" class="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200">Editar</a>
+      <a href="/backoffice/correspondences" class="rounded-lg bg-black px-3 py-2 text-sm text-white">Volver</a>
+    </div>
+  </div>
+  <article class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-sm text-zinc-300 space-y-2">
+    <p><strong class="text-zinc-100">Folio:</strong> <%= @correspondence.folio.presence || '-' %></p>
+    <p><strong class="text-zinc-100">Direccion:</strong> <%= @correspondence.direction.humanize %> - <strong class="text-zinc-100">Estado:</strong> <%= @correspondence.status.humanize %></p>
+    <p><strong class="text-zinc-100">Confidencialidad:</strong> <%= @correspondence.confidentiality_level.humanize %></p>
+    <p><strong class="text-zinc-100">Remitente:</strong> <%= @correspondence.sender_name.presence || '-' %></p>
+    <p><strong class="text-zinc-100">Destinatario:</strong> <%= @correspondence.recipient_name.presence || '-' %></p>
+    <p><strong class="text-zinc-100">Resumen:</strong> <%= @correspondence.summary.presence || '-' %></p>
+    <div><strong class="text-zinc-100">Cuerpo:</strong><p class="mt-2 whitespace-pre-wrap"><%= @correspondence.body.presence || '-' %></p></div>
+    <div><strong class="text-zinc-100">Adjuntos:</strong><ul class="mt-2 space-y-1"><% @correspondence.documents.each do |doc| %><li><a class="text-amber-300 hover:underline" href="<%= rails_blob_path(doc, disposition: 'attachment') %>"><%= doc.filename.to_s %></a></li><% end %><% if @correspondence.documents.empty? %><li class="text-zinc-500">Sin adjuntos.</li><% end %></ul></div>
+  </article>
+</section>

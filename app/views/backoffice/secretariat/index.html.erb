@@ -1,0 +1,63 @@
+<% content_for :title, "Secretaria | Sistema de Gestion Logial" %>
+
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">Secretaria</h1>
+      <p class="mt-1 text-sm text-zinc-400">Gestion de actas, correspondencia y documentacion institucional.</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="/backoffice/minutes/new" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Nueva acta</a>
+      <a href="/backoffice/correspondences/new" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Nueva correspondencia</a>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Actas en borrador</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= @draft_minutes %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Correspondencia pendiente</p>
+      <p class="mt-2 text-3xl font-semibold text-zinc-100"><%= @pending_correspondences %></p>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-2">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-zinc-100">Actas recientes</h2>
+        <a href="/backoffice/minutes" class="text-sm text-amber-300 hover:underline">Ver todas</a>
+      </div>
+      <div class="space-y-2 text-sm">
+        <% @minutes_recent.each do |minute| %>
+          <a href="/backoffice/minutes/<%= minute.id %>" class="block rounded-lg border border-zinc-800 p-3 hover:bg-zinc-800/60">
+            <p class="font-semibold text-zinc-200"><%= minute.title %></p>
+            <p class="text-zinc-500">Sesion: <%= minute.session_date %> - Estado: <%= minute.status.humanize %></p>
+          </a>
+        <% end %>
+        <% if @minutes_recent.empty? %>
+          <p class="text-zinc-500">Sin actas registradas.</p>
+        <% end %>
+      </div>
+    </article>
+
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-zinc-100">Correspondencia reciente</h2>
+        <a href="/backoffice/correspondences" class="text-sm text-amber-300 hover:underline">Ver todas</a>
+      </div>
+      <div class="space-y-2 text-sm">
+        <% @correspondences_recent.each do |c| %>
+          <a href="/backoffice/correspondences/<%= c.id %>" class="block rounded-lg border border-zinc-800 p-3 hover:bg-zinc-800/60">
+            <p class="font-semibold text-zinc-200"><%= c.subject %></p>
+            <p class="text-zinc-500">Folio: <%= c.folio.presence || '-' %> - <%= c.direction.humanize %> - <%= c.status.humanize %></p>
+          </a>
+        <% end %>
+        <% if @correspondences_recent.empty? %>
+          <p class="text-zinc-500">Sin correspondencia registrada.</p>
+        <% end %>
+      </div>
+    </article>
+  </div>
+</section>
