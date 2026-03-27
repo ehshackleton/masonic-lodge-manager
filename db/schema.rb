@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_043000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -352,6 +352,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_043000) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  create_table "work_reviews", force: :cascade do |t|
+    t.text "comments"
+    t.datetime "created_at", null: false
+    t.bigint "masonic_work_id", null: false
+    t.date "reviewed_on", null: false
+    t.bigint "reviewer_user_id", null: false
+    t.string "status", default: "commented", null: false
+    t.datetime "updated_at", null: false
+    t.index ["masonic_work_id"], name: "index_work_reviews_on_masonic_work_id"
+    t.index ["reviewer_user_id"], name: "index_work_reviews_on_reviewer_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "audit_logs", "users"
@@ -380,4 +392,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_043000) do
   add_foreign_key "treasury_settings", "lodges"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
+  add_foreign_key "work_reviews", "masonic_works"
+  add_foreign_key "work_reviews", "users", column: "reviewer_user_id"
 end

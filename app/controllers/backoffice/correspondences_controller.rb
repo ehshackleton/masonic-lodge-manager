@@ -3,6 +3,9 @@ module Backoffice
     before_action :require_authentication
     before_action :set_correspondence, only: %i[show edit update destroy submit_review approve publish]
     before_action :set_default_lodge, only: %i[new create]
+    before_action :authorize_correspondences_read_access!
+    before_action :authorize_correspondences_write_access!, only: %i[new create edit update destroy submit_review]
+    before_action :authorize_correspondences_approval_access!, only: %i[approve publish]
 
     def index
       @q = params[:q].to_s.strip
@@ -166,6 +169,38 @@ module Backoffice
 
     def invalid_workflow_transition
       redirect_to backoffice_correspondence_path(@correspondence), alert: "Transicion de workflow no permitida."
+    end
+
+    def authorize_correspondences_read_access!
+      return if current_user&.can_access_module?(:secretariat) && current_user&.can_manage_secretariat_action?(:correspondences_read)
+
+      audit_permission_denied("correspondences_read")
+      redirect_to "/backoffice", alert: "No tienes permisos para acceder al modulo de correspondencia."
+    end
+
+    def authorize_correspondences_write_access!
+      return if current_user&.can_manage_secretariat_action?(:correspondence_write)
+
+      audit_permission_denied("correspondence_write")
+      redirect_to "/backoffice/correspondences", alert: "No tienes permisos para crear/editar correspondencia."
+    end
+
+    def authorize_correspondences_approval_access!
+      return if current_user&.can_manage_secretariat_action?(:correspondence_approve)
+
+      audit_permission_denied("correspondence_approve")
+      redirect_to "/backoffice/correspondences", alert: "No tienes permisos para aprobar/publicar correspondencia."
+    end
+
+    def audit_permission_denied(denied_action)
+      AuditLog.record!(
+        user: current_user,
+        action: "permission.denied.secretariat.correspondence",
+        auditable: @correspondence || current_user,
+        metadata: { denied_action: denied_action, path: request.path, method: request.request_method },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
     end
   end
 end

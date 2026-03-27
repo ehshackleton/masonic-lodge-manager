@@ -6,6 +6,7 @@ class Brother < ApplicationRecord
   has_many :offices, through: :brother_office_assignments
   has_many :charges, dependent: :restrict_with_error
   has_many :payments, dependent: :restrict_with_error
+  has_many :masonic_works, dependent: :restrict_with_error
   has_many_attached :documents
 
   enum :membership_status, {

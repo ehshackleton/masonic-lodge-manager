@@ -1,6 +1,10 @@
 module Backoffice
   class TreasuryController < ApplicationController
     before_action :require_authentication
+    before_action :authorize_treasury_read_access!
+    before_action :authorize_treasury_operation_access!, only: %i[update_settings generate_charges create_payment]
+    before_action :authorize_treasury_closure_access!, only: %i[create_closure destroy_closure]
+    before_action :authorize_treasury_export_access!, only: %i[export_excel export_pdf export_delinquency_excel export_delinquency_pdf]
     before_action :set_lodge
     before_action :set_treasury_setting
 
@@ -345,6 +349,45 @@ module Backoffice
         amount: payment.amount,
         period_year: payment.paid_on.year,
         period_month: payment.paid_on.month
+      )
+    end
+
+    def authorize_treasury_read_access!
+      return if current_user&.can_access_module?(:treasury) && current_user&.can_manage_treasury_action?(:read)
+
+      audit_permission_denied("treasury_read")
+      redirect_to "/backoffice", alert: "No tienes permisos para acceder a Tesoreria."
+    end
+
+    def authorize_treasury_operation_access!
+      return if current_user&.can_manage_treasury_action?(:operate)
+
+      audit_permission_denied("treasury_operate")
+      redirect_to "/backoffice/tesoreria", alert: "No tienes permisos para operar en Tesoreria."
+    end
+
+    def authorize_treasury_closure_access!
+      return if current_user&.can_manage_treasury_action?(:close_period)
+
+      audit_permission_denied("treasury_close_period")
+      redirect_to "/backoffice/tesoreria", alert: "No tienes permisos para cierres mensuales."
+    end
+
+    def authorize_treasury_export_access!
+      return if current_user&.can_manage_treasury_action?(:export)
+
+      audit_permission_denied("treasury_export")
+      redirect_to "/backoffice/tesoreria", alert: "No tienes permisos para exportar reportes de Tesoreria."
+    end
+
+    def audit_permission_denied(denied_action)
+      AuditLog.record!(
+        user: current_user,
+        action: "permission.denied.treasury",
+        auditable: current_user,
+        metadata: { denied_action: denied_action, path: request.path, method: request.request_method },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
       )
     end
   end

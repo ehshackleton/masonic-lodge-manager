@@ -10,7 +10,9 @@ module Backoffice
     def secretariat
       redirect_to "/backoffice/secretaria"
     end
-    def works; render :index; end
+    def works
+      redirect_to "/backoffice/masonic_works"
+    end
     def administration; render :index; end
   end
 end

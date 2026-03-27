@@ -1,0 +1,83 @@
+<%= form_with model: [:backoffice, @masonic_work], class: "space-y-6" do |f| %>
+  <% if @masonic_work.errors.any? %>
+    <div class="rounded-lg border border-amber-800 bg-amber-950/50 px-4 py-3 text-sm text-amber-300">
+      <p class="font-semibold">No se pudo guardar el trabajo:</p>
+      <ul class="mt-2 list-disc space-y-1 pl-6">
+        <% @masonic_work.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :lodge_id, "Logia", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.collection_select :lodge_id, @lodges, :id, :name, {}, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :brother_id, "Hermano responsable", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.collection_select :brother_id, @brothers, :id, :full_name, { include_blank: "Seleccionar" }, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :degree_id, "Grado", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.collection_select :degree_id, @degrees, :id, :name, { include_blank: "Sin grado especifico" }, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :reviewer_user_id, "Revisor asignado", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.collection_select :reviewer_user_id, @reviewers, :id, :email, { include_blank: "Sin asignar" }, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :title, "Titulo", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.text_field :title, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :topic, "Tema", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.text_field :topic, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div class="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Estado actual</p>
+      <p class="mt-1 text-sm font-medium text-zinc-200"><%= (@masonic_work.status || "assigned").humanize %></p>
+    </div>
+    <div>
+      <%= f.label :assigned_on, "Fecha de asignacion", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.date_field :assigned_on, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :due_on, "Fecha compromiso", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.date_field :due_on, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+    <div>
+      <%= f.label :presented_on, "Fecha de presentacion", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+      <%= f.date_field :presented_on, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :abstract, "Resumen", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+    <%= f.text_area :abstract, rows: 4, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  </div>
+
+  <div>
+    <%= f.label :body, "Cuerpo del trabajo", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+    <%= f.text_area :body, rows: 10, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  </div>
+
+  <div>
+    <%= f.label :private_notes, "Notas privadas del taller", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+    <%= f.text_area :private_notes, rows: 4, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  </div>
+
+  <div>
+    <%= f.label :documents, "Adjuntos", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+    <%= f.file_field :documents, multiple: true, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit(@masonic_work.new_record? ? "Crear trabajo" : "Guardar cambios", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white") %>
+    <a href="/backoffice/masonic_works" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200">Cancelar</a>
+  </div>
+<% end %>

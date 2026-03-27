@@ -23,8 +23,10 @@ Rails.application.routes.draw do
     get "/tesoreria/export/morosidad/excel", to: "treasury#export_delinquency_excel"
     get "/tesoreria/export/morosidad/pdf", to: "treasury#export_delinquency_pdf"
     get "/secretaria", to: "secretariat#index"
-    get "/trabajos", to: "dashboard#works"
-    get "/administracion", to: "dashboard#administration"
+    get "/trabajos", to: redirect("/backoffice/masonic_works")
+    get "/administracion", to: "administration#index"
+    patch "/administracion/usuarios/:id/roles", to: "administration#update_user_roles", as: :administration_user_roles
+    patch "/administracion/usuarios/:id/roles-plantilla", to: "administration#apply_role_template", as: :administration_user_role_template
     resources :brothers do
       member do
         delete "documents/:attachment_id", to: "brothers#purge_document", as: :purge_document
@@ -55,6 +57,23 @@ Rails.application.routes.draw do
         patch :approve
         patch :publish
       end
+    end
+
+    resources :masonic_works do
+      collection do
+        get :export_excel
+        get :export_pdf
+        get :export_reviews_excel
+        get :export_reviews_pdf
+        get :export_dashboard_pdf
+      end
+      member do
+        patch :submit_review
+        patch :approve
+        patch :mark_presented
+        patch :archive
+      end
+      resources :work_reviews, only: %i[create destroy]
     end
   end
 end

@@ -2,6 +2,9 @@ module Backoffice
   class MinutesController < ApplicationController
     before_action :require_authentication
     before_action :set_minute, only: %i[show edit update destroy submit_review approve publish]
+    before_action :authorize_minutes_read_access!
+    before_action :authorize_minutes_write_access!, only: %i[new create edit update destroy submit_review]
+    before_action :authorize_minutes_approval_access!, only: %i[approve publish]
 
     def index
       @q = params[:q].to_s.strip
@@ -156,6 +159,38 @@ module Backoffice
 
     def invalid_workflow_transition
       redirect_to backoffice_minute_path(@minute), alert: "Transicion de workflow no permitida."
+    end
+
+    def authorize_minutes_read_access!
+      return if current_user&.can_access_module?(:secretariat) && current_user&.can_manage_secretariat_action?(:minutes_read)
+
+      audit_permission_denied("minutes_read")
+      redirect_to "/backoffice", alert: "No tienes permisos para acceder al modulo de actas."
+    end
+
+    def authorize_minutes_write_access!
+      return if current_user&.can_manage_secretariat_action?(:minute_write)
+
+      audit_permission_denied("minute_write")
+      redirect_to "/backoffice/minutes", alert: "No tienes permisos para crear/editar actas."
+    end
+
+    def authorize_minutes_approval_access!
+      return if current_user&.can_manage_secretariat_action?(:minute_approve)
+
+      audit_permission_denied("minute_approve")
+      redirect_to "/backoffice/minutes", alert: "No tienes permisos para aprobar/publicar actas."
+    end
+
+    def audit_permission_denied(denied_action)
+      AuditLog.record!(
+        user: current_user,
+        action: "permission.denied.secretariat.minute",
+        auditable: @minute || current_user,
+        metadata: { denied_action: denied_action, path: request.path, method: request.request_method },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
     end
   end
 end

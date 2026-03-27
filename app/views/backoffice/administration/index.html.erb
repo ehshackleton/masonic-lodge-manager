@@ -1,0 +1,77 @@
+<% content_for :title, "Administracion | Backoffice" %>
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-3xl font-bold text-zinc-100">Administracion de roles</h1>
+      <p class="mt-1 text-sm text-zinc-400">Matriz RBAC por modulo: Secretaria, Tesoreria y Trabajos.</p>
+    </div>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
+    <table class="min-w-full divide-y divide-zinc-800 text-sm">
+      <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+        <tr>
+          <th class="px-4 py-3">Usuario</th>
+          <th class="px-4 py-3">Roles granulares</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800">
+        <% @users.each do |user| %>
+          <tr>
+            <td class="px-4 py-3">
+              <p class="font-medium text-zinc-100"><%= user.email %></p>
+              <p class="text-xs text-zinc-500">Roles actuales: <%= user.roles.order(:key).pluck(:key).join(", ").presence || "-" %></p>
+            </td>
+            <td class="px-4 py-3">
+              <%= form_with url: backoffice_administration_user_roles_path(user), method: :patch do %>
+                <div class="space-y-3">
+                  <% @role_matrix.each do |module_name, module_roles| %>
+                    <div class="rounded-lg border border-zinc-800 p-3">
+                      <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= module_name %></p>
+                      <div class="grid gap-2 md:grid-cols-2">
+                        <% module_roles.each do |role| %>
+                          <label class="inline-flex items-center gap-2 text-zinc-300">
+                            <%= check_box_tag "role_ids[]", role.id, user.roles.any? { |r| r.id == role.id }, class: "rounded border-zinc-700 bg-zinc-900 text-amber-300" %>
+                            <span><%= role.name %> <span class="text-xs text-zinc-500">(<%= role.key %>)</span></span>
+                          </label>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+                <button type="submit" class="mt-3 rounded-lg bg-black px-3 py-2 text-xs font-semibold text-white">Guardar roles</button>
+              <% end %>
+              <div class="mt-3 border-t border-zinc-800 pt-3">
+                <p class="mb-2 text-xs uppercase tracking-wide text-zinc-500">Asignacion rapida por plantilla</p>
+                <%= form_with url: backoffice_administration_user_role_template_path(user), method: :patch, class: "flex flex-wrap items-center gap-2" do %>
+                  <%= select_tag :template_key, options_for_select(@role_templates.map { |key, cfg| [cfg[:name], key] }), class: "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200" %>
+                  <button type="submit" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Aplicar plantilla</button>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @users.empty? %>
+          <tr><td colspan="2" class="px-4 py-6 text-zinc-500">Sin usuarios.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+    <h2 class="text-lg font-semibold text-zinc-100">Auditoria de cambios de roles</h2>
+    <ul class="mt-4 space-y-2 text-sm">
+      <% @recent_audit_logs.each do |log| %>
+        <li class="rounded-lg border border-zinc-800 px-3 py-2 text-zinc-300">
+          <span class="font-medium text-zinc-100"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+          - <%= log.user&.email.presence || "sistema" %>
+          - objetivo: <%= log.metadata.to_h["target_user_email"] || "-" %>
+          - roles: <%= Array(log.metadata.to_h["role_keys"]).join(", ").presence || "-" %>
+        </li>
+      <% end %>
+      <% if @recent_audit_logs.empty? %>
+        <li class="text-zinc-500">Sin eventos de cambios de roles.</li>
+      <% end %>
+    </ul>
+  </section>
+</section>

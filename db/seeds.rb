@@ -14,6 +14,32 @@ superadmin_role = Role.find_or_create_by!(key: "superadmin") do |record|
   record.description = "Control total del sistema"
 end
 
+Role.find_or_create_by!(key: "secretario") do |record|
+  record.name = "Secretario"
+  record.description = "Puede aprobar y archivar trabajos masonicos"
+end
+
+[
+  { key: "secretariat_manager", name: "Gestor de Secretaria", description: "Acceso total a Secretaria" },
+  { key: "minute_editor", name: "Editor de actas", description: "Puede crear y editar actas" },
+  { key: "minute_approver", name: "Aprobador de actas", description: "Puede aprobar y publicar actas" },
+  { key: "correspondence_editor", name: "Editor de correspondencia", description: "Puede crear y editar correspondencia" },
+  { key: "correspondence_approver", name: "Aprobador de correspondencia", description: "Puede aprobar y publicar correspondencia" },
+  { key: "tesoreria_manager", name: "Gestor de tesoreria", description: "Acceso total a Tesoreria" },
+  { key: "tesoreria_operator", name: "Operador de tesoreria", description: "Puede operar cargos y pagos" },
+  { key: "tesoreria_closer", name: "Cierre de tesoreria", description: "Puede cerrar y reabrir periodos" },
+  { key: "tesoreria_exporter", name: "Exportador de tesoreria", description: "Puede exportar reportes financieros" },
+  { key: "work_reviewer", name: "Revisor de trabajos", description: "Puede enviar a revision y gestionar revisiones" },
+  { key: "work_approver", name: "Aprobador de trabajos", description: "Puede aprobar trabajos masonicos" },
+  { key: "work_presenter", name: "Presentador de trabajos", description: "Puede marcar trabajos como presentados" },
+  { key: "work_archiver", name: "Archivador de trabajos", description: "Puede archivar trabajos masonicos" }
+].each do |role_attrs|
+  Role.find_or_create_by!(key: role_attrs[:key]) do |record|
+    record.name = role_attrs[:name]
+    record.description = role_attrs[:description]
+  end
+end
+
 admin = User.find_or_initialize_by(email: admin_email)
 admin.password = admin_password
 admin.password_confirmation = admin_password
