@@ -31,16 +31,58 @@
       }
     </script>
     <style>
+      input,
+      select,
+      textarea {
+        background-color: #18181b !important;
+        color: #f4f4f5 !important;
+        border-color: #3f3f46 !important;
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: #a1a1aa !important;
+      }
+      button,
+      a {
+        text-underline-offset: 2px;
+      }
+      .border-zinc-700.text-zinc-200 {
+        color: #e4e4e7 !important;
+        border-color: #52525b !important;
+      }
+      .border-zinc-700.text-zinc-200:hover {
+        color: #f59e0b !important;
+        border-color: #f59e0b !important;
+      }
+      .text-amber-300 {
+        color: #fbbf24 !important;
+      }
+      .text-amber-300:hover {
+        color: #fcd34d !important;
+      }
+      .theme-light body { background-color: #f8fafc !important; color: #0f172a !important; }
       .theme-light .bg-zinc-950 { background-color: #f8fafc !important; }
       .theme-light .bg-zinc-950\/95 { background-color: rgba(248, 250, 252, 0.95) !important; }
+      .theme-light .bg-zinc-950\/80 { background-color: rgba(248, 250, 252, 0.8) !important; }
+      .theme-light .bg-zinc-950\/70 { background-color: rgba(248, 250, 252, 0.7) !important; }
+      .theme-light .bg-zinc-950\/40 { background-color: rgba(248, 250, 252, 0.4) !important; }
       .theme-light .bg-zinc-900 { background-color: #ffffff !important; }
+      .theme-light .bg-zinc-900\/80 { background-color: rgba(255, 255, 255, 0.86) !important; }
+      .theme-light .bg-zinc-900\/70 { background-color: rgba(255, 255, 255, 0.78) !important; }
       .theme-light .border-zinc-800 { border-color: #e2e8f0 !important; }
       .theme-light .border-zinc-700 { border-color: #cbd5e1 !important; }
       .theme-light .text-zinc-100 { color: #0f172a !important; }
       .theme-light .text-zinc-200 { color: #1e293b !important; }
+      .theme-light .text-zinc-300 { color: #334155 !important; }
       .theme-light .text-zinc-400 { color: #475569 !important; }
       .theme-light .text-zinc-500 { color: #64748b !important; }
+      .theme-light .text-xs.text-zinc-500 { color: #475569 !important; }
+      .theme-light .text-xs.text-zinc-400 { color: #334155 !important; }
+      .theme-light .tracking-wide.text-zinc-500 { color: #475569 !important; }
       .theme-light .bg-black { background-color: #0f172a !important; }
+      .theme-light .from-zinc-900,
+      .theme-light .via-zinc-950,
+      .theme-light .to-zinc-900 { background-image: linear-gradient(135deg, #ffffff, #f8fafc, #ffffff) !important; }
       .theme-light .hover\:bg-zinc-700:hover { background-color: #334155 !important; }
       .theme-light .hover\:bg-zinc-800\/60:hover { background-color: #e2e8f0 !important; }
       .theme-light .bg-amber-950\/30 { background-color: rgba(253, 246, 227, 0.8) !important; }
@@ -56,6 +98,30 @@
       .theme-light textarea {
         background-color: #ffffff !important;
         color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+      }
+      .theme-light input::placeholder,
+      .theme-light textarea::placeholder { color: #64748b !important; }
+      .theme-light .text-amber-300 { color: #92400e !important; }
+      .theme-light .text-emerald-300 { color: #065f46 !important; }
+      .theme-light .bg-amber-950\/40 { background-color: rgba(254, 243, 199, 0.95) !important; }
+      .theme-light .bg-emerald-950\/40 { background-color: rgba(209, 250, 229, 0.95) !important; }
+      .theme-light .border-amber-800 { border-color: #b45309 !important; }
+      .theme-light .border-emerald-800 { border-color: #047857 !important; }
+      .theme-light .text-zinc-500.uppercase { color: #475569 !important; }
+      .theme-light .border-zinc-700.text-zinc-200 {
+        color: #1e293b !important;
+        border-color: #94a3b8 !important;
+      }
+      .theme-light .border-zinc-700.text-zinc-200:hover {
+        color: #92400e !important;
+        border-color: #b45309 !important;
+      }
+      .theme-light a.text-amber-300 {
+        color: #92400e !important;
+      }
+      .theme-light a.text-amber-300:hover {
+        color: #78350f !important;
       }
     </style>
     <script>
