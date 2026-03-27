@@ -11,6 +11,9 @@ Rails.application.routes.draw do
 
   namespace :backoffice do
     root to: "dashboard#index"
+    get "/perfil", to: "profiles#show"
+    patch "/perfil", to: "profiles#update"
+    delete "/perfil/avatar", to: "profiles#destroy_avatar"
     get "/cuadro-logial", to: redirect("/backoffice/brothers")
     get "/tesoreria", to: "treasury#index"
     post "/tesoreria/settings", to: "treasury#update_settings"

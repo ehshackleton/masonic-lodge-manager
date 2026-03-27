@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
+  has_one_attached :avatar
   has_many :registered_payments, class_name: "Payment", foreign_key: :received_by_user_id, dependent: :nullify
   has_many :monthly_closures, class_name: "MonthlyClosure", foreign_key: :closed_by_user_id, dependent: :nullify
   has_many :hospital_fund_transactions, class_name: "HospitalFundTransaction", foreign_key: :recorded_by_user_id, dependent: :nullify
@@ -12,6 +13,14 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
   validates :password, length: { minimum: 12 }, allow_nil: true
+  validates :first_name, length: { maximum: 100 }, allow_blank: true
+  validates :last_name, length: { maximum: 100 }, allow_blank: true
+  validates :phone, length: { maximum: 50 }, allow_blank: true
+  validate :avatar_constraints
+
+  def full_name
+    [first_name, last_name].compact.join(" ").strip.presence || email
+  end
 
   def locked?
     locked_at.present?
@@ -121,5 +130,18 @@ class User < ApplicationRecord
 
   def normalize_email
     self.email = email.to_s.strip.downcase
+  end
+
+  def avatar_constraints
+    return unless avatar.attached?
+
+    if avatar.byte_size > 3.megabytes
+      errors.add(:avatar, "debe pesar maximo 3MB")
+    end
+
+    allowed_types = %w[image/jpeg image/png image/webp image/gif]
+    return if allowed_types.include?(avatar.content_type)
+
+    errors.add(:avatar, "debe ser JPG, PNG, WEBP o GIF")
   end
 end

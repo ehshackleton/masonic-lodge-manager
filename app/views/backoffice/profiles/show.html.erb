@@ -1,0 +1,86 @@
+<% content_for :title, "Mi perfil | Backoffice" %>
+<section class="mx-auto max-w-4xl px-6 py-10">
+  <div class="flex items-center justify-between">
+    <h1 class="text-3xl font-bold text-zinc-100">Mi perfil</h1>
+    <a href="/backoffice" class="rounded-lg bg-black px-3 py-2 text-sm text-white">Volver</a>
+  </div>
+
+  <div class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <% if @user.errors.any? %>
+      <div class="mb-4 rounded-lg border border-amber-800 bg-amber-950/50 px-4 py-3 text-sm text-amber-300">
+        <p class="font-semibold">No se pudo actualizar el perfil:</p>
+        <ul class="mt-2 list-disc pl-5">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: "/backoffice/perfil", method: :patch, class: "space-y-5" do |f| %>
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <%= f.label :first_name, "Nombres", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.text_field :first_name, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :last_name, "Apellidos", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.text_field :last_name, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :email, "Correo", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.email_field :email, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :phone, "Telefono", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.text_field :phone, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :locale, "Idioma", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.select :locale, options_for_select([["Espanol","es"],["Ingles","en"]], @user.locale), {}, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :time_zone, "Zona horaria", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.select :time_zone, options_for_select([["America/Santiago","America/Santiago"],["UTC","UTC"]], @user.time_zone), {}, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :bio, "Informacion personal", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.text_area :bio, rows: 4, class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <%= f.label :password, "Nueva contrasena (opcional)", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.password_field :password, autocomplete: "new-password", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+        <div>
+          <%= f.label :password_confirmation, "Confirmar nueva contrasena", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <%= f.label :avatar, "Foto de perfil (max 3MB, JPG/PNG/WEBP/GIF)", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+          <%= f.file_field :avatar, accept: "image/*", class: "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+          <p class="mt-2 text-xs text-zinc-500">Seleccionar una nueva imagen reemplaza la actual al guardar perfil.</p>
+        </div>
+        <div class="rounded-lg border border-zinc-800 p-4">
+          <p class="mb-2 text-xs uppercase tracking-wide text-zinc-500">Vista previa actual</p>
+          <% if @user.avatar.attached? %>
+            <%= image_tag rails_blob_path(@user.avatar, disposition: "inline"), class: "h-20 w-20 rounded-full object-cover border border-zinc-700" %>
+            <%= button_to "Eliminar foto", "/backoffice/perfil/avatar", method: :delete, class: "mt-3 rounded-lg border border-amber-800 px-3 py-2 text-xs font-semibold text-amber-300", form: { data: { turbo_confirm: "Eliminar foto de perfil actual?" } } %>
+          <% else %>
+            <div class="flex h-20 w-20 items-center justify-center rounded-full border border-zinc-700 text-zinc-500">Sin foto</div>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.submit "Guardar perfil", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white" %>
+      </div>
+    <% end %>
+  </div>
+</section>

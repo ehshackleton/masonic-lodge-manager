@@ -97,6 +97,7 @@
             Tema: <span id="theme-toggle-label">Dark</span>
           </button>
           <% if user_signed_in? %>
+            <a href="/backoffice/perfil" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300">Mi perfil</a>
             <a href="/backoffice" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-700">Backoffice</a>
             <%= button_to "Cerrar sesion", "/cerrar-sesion", method: :delete, class: "rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300" %>
           <% else %>
