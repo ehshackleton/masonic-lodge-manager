@@ -2,10 +2,9 @@ services:
   web:
     build:
       context: .
-    command: bash -lc "bundle install && ./bin/rails db:prepare && ./bin/rails server -b 0.0.0.0 -p 3000"
+    command: bash -lc "./bin/rails db:prepare db:seed && ./bin/rails server -b 0.0.0.0 -p 3000"
     volumes:
       - .:/rails
-      - bundle_cache:/usr/local/bundle
       - storage_data:/rails/storage
       - tmp_data:/rails/tmp
     ports:
@@ -25,10 +24,9 @@ services:
       context: .
     profiles:
       - worker
-    command: bash -lc "bundle install && ./bin/rake solid_queue:start"
+    command: bash -lc "./bin/rake solid_queue:start"
     volumes:
       - .:/rails
-      - bundle_cache:/usr/local/bundle
       - storage_data:/rails/storage
       - tmp_data:/rails/tmp
     env_file:
@@ -59,6 +57,5 @@ services:
 
 volumes:
   postgres_data:
-  bundle_cache:
   storage_data:
   tmp_data:

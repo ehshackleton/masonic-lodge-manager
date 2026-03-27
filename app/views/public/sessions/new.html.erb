@@ -1,23 +1,23 @@
 <% content_for :title, "Iniciar sesion | Sistema de Gestion Logial" %>
 
 <section class="mx-auto flex max-w-5xl px-6 py-14">
-  <div class="mx-auto w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-    <h1 class="text-2xl font-bold tracking-tight text-ink">Iniciar sesion</h1>
-    <p class="mt-2 text-sm text-slate-600">Acceso exclusivo para usuarios autorizados de la logia.</p>
+  <div class="mx-auto w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-8 shadow-sm">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-100">Iniciar sesion</h1>
+    <p class="mt-2 text-sm text-zinc-400">Acceso exclusivo para usuarios autorizados de la logia.</p>
 
-    <form class="mt-6 space-y-4">
-      <label class="block text-sm font-medium text-slate-700">Correo institucional
-        <input type="email" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="usuario@logia.local">
+    <%= form_with url: "/iniciar-sesion", method: :post, class: "mt-6 space-y-4" do %>
+      <label class="block text-sm font-medium text-zinc-200">Correo institucional
+        <%= email_field_tag :email, nil, required: true, autocomplete: "email", class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "admin@logia.local" %>
       </label>
-      <label class="block text-sm font-medium text-slate-700">Contrasena
-        <input type="password" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="********">
+      <label class="block text-sm font-medium text-zinc-200">Contrasena
+        <%= password_field_tag :password, nil, required: true, autocomplete: "current-password", class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "********" %>
       </label>
-      <button type="button" class="w-full rounded-lg bg-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700">
+      <button type="submit" class="w-full rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700">
         Ingresar
       </button>
-    </form>
+    <% end %>
 
-    <div class="mt-6 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
+    <div class="mt-6 rounded-lg bg-amber-950/50 p-3 text-xs text-amber-300">
       Recomendacion de seguridad: active politicas de bloqueo temporal y recuperacion controlada de contrasena.
     </div>
   </div>

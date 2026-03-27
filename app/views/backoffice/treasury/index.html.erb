@@ -1,0 +1,305 @@
+<% content_for :title, "Tesoreria y contabilidad | Sistema de Gestion Logial" %>
+
+<section class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">Tesoreria y contabilidad</h1>
+      <p class="mt-1 text-sm text-zinc-400">Control de cuotas mensuales, cargos, pagos e ingresos del taller.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a href="/backoffice/tesoreria/export/excel?from=<%= @from %>&to=<%= @to %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar Excel</a>
+      <a href="/backoffice/tesoreria/export/pdf?from=<%= @from %>&to=<%= @to %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Exportar PDF</a>
+      <a href="/backoffice/tesoreria/export/morosidad/excel?from=<%= @from %>&to=<%= @to %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Morosidad Excel</a>
+      <a href="/backoffice/tesoreria/export/morosidad/pdf?from=<%= @from %>&to=<%= @to %>" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Morosidad PDF</a>
+      <span class="rounded-full bg-amber-950/30 px-3 py-1 text-xs font-semibold text-amber-300">Modulo operativo</span>
+    </div>
+  </div>
+
+  <article class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Grafico mensual de ingresos (12 meses)</h2>
+    <% max_income = @monthly_income_series.map { |x| x[:amount].to_f }.max.to_f %>
+    <% max_income = 1 if max_income <= 0 %>
+    <div class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
+      <% @monthly_income_series.each do |point| %>
+        <% percent = ((point[:amount].to_f / max_income) * 100).round %>
+        <div class="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
+          <p class="text-xs text-zinc-500"><%= point[:label] %></p>
+          <div class="mt-2 h-2 w-full rounded-full bg-zinc-800">
+            <div class="h-2 rounded-full bg-amber-300" style="width: <%= percent %>%"></div>
+          </div>
+          <p class="mt-2 text-sm font-semibold text-zinc-200"><%= number_to_currency(point[:amount], unit: "$", precision: 0) %></p>
+        </div>
+      <% end %>
+    </div>
+  </article>
+
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Ingresos (filtro)</p>
+      <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= number_to_currency(@total_income, unit: "$", precision: 0) %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Pagos registrados</p>
+      <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= @payments_count %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Activos con cuota</p>
+      <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= @active_brothers.count %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Esperado mensual</p>
+      <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= number_to_currency(@expected_month_income, unit: "$", precision: 0) %></p>
+    </article>
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500">Cuotas vencidas</p>
+      <p class="mt-2 text-2xl font-semibold text-zinc-100"><%= @overdue_count %></p>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-2">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Tablero de ingresos (filtro de tiempo)</h2>
+      <%= form_with url: "/backoffice/tesoreria", method: :get, class: "mt-4 grid gap-3 md:grid-cols-3" do %>
+        <label class="text-sm text-zinc-400">
+          Desde
+          <%= date_field_tag :from, @from, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Hasta
+          <%= date_field_tag :to, @to, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <div class="flex items-end">
+          <button type="submit" class="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Aplicar filtro</button>
+        </div>
+      <% end %>
+      <p class="mt-4 text-sm text-zinc-400">
+        Ingreso acumulado del periodo: <span class="font-semibold text-amber-300"><%= number_to_currency(@total_income, unit: "$", precision: 0) %></span>
+      </p>
+      <p class="mt-1 text-sm text-zinc-400">
+        Recaudado en mes actual: <span class="font-semibold text-amber-300"><%= number_to_currency(@collected_month_income, unit: "$", precision: 0) %></span>
+      </p>
+    </article>
+
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Configuracion de cuota mensual</h2>
+      <%= form_with model: @treasury_setting, url: "/backoffice/tesoreria/settings", method: :post, class: "mt-4 grid gap-3 md:grid-cols-2" do |f| %>
+        <label class="text-sm text-zinc-400">
+          Cuota mensual
+          <%= f.number_field :monthly_fee, step: 100, min: 0, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Moneda
+          <%= f.text_field :currency, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Dia de vencimiento (1-28)
+          <%= f.number_field :due_day, min: 1, max: 28, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <div class="flex items-end">
+          <button type="submit" class="w-full rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300">Guardar configuracion</button>
+        </div>
+      <% end %>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-2">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Morosidad por hermano</h2>
+      <p class="mt-2 text-sm text-zinc-400">Saldo pendiente exacto y antiguedad de deuda por hermano activo.</p>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-800 text-sm">
+          <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+            <tr>
+              <th class="py-2 pr-3">Hermano</th>
+              <th class="py-2 pr-3">Saldo pendiente</th>
+              <th class="py-2 pr-3">Primera cuota vencida</th>
+              <th class="py-2 pr-3">Antiguedad (dias)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800">
+            <% @delinquency_rows.each do |row| %>
+              <tr>
+                <td class="py-2 pr-3 text-zinc-300"><%= row[:brother].full_name %></td>
+                <td class="py-2 pr-3 text-amber-300"><%= number_to_currency(row[:balance], unit: "$", precision: 0) %></td>
+                <td class="py-2 pr-3 text-zinc-400"><%= row[:oldest_due_on] || "-" %></td>
+                <td class="py-2 pr-3 text-zinc-300"><%= row[:aging_days] %></td>
+              </tr>
+            <% end %>
+            <% if @delinquency_rows.empty? %>
+              <tr><td colspan="4" class="py-4 text-zinc-500">Sin morosidad registrada.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Cierres mensuales</h2>
+      <p class="mt-2 text-sm text-zinc-400">Bloquea la contabilidad por periodo (impide nuevos cargos y pagos en ese mes).</p>
+      <%= form_with url: "/backoffice/tesoreria/closures", method: :post, class: "mt-4 grid gap-3 md:grid-cols-3" do %>
+        <label class="text-sm text-zinc-400 md:col-span-2">
+          Periodo a cerrar
+          <%= month_field_tag :period, Date.current.strftime("%Y-%m"), class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <div class="flex items-end">
+          <button type="submit" class="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Cerrar periodo</button>
+        </div>
+        <label class="text-sm text-zinc-400 md:col-span-3">
+          Notas de cierre
+          <%= text_field_tag :notes, nil, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+      <% end %>
+      <div class="mt-4 space-y-2 text-sm">
+        <% @closures.each do |closure| %>
+          <div class="flex items-center justify-between rounded-lg border border-zinc-800 p-3">
+            <div>
+              <p class="font-semibold text-zinc-200"><%= format("%02d/%d", closure.period_month, closure.period_year) %></p>
+              <p class="text-zinc-500">Cerrado: <%= l(closure.closed_at, format: :short) rescue closure.closed_at %></p>
+            </div>
+            <%= button_to "Reabrir", "/backoffice/tesoreria/closures/#{closure.id}", method: :delete, class: "text-xs font-semibold text-amber-300 hover:underline" %>
+          </div>
+        <% end %>
+        <% if @closures.empty? %>
+          <p class="text-zinc-500">Aun no hay periodos cerrados.</p>
+        <% end %>
+      </div>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-2">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Generar cargos mensuales (hermanos activos)</h2>
+      <p class="mt-2 text-sm text-zinc-400">Crea un cargo por hermano activo para el mes seleccionado, evitando duplicados.</p>
+      <%= form_with url: "/backoffice/tesoreria/generate-charges", method: :post, class: "mt-4 flex flex-wrap items-end gap-3" do %>
+        <label class="text-sm text-zinc-400">
+          Periodo
+          <%= month_field_tag :period, Date.current.strftime("%Y-%m"), class: "mt-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <button type="submit" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Generar cargos</button>
+      <% end %>
+    </article>
+
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Registrar pago</h2>
+      <%= form_with model: @new_payment, url: "/backoffice/tesoreria/payments", method: :post, class: "mt-4 grid gap-3 md:grid-cols-2" do |f| %>
+        <label class="text-sm text-zinc-400 md:col-span-2">
+          Hermano
+          <%= f.collection_select :brother_id, @active_brothers, :id, :full_name, { include_blank: "Seleccione hermano" }, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Fecha de pago
+          <%= f.date_field :paid_on, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Monto
+          <%= f.number_field :amount, step: 100, min: 1, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Metodo de pago
+          <%= f.text_field :payment_method, placeholder: "Efectivo / Transferencia", class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400">
+          Referencia
+          <%= f.text_field :reference, placeholder: "Nro. operacion", class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <label class="text-sm text-zinc-400 md:col-span-2">
+          Notas
+          <%= f.text_area :notes, rows: 2, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100" %>
+        </label>
+        <button type="submit" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-300 hover:text-amber-300 md:col-span-2">Registrar pago</button>
+      <% end %>
+    </article>
+  </div>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-2">
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Pagos del periodo filtrado</h2>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-800 text-sm">
+          <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+            <tr>
+              <th class="py-2 pr-3">Fecha</th>
+              <th class="py-2 pr-3">Hermano</th>
+              <th class="py-2 pr-3">Monto</th>
+              <th class="py-2 pr-3">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800">
+            <% @payments.each do |payment| %>
+              <tr>
+                <td class="py-2 pr-3 text-zinc-300"><%= payment.paid_on %></td>
+                <td class="py-2 pr-3 text-zinc-300"><%= payment.brother&.full_name || "-" %></td>
+                <td class="py-2 pr-3 text-amber-300"><%= number_to_currency(payment.amount, unit: "$", precision: 0) %></td>
+                <td class="py-2 pr-3 text-zinc-400"><%= payment.payment_method.presence || "-" %></td>
+              </tr>
+            <% end %>
+            <% if @payments.empty? %>
+              <tr><td colspan="4" class="py-4 text-zinc-500">Sin pagos para el rango seleccionado.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+      <h2 class="text-lg font-semibold text-zinc-100">Cargos del mes actual</h2>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-800 text-sm">
+          <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+            <tr>
+              <th class="py-2 pr-3">Hermano</th>
+              <th class="py-2 pr-3">Vence</th>
+              <th class="py-2 pr-3">Monto</th>
+              <th class="py-2 pr-3">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800">
+            <% @charges.each do |charge| %>
+              <tr>
+                <td class="py-2 pr-3 text-zinc-300"><%= charge.brother&.full_name || "-" %></td>
+                <td class="py-2 pr-3 text-zinc-400"><%= charge.due_on %></td>
+                <td class="py-2 pr-3 text-zinc-300"><%= number_to_currency(charge.amount, unit: "$", precision: 0) %></td>
+                <td class="py-2 pr-3 text-amber-300"><%= charge.status.humanize %></td>
+              </tr>
+            <% end %>
+            <% if @charges.empty? %>
+              <tr><td colspan="4" class="py-4 text-zinc-500">Aun no hay cargos del mes actual.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <article class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Libro diario simplificado</h2>
+    <p class="mt-2 text-sm text-zinc-400">Asientos contables basicos generados por cargos mensuales y pagos.</p>
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-zinc-800 text-sm">
+        <thead class="text-left text-xs uppercase tracking-wide text-zinc-500">
+          <tr>
+            <th class="py-2 pr-3">Fecha</th>
+            <th class="py-2 pr-3">Concepto</th>
+            <th class="py-2 pr-3">Debe</th>
+            <th class="py-2 pr-3">Haber</th>
+            <th class="py-2 pr-3">Monto</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800">
+          <% @ledger_entries.each do |entry| %>
+            <tr>
+              <td class="py-2 pr-3 text-zinc-400"><%= entry.occurred_on %></td>
+              <td class="py-2 pr-3 text-zinc-300"><%= entry.concept %></td>
+              <td class="py-2 pr-3 text-zinc-300"><%= entry.debit_account %></td>
+              <td class="py-2 pr-3 text-zinc-300"><%= entry.credit_account %></td>
+              <td class="py-2 pr-3 text-amber-300"><%= number_to_currency(entry.amount, unit: "$", precision: 0) %></td>
+            </tr>
+          <% end %>
+          <% if @ledger_entries.empty? %>
+            <tr><td colspan="5" class="py-4 text-zinc-500">Sin asientos en el rango seleccionado.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>

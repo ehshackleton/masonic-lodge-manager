@@ -22,39 +22,107 @@
         theme: {
           extend: {
             colors: {
-              ink: "#0f172a",
-              brand: "#1d4ed8",
-              accent: "#b45309"
+              ink: "#f4f4f5",
+              brand: "#60a5fa",
+              accent: "#f59e0b"
             }
           }
         }
       }
     </script>
+    <style>
+      .theme-light .bg-zinc-950 { background-color: #f8fafc !important; }
+      .theme-light .bg-zinc-950\/95 { background-color: rgba(248, 250, 252, 0.95) !important; }
+      .theme-light .bg-zinc-900 { background-color: #ffffff !important; }
+      .theme-light .border-zinc-800 { border-color: #e2e8f0 !important; }
+      .theme-light .border-zinc-700 { border-color: #cbd5e1 !important; }
+      .theme-light .text-zinc-100 { color: #0f172a !important; }
+      .theme-light .text-zinc-200 { color: #1e293b !important; }
+      .theme-light .text-zinc-400 { color: #475569 !important; }
+      .theme-light .text-zinc-500 { color: #64748b !important; }
+      .theme-light .bg-black { background-color: #0f172a !important; }
+      .theme-light .hover\:bg-zinc-700:hover { background-color: #334155 !important; }
+      .theme-light .hover\:bg-zinc-800\/60:hover { background-color: #e2e8f0 !important; }
+      .theme-light .bg-amber-950\/30 { background-color: rgba(253, 246, 227, 0.8) !important; }
+      .theme-light .bg-amber-950\/50 { background-color: rgba(253, 246, 227, 0.95) !important; }
+      .theme-light .bg-emerald-950\/50 { background-color: rgba(236, 253, 245, 0.95) !important; }
+      .theme-light .text-amber-300 { color: #b45309 !important; }
+      .theme-light .text-amber-200 { color: #92400e !important; }
+      .theme-light .text-emerald-300 { color: #047857 !important; }
+      .theme-light .border-amber-800 { border-color: #d97706 !important; }
+      .theme-light .border-emerald-800 { border-color: #059669 !important; }
+      .theme-light input,
+      .theme-light select,
+      .theme-light textarea {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+    </style>
+    <script>
+      (function() {
+        function applyTheme(theme) {
+          document.documentElement.classList.toggle("theme-light", theme === "light");
+          localStorage.setItem("theme", theme);
+          var label = document.getElementById("theme-toggle-label");
+          if (label) label.textContent = theme === "light" ? "Light" : "Dark";
+        }
+
+        var saved = localStorage.getItem("theme");
+        applyTheme(saved || "dark");
+
+        document.addEventListener("DOMContentLoaded", function() {
+          var button = document.getElementById("theme-toggle");
+          if (!button) return;
+          button.addEventListener("click", function() {
+            var isLight = document.documentElement.classList.contains("theme-light");
+            applyTheme(isLight ? "dark" : "light");
+          });
+        });
+      })();
+    </script>
   </head>
 
-  <body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
-    <header class="border-b border-slate-200 bg-white/95 backdrop-blur">
+  <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+    <header class="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
       <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a href="/" class="text-lg font-semibold tracking-tight text-ink">Sistema de Gestion Logial</a>
         <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
-          <a href="/" class="text-slate-600 transition hover:text-brand">Inicio</a>
-          <a href="/sobre-nosotros" class="text-slate-600 transition hover:text-brand">Sobre nosotros</a>
-          <a href="/contacto" class="text-slate-600 transition hover:text-brand">Contacto</a>
-          <a href="/sobre-el-sistema" class="text-slate-600 transition hover:text-brand">Sobre el sistema</a>
+          <a href="/" class="text-zinc-400 transition hover:text-amber-300">Inicio</a>
+          <a href="/sobre-nosotros" class="text-zinc-400 transition hover:text-amber-300">Sobre nosotros</a>
+          <a href="/contacto" class="text-zinc-400 transition hover:text-amber-300">Contacto</a>
+          <a href="/sobre-el-sistema" class="text-zinc-400 transition hover:text-amber-300">Sobre el sistema</a>
         </nav>
         <div class="flex items-center gap-3">
-          <a href="/iniciar-sesion" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand">Iniciar sesion</a>
-          <a href="/backoffice" class="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700">Backoffice</a>
+          <button id="theme-toggle" type="button" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300">
+            Tema: <span id="theme-toggle-label">Dark</span>
+          </button>
+          <% if user_signed_in? %>
+            <a href="/backoffice" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-700">Backoffice</a>
+            <%= button_to "Cerrar sesion", "/cerrar-sesion", method: :delete, class: "rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300" %>
+          <% else %>
+            <a href="/iniciar-sesion" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300">Iniciar sesion</a>
+            <a href="/backoffice" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-700">Backoffice</a>
+          <% end %>
         </div>
       </div>
     </header>
 
     <main>
+      <% if flash[:notice] %>
+        <div class="mx-auto mt-4 max-w-7xl rounded-lg border border-emerald-800 bg-emerald-950/50 px-4 py-3 text-sm text-emerald-300">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="mx-auto mt-4 max-w-7xl rounded-lg border border-amber-800 bg-amber-950/50 px-4 py-3 text-sm text-amber-300">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
       <%= yield %>
     </main>
 
-    <footer class="mt-16 border-t border-slate-200 bg-white">
-      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+    <footer class="mt-16 border-t border-zinc-800 bg-zinc-950">
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-zinc-400 md:flex-row md:items-center md:justify-between">
         <p>Gestion institucional, trazabilidad y resguardo documental para logias.</p>
         <p>V1 - Portal publico y backoffice inicial</p>
       </div>

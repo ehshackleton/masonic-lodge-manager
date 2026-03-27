@@ -6,13 +6,32 @@ Rails.application.routes.draw do
   get "/contacto", to: "public/contact#index"
   get "/sobre-el-sistema", to: "public/system#index"
   get "/iniciar-sesion", to: "public/sessions#new"
+  post "/iniciar-sesion", to: "public/sessions#create"
+  delete "/cerrar-sesion", to: "public/sessions#destroy"
 
   namespace :backoffice do
     root to: "dashboard#index"
-    get "/cuadro-logial", to: "dashboard#registry"
-    get "/tesoreria", to: "dashboard#treasury"
+    get "/cuadro-logial", to: redirect("/backoffice/brothers")
+    get "/tesoreria", to: "treasury#index"
+    post "/tesoreria/settings", to: "treasury#update_settings"
+    post "/tesoreria/generate-charges", to: "treasury#generate_charges"
+    post "/tesoreria/payments", to: "treasury#create_payment"
+    post "/tesoreria/closures", to: "treasury#create_closure"
+    delete "/tesoreria/closures/:id", to: "treasury#destroy_closure"
+    get "/tesoreria/export/excel", to: "treasury#export_excel"
+    get "/tesoreria/export/pdf", to: "treasury#export_pdf"
+    get "/tesoreria/export/morosidad/excel", to: "treasury#export_delinquency_excel"
+    get "/tesoreria/export/morosidad/pdf", to: "treasury#export_delinquency_pdf"
     get "/secretaria", to: "dashboard#secretariat"
     get "/trabajos", to: "dashboard#works"
     get "/administracion", to: "dashboard#administration"
+    resources :brothers do
+      member do
+        delete "documents/:attachment_id", to: "brothers#purge_document", as: :purge_document
+      end
+
+      resources :brother_degree_histories, only: %i[create destroy]
+      resources :brother_office_assignments, only: %i[create destroy]
+    end
   end
 end

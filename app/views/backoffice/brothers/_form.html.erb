@@ -1,0 +1,171 @@
+<% if @brother.errors.any? %>
+  <div class="mb-6 rounded-lg border border-amber-800 bg-amber-950/50 p-4 text-sm text-amber-300">
+    <p class="font-semibold">No se pudo guardar la ficha del hermano:</p>
+    <ul class="mt-2 list-disc pl-5">
+      <% @brother.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [:backoffice, @brother], class: "space-y-8" do |f| %>
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Datos logiales</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <label class="text-sm font-medium text-zinc-200">
+        Logia
+        <%= f.collection_select :lodge_id, @lodges, :id, :name, {}, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Numero de registro
+        <%= f.text_field :registry_number, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Nombre simbolico
+        <%= f.text_field :symbolic_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Grado actual
+        <%= f.collection_select :current_degree_id, @degrees, :id, :name, { include_blank: "Sin grado asignado" }, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Estado de membresia
+        <%= f.select :membership_status, Brother.membership_statuses.keys.map { |k| [k.humanize, k] }, {}, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Vigente desde
+        <%= f.date_field :status_since, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Datos personales</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <label class="text-sm font-medium text-zinc-200">
+        Nombres
+        <%= f.text_field :first_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Apellidos
+        <%= f.text_field :last_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Identificador nacional
+        <%= f.text_field :national_id, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Fecha de nacimiento
+        <%= f.date_field :birth_date, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Estado civil
+        <%= f.text_field :marital_status, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Profesion
+        <%= f.text_field :profession, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200 md:col-span-2">
+        Empleador
+        <%= f.text_field :employer, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Contacto y ubicacion</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <label class="text-sm font-medium text-zinc-200">
+        Correo
+        <%= f.email_field :email, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Telefono
+        <%= f.text_field :phone, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Celular
+        <%= f.text_field :mobile_phone, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Ciudad
+        <%= f.text_field :city, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200 md:col-span-2">
+        Direccion
+        <%= f.text_field :address, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Datos familiares y emergencia</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <label class="text-sm font-medium text-zinc-200">
+        Contacto de emergencia
+        <%= f.text_field :emergency_contact_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Telefono de emergencia
+        <%= f.text_field :emergency_contact_phone, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Conyuge
+        <%= f.text_field :spouse_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Padre
+        <%= f.text_field :father_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200 md:col-span-2">
+        Madre
+        <%= f.text_field :mother_name, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Historial de grado y notas</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <label class="text-sm font-medium text-zinc-200">
+        Iniciacion
+        <%= f.date_field :initiation_date, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Exaltacion
+        <%= f.date_field :exaltation_date, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Elevacion
+        <%= f.date_field :raising_date, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200">
+        Fecha de fallecimiento
+        <%= f.datetime_local_field :deceased_at, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="text-sm font-medium text-zinc-200 md:col-span-2">
+        Observaciones privadas
+        <%= f.text_area :notes_private, rows: 5, class: "mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+      </label>
+      <label class="flex items-center gap-2 text-sm font-medium text-zinc-200 md:col-span-2">
+        <%= f.check_box :active, class: "h-4 w-4 rounded border-zinc-700" %>
+        Hermano activo
+      </label>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-lg font-semibold text-zinc-100">Adjuntos y documentos</h2>
+    <p class="mt-1 text-sm text-zinc-500">Puede cargar uno o varios documentos relacionados con la ficha del hermano.</p>
+    <div class="mt-4">
+      <%= f.file_field :documents, multiple: true, class: "w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+    </div>
+  </section>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit(@brother.persisted? ? "Actualizar hermano" : "Crear hermano", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700") %>
+    <a href="/backoffice/brothers" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Cancelar</a>
+  </div>
+<% end %>
