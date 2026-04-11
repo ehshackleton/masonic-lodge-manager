@@ -1,0 +1,54 @@
+# Despliegue en VM Azure (Docker + Traefik ya existentes, red externa "proxy").
+#
+# Prerrequisitos en la VM:
+# - DNS: A/AAAA de logia.amenti.cl (o el host en TRAEFIK_HOST_RULE) → IP pública de la VM.
+# - docker network create proxy (si Traefik/Odoo aún no lo crearon).
+# - Traefik activo (p. ej. repo Odoo-Community-Deploy-Instance/proxy) con certresolver letsencrypt.
+# - En el directorio de despliegue: .env.production (copiar desde .env.production.example).
+#
+# GitHub → Settings → Environments → crear "masonic-production" (o el nombre de `environment:` abajo)
+# con secretos: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY, SSH_PORT (opcional, default 22).
+# Variables opcionales: DEPLOY_ROOT (ruta del repo en la VM), DEPLOY_BRANCH (default main).
+
+name: Deploy production (Azure VM)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: masonic-production
+    steps:
+      - name: Desplegar por SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ vars.SSH_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            REPO_DIR="${{ vars.DEPLOY_ROOT || '/home/azureuser/masonic-lodge-manager' }}"
+            BRANCH="${{ vars.DEPLOY_BRANCH || 'main' }}"
+            REPO_URL="${{ vars.REPO_URL || format('git@github.com:{0}.git', github.repository) }}"
+
+            mkdir -p "$(dirname "${REPO_DIR}")"
+            if [[ ! -d "${REPO_DIR}/.git" ]]; then
+              git clone --branch "${BRANCH}" --single-branch "${REPO_URL}" "${REPO_DIR}"
+            fi
+            cd "${REPO_DIR}"
+            if ! git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$(pwd)"; then
+              git config --global --add safe.directory "$(pwd)"
+            fi
+            git fetch origin "${BRANCH}"
+            git checkout "${BRANCH}"
+            git reset --hard "origin/${BRANCH}"
+
+            if [[ ! -f .env.production ]]; then
+              echo "::error::Falta .env.production en ${REPO_DIR}. Copia .env.production.example y configura secretos."
+              exit 1
+            fi
+
+            docker compose -f docker-compose.production.yml --env-file .env.production build
+            docker compose -f docker-compose.production.yml --env-file .env.production up -d

@@ -87,18 +87,34 @@ test:
 production:
   primary: &primary_production
     <<: *default
+    <% if ENV["DATABASE_URL"].present? %>
+    url: <%= ENV["DATABASE_URL"] %>
+    <% else %>
     database: app_production
     username: app
     password: <%= ENV["APP_DATABASE_PASSWORD"] %>
+    <% end %>
   cache:
     <<: *primary_production
+    <% if ENV["CACHE_DATABASE_URL"].present? %>
+    url: <%= ENV["CACHE_DATABASE_URL"] %>
+    <% else %>
     database: app_production_cache
     migrations_paths: db/cache_migrate
+    <% end %>
   queue:
     <<: *primary_production
+    <% if ENV["QUEUE_DATABASE_URL"].present? %>
+    url: <%= ENV["QUEUE_DATABASE_URL"] %>
+    <% else %>
     database: app_production_queue
     migrations_paths: db/queue_migrate
+    <% end %>
   cable:
     <<: *primary_production
+    <% if ENV["CABLE_DATABASE_URL"].present? %>
+    url: <%= ENV["CABLE_DATABASE_URL"] %>
+    <% else %>
     database: app_production_cable
     migrations_paths: db/cable_migrate
+    <% end %>

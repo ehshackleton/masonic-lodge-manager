@@ -14,7 +14,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/masonic_lodge_manager_development
       RAILS_ENV: development
-      RAILS_MASTER_KEY: 45e05757010dfb82cb13e3883ced4bd8
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?definir RAILS_MASTER_KEY en .env}
     depends_on:
       db:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/masonic_lodge_manager_development
       RAILS_ENV: development
-      RAILS_MASTER_KEY: 45e05757010dfb82cb13e3883ced4bd8
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?definir RAILS_MASTER_KEY en .env}
     depends_on:
       db:
         condition: service_healthy
