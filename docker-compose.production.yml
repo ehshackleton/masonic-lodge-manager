@@ -60,7 +60,8 @@ services:
     build:
       context: .
     restart: unless-stopped
-    command: ["./bin/rake", "solid_queue:start"]
+    # db:prepare es idempotente: evita carrera con web al crear/migrar bases queue/cache/cable.
+    command: bash -lc "./bin/rails db:prepare && exec ./bin/rake solid_queue:start"
     env_file:
       - .env.production
     environment:
