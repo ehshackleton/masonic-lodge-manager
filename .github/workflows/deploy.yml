@@ -6,9 +6,13 @@
 # - Traefik activo (p. ej. repo Odoo-Community-Deploy-Instance/proxy) con certresolver letsencrypt.
 # - En el directorio de despliegue: .env.production (copiar desde .env.production.example).
 #
-# GitHub → Settings → Environments → crear "masonic-production" (o el nombre de `environment:` abajo)
-# con secretos: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY, SSH_PORT (opcional, default 22).
-# Variables opcionales: DEPLOY_ROOT (ruta del repo en la VM), DEPLOY_BRANCH (default main).
+# Secretos (repositorio): Settings → Secrets and variables → Actions → Repository secrets:
+#   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
+# Variables de repositorio (opcionales): DEPLOY_ROOT, DEPLOY_BRANCH, REPO_URL, SSH_PORT
+#
+# Si más adelante quieres reglas de despliegue (aprobadores), añade al job la clave
+#   environment: nombre-del-entorno
+# y define los mismos secretos también en ese Environment.
 
 name: Deploy production (Azure VM)
 
@@ -18,8 +22,28 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: masonic-production
     steps:
+      - name: Comprobar secretos SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          missing=0
+          if [ -z "${SSH_HOST}" ]; then
+            echo "::error::Falta el secreto SSH_HOST. Añádelo en Settings → Secrets and variables → Actions (Secrets del repositorio)."
+            missing=1
+          fi
+          if [ -z "${SSH_USER}" ]; then
+            echo "::error::Falta el secreto SSH_USER."
+            missing=1
+          fi
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo "::error::Falta el secreto SSH_PRIVATE_KEY."
+            missing=1
+          fi
+          exit "${missing}"
+
       - name: Desplegar por SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
