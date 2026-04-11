@@ -28,7 +28,17 @@ Rails.application.configure do
   # Traefik termina TLS; la app confía en X-Forwarded-Proto (rangos Docker típicos).
   config.assume_ssl = true
   config.force_ssl = true
-  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  config.ssl_options = {
+    redirect: { exclude: ->(request) { request.path == "/up" } },
+    hsts: { expires: 1.year, subdomains: true, preload: false }
+  }
+
+  config.action_dispatch.default_headers.merge!(
+    "X-Frame-Options" => "SAMEORIGIN",
+    "X-Content-Type-Options" => "nosniff",
+    "Referrer-Policy" => "strict-origin-when-cross-origin",
+    "Permissions-Policy" => "camera=(), microphone=(), geolocation=()"
+  )
 
   config.action_dispatch.trusted_proxies = ActionDispatch::RemoteIp::TRUSTED_PROXIES + [
     IPAddr.new("10.0.0.0/8"),
@@ -80,5 +90,21 @@ Rails.application.configure do
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
+
+  # CSP solo informe: mejora visibilidad en securityheaders.com sin bloquear aún el front.
+  config.content_security_policy_report_only = true
+  config.content_security_policy do |policy|
+    policy.default_src :self
+    policy.script_src :self, :unsafe_inline
+    policy.style_src :self, :unsafe_inline
+    policy.img_src :self, :data, :blob, :https
+    policy.font_src :self, :data
+    policy.object_src :none
+    policy.frame_ancestors :self
+    policy.base_uri :self
+    policy.connect_src :self
+    policy.form_action :self
+    policy.frame_src :self
+  end
 
 end

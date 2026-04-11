@@ -1,4 +1,7 @@
 # Be sure to restart your server when you modify this file.
+#
+# En producción la CSP está en modo "report only" en
+# config/environments/production.rb (cabecera Content-Security-Policy-Report-Only).
 
 # Define an application-wide content security policy.
 # See the Securing Rails Applications Guide for more information:
