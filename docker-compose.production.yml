@@ -1,6 +1,10 @@
 # Producción detrás de Traefik (red externa "proxy" en la VM).
 # En la VM: copiar .env.production.example → .env.production y rellenar secretos.
 # DNS: apuntar logia.amenti.cl (o TRAEFIK_HOST_RULE) a la misma IP que Traefik.
+#
+# Postgres: el volumen postgres_data fija POSTGRES_USER solo la primera vez.
+# Si cambias POSTGRES_USER o ves "role masonic does not exist", alinea .env con el
+# usuario existente o haz `docker compose ... down -v` (borra datos) y vuelve a subir.
 
 services:
   db:
