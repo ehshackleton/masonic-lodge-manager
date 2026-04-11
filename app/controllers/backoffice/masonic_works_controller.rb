@@ -346,7 +346,7 @@ module Backoffice
           presented: MasonicWork.where(status: "presented", updated_at: month_start.beginning_of_day..month_end.end_of_day).count
         }
       end
-      @monthly_productivity_max = @monthly_productivity_series.map { |row| [row[:created], row[:approved], row[:presented]].max }.max.to_i
+      @monthly_productivity_max = @monthly_productivity_series.map { |row| [ row[:created], row[:approved], row[:presented] ].max }.max.to_i
       @monthly_productivity_max = 1 if @monthly_productivity_max.zero?
     end
 

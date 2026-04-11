@@ -42,9 +42,9 @@ class Minute < ApplicationRecord
     last_folio = Minute.where("folio LIKE ?", "#{prefix}%").order(:folio).pluck(:folio).last
     sequence = if last_folio.present?
                  last_folio.split("-").last.to_i + 1
-               else
+    else
                  1
-               end
+    end
     self.folio = "#{prefix}#{format('%04d', sequence)}"
   end
 end

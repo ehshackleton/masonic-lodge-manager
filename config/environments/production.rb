@@ -106,5 +106,4 @@ Rails.application.configure do
     policy.form_action :self
     policy.frame_src :self
   end
-
 end

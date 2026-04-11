@@ -19,7 +19,7 @@ class User < ApplicationRecord
   validate :avatar_constraints
 
   def full_name
-    [first_name, last_name].compact.join(" ").strip.presence || email
+    [ first_name, last_name ].compact.join(" ").strip.presence || email
   end
 
   def locked?

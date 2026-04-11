@@ -28,7 +28,7 @@ module Backoffice
         redirect_to "/backoffice/tesoreria", alert: "Periodo #{format('%02d', month)}/#{year} cerrado. No se pueden generar cargos."
         return
       end
-      due_on = Date.new(year, month, [@treasury_setting.due_day, 28].min)
+      due_on = Date.new(year, month, [ @treasury_setting.due_day, 28 ].min)
 
       created = 0
       Brother.where(active: true, membership_status: "active").find_each do |brother|
@@ -213,7 +213,7 @@ module Backoffice
         balance = charge.amount - paid_for_charge
         next if balance <= 0
 
-        applied = [remaining, balance].min
+        applied = [ remaining, balance ].min
         remaining -= applied
 
         PaymentAllocation.create!(payment: payment, charge: charge, applied_amount: applied)
@@ -221,9 +221,9 @@ module Backoffice
         new_paid_total = paid_for_charge + applied
         new_status = if new_paid_total >= charge.amount
                        "paid"
-                     else
+        else
                        "partial"
-                     end
+        end
         charge.update!(status: new_status)
       end
     end
@@ -246,9 +246,9 @@ module Backoffice
           brother: brother,
           balance: balance,
           oldest_due_on: oldest_due,
-          aging_days: [aging, 0].max
+          aging_days: [ aging, 0 ].max
         }
-      end.compact.sort_by { |row| [-row[:balance].to_f, -row[:aging_days]] }
+      end.compact.sort_by { |row| [ -row[:balance].to_f, -row[:aging_days] ] }
     end
 
     def prepare_dashboard_data

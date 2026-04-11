@@ -320,18 +320,18 @@ module Backoffice
       @coverage_pending_count = @coverage_total_active - @coverage_contributed_count
       @coverage_percentage = if @coverage_total_active.positive?
                                ((@coverage_contributed_count.to_f / @coverage_total_active) * 100).round(1)
-                             else
+      else
                                0
-                             end
+      end
 
       @coverage_rows = case @coverage_filter
-                       when "contributed"
-                         all_rows.select { |row| row[:contributed] }
-                       when "pending"
-                         all_rows.reject { |row| row[:contributed] }
-                       else
-                         all_rows
-                       end
+      when "contributed"
+        all_rows.select { |row| row[:contributed] }
+      when "pending"
+        all_rows.reject { |row| row[:contributed] }
+      else
+        all_rows
+      end
     end
 
     def authorize_hospital_read_access!

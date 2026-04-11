@@ -26,6 +26,6 @@ class Brother < ApplicationRecord
   scope :ordered, -> { order(last_name: :asc, first_name: :asc) }
 
   def full_name
-    [first_name, last_name].compact.join(" ").strip
+    [ first_name, last_name ].compact.join(" ").strip
   end
 end

@@ -22,8 +22,8 @@ class CreateHospitalFundTables < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :hospital_fund_transactions, [:lodge_id, :occurred_on]
-    add_index :hospital_fund_transactions, [:lodge_id, :entry_type]
-    add_index :hospital_fund_transactions, [:lodge_id, :category]
+    add_index :hospital_fund_transactions, [ :lodge_id, :occurred_on ]
+    add_index :hospital_fund_transactions, [ :lodge_id, :entry_type ]
+    add_index :hospital_fund_transactions, [ :lodge_id, :category ]
   end
 end
