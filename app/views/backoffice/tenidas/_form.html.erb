@@ -1,0 +1,32 @@
+<% if @tenida.errors.any? %>
+  <div class="mb-6 rounded-lg border border-amber-800 bg-amber-950/50 p-4 text-sm text-amber-300">
+    <ul class="list-disc pl-5">
+      <% @tenida.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [:backoffice, @tenida], class: "space-y-6" do |f| %>
+  <div class="grid gap-4 rounded-xl border border-zinc-800 bg-zinc-900 p-6 md:grid-cols-2">
+    <label class="text-sm text-zinc-400">Fecha<%= f.date_field :held_on, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400">Tipo<%= f.select :tenida_type, Tenida.tenida_types.keys.map { |k| [k.humanize, k] }, {}, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400">Estado<%= f.select :status, Tenida.statuses.keys.map { |k| [k.humanize, k] }, {}, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400">Grado<%= f.collection_select :degree_id, @degrees, :id, :name, { include_blank: "Sin grado" }, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400 md:col-span-2">Lugar<%= f.text_field :place, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100", placeholder: "Opcional" %></label>
+
+    <div class="md:col-span-2 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">Quien preside esta Tenida</p>
+      <p class="mt-1 text-xs text-zinc-500">No reemplaza al cargo titular del periodo (cuadro logial). Use P.T. u otra condicion cuando corresponda.</p>
+      <div class="mt-3 grid gap-3 md:grid-cols-2">
+        <label class="text-sm text-zinc-400">Hermano<%= f.collection_select :presiding_brother_id, @brothers, :id, :full_name, { include_blank: "Sin definir" }, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+        <label class="text-sm text-zinc-400">Condicion<%= f.select :presiding_capacity, Tenida.presiding_capacities.keys.map { |k| [k.humanize, k] }, { include_blank: "—" }, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+      </div>
+    </div>
+
+    <label class="text-sm text-zinc-400 md:col-span-2">Notas<%= f.text_area :notes, rows: 3, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %></label>
+  </div>
+  <div class="flex gap-2">
+    <%= f.submit(@tenida.persisted? ? "Actualizar Tenida" : "Crear Tenida", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700") %>
+    <a href="/backoffice/tenidas" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Cancelar</a>
+  </div>
+<% end %>

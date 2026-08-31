@@ -19,6 +19,13 @@
   <article class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-sm text-zinc-300 space-y-3">
     <p><strong class="text-zinc-100">Sesion:</strong> <%= @minute.session_date %></p>
     <p><strong class="text-zinc-100">Folio:</strong> <%= @minute.folio.presence || '-' %></p>
+    <p><strong class="text-zinc-100">Tenida:</strong>
+      <% if @minute.tenida %>
+        <a class="text-amber-300 hover:underline" href="<%= backoffice_tenida_path(@minute.tenida) %>"><%= @minute.tenida.code %></a>
+      <% else %>
+        —
+      <% end %>
+    </p>
     <p><strong class="text-zinc-100">Estado:</strong> <%= @minute.status.humanize %> - <strong class="text-zinc-100">Visibilidad:</strong> <%= @minute.visibility.humanize %></p>
     <p><strong class="text-zinc-100">Resumen:</strong> <%= @minute.summary.presence || '-' %></p>
     <div><strong class="text-zinc-100">Cuerpo:</strong><p class="mt-2 whitespace-pre-wrap"><%= @minute.body.presence || '-' %></p></div>

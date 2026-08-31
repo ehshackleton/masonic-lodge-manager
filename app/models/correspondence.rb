@@ -48,13 +48,14 @@ class Correspondence < ApplicationRecord
     return if folio.present?
 
     year = (sent_on || received_on || Date.current).year
-    prefix = "CORR-#{year}-"
-    last_folio = Correspondence.where("folio LIKE ?", "#{prefix}%").order(:folio).pluck(:folio).last
+    prefix = "A31-#{year}-"
+    scope = lodge_id.present? ? Correspondence.where(lodge_id: lodge_id) : Correspondence.all
+    last_folio = scope.where("folio LIKE ?", "#{prefix}%").order(:folio).pluck(:folio).last
     sequence = if last_folio.present?
                  last_folio.split("-").last.to_i + 1
     else
                  1
     end
-    self.folio = "#{prefix}#{format('%04d', sequence)}"
+    self.folio = "#{prefix}#{format('%03d', sequence)}"
   end
 end

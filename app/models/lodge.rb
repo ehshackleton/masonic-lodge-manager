@@ -3,6 +3,7 @@ class Lodge < ApplicationRecord
   has_many :masonic_works, dependent: :restrict_with_error
   has_many :minutes, dependent: :restrict_with_error
   has_many :correspondences, dependent: :restrict_with_error
+  has_many :tenidas, dependent: :restrict_with_error
   has_one :treasury_setting, dependent: :destroy
   has_one :hospital_fund_setting, dependent: :destroy
   has_many :monthly_closures, dependent: :destroy

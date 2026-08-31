@@ -159,7 +159,7 @@ Dirección creativa del sitio (§19 Contexto Maestro):
 | Tesorería | =Treasury*= | Config CLP Amenti; exports |
 | Hospitalario | =HospitalFund*= | Sensibilidad; sin diagnósticos |
 | Admin / roles | =User=/=Role= | Plantillas Veneratura/Secretaría/Tesorería |
-| Tenida | *No existe* | Modelo nuevo cuando Secretaría lo priorice |
+| Tenida | =tenidas= + minutes.tenida_id | Planificación; quien preside ≠ cargo titular |
 | Memoria / timeline | *No existe* | Contenido estático en Sobre nosotros (Fase 1); modelo luego |
 | Contacto | Vista sin persistir | Usar =ContactMessage= |
 | Public CMS | =PublicPage= vacío | Activar o contenido ERB versionado |
@@ -189,11 +189,12 @@ Objetivo: que el sitio y la logia en BD digan *Amenti Diez Nº 31*.
 
 ** Fase C — Secretaría y gobierno
 
-- [ ] Revisar workflows actas/correspondencia vs práctica Amenti (draft →…
-  approved).
-- [ ] Modelo =Tenida= (mínimo) enlazado a =Minute= cuando se priorice.
-- [ ] Distinción cargo titular vs quien preside (campos / tabla puente).
-- [ ] Dashboard Secretaría: “¿Qué requiere mi atención hoy?”
+- [X] Revisar workflows actas/correspondencia vs práctica Amenti (draft →…
+  approved). Folio correspondencia =A31-AAAA-NNN=.
+- [X] Modelo =Tenida= (mínimo) enlazado a =Minute=.
+- [X] Distinción cargo titular vs quien preside (campos en Tenida + cargos
+  vigentes del cuadro en la ficha).
+- [X] Dashboard Secretaría: “¿Qué requiere mi atención hoy?”
 
 ** Fase D — Sitio editorial ampliado
 
@@ -251,8 +252,8 @@ feature/*  -->  amenti-diez-31  -->  PR  -->  main (protegida)  -->  deploy
 |------+--------+-------|
 | A Fundación identitaria | HECHA | Seeds + portal + contacto |
 | B Seguridad y tenant | HECHA | =lodge_id= actas, AuthZ cuadro, dashboard |
-| C Secretaría / Tenida | Pendiente | |
+| C Secretaría / Tenida | HECHA | Tenidas, preside≠titular, hub atención |
 | D Sitio editorial | Pendiente | |
 | E Integraciones / Mi Amenti | Diferido | |
 
-Última actualización: 2026-08-31 — Fase B: tenant en actas y AuthZ de cuadro logial.
+Última actualización: 2026-08-31 — Fase C: entidad Tenida y dashboard de Secretaría.

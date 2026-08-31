@@ -42,6 +42,13 @@ Rails.application.routes.draw do
     patch "/administracion/logia", to: "administration#update_lodge"
     patch "/administracion/usuarios/:id/roles", to: "administration#update_user_roles", as: :administration_user_roles
     patch "/administracion/usuarios/:id/roles-plantilla", to: "administration#apply_role_template", as: :administration_user_role_template
+    resources :tenidas do
+      member do
+        patch :mark_cited
+        patch :mark_held
+        patch :cancel
+      end
+    end
     resources :brothers do
       member do
         delete "documents/:attachment_id", to: "brothers#purge_document", as: :purge_document

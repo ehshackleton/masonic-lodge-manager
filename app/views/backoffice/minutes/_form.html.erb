@@ -11,6 +11,9 @@
     <label class="text-sm text-zinc-400">Titulo<%= f.text_field :title, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
     <label class="text-sm text-zinc-400">Fecha de sesion<%= f.date_field :session_date, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
     <label class="text-sm text-zinc-400">Folio<%= f.text_field :folio, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %></label>
+    <label class="text-sm text-zinc-400 md:col-span-2">Tenida asociada
+      <%= f.collection_select :tenida_id, @tenidas || [], :id, :label, { include_blank: "Sin Tenida" }, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" %>
+    </label>
     <div class="text-sm text-zinc-400">
       Estado actual
       <div class="mt-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-zinc-200"><%= @minute.status.humanize %></div>

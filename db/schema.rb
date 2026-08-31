@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -273,12 +273,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
     t.date "session_date"
     t.string "status", default: "draft"
     t.text "summary"
+    t.bigint "tenida_id"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.string "visibility", default: "internal"
     t.index ["lodge_id", "session_date"], name: "index_minutes_on_lodge_id_and_session_date"
     t.index ["lodge_id"], name: "index_minutes_on_lodge_id"
     t.index ["session_date"], name: "index_minutes_on_session_date"
+    t.index ["tenida_id"], name: "index_minutes_on_tenida_id"
   end
 
   create_table "monthly_closures", force: :cascade do |t|
@@ -350,6 +352,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_roles_on_key", unique: true
+  end
+
+  create_table "tenidas", force: :cascade do |t|
+    t.string "code"
+    t.datetime "created_at", null: false
+    t.bigint "degree_id"
+    t.date "held_on", null: false
+    t.bigint "lodge_id", null: false
+    t.text "notes"
+    t.string "place"
+    t.bigint "presiding_brother_id"
+    t.string "presiding_capacity"
+    t.time "starts_at"
+    t.string "status", default: "planned", null: false
+    t.string "tenida_type", default: "regular", null: false
+    t.datetime "updated_at", null: false
+    t.index ["degree_id"], name: "index_tenidas_on_degree_id"
+    t.index ["lodge_id", "code"], name: "index_tenidas_on_lodge_id_and_code", unique: true
+    t.index ["lodge_id", "held_on"], name: "index_tenidas_on_lodge_id_and_held_on"
+    t.index ["lodge_id"], name: "index_tenidas_on_lodge_id"
+    t.index ["presiding_brother_id"], name: "index_tenidas_on_presiding_brother_id"
+    t.index ["status"], name: "index_tenidas_on_status"
   end
 
   create_table "treasury_settings", force: :cascade do |t|
@@ -426,6 +450,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
   add_foreign_key "masonic_works", "lodges"
   add_foreign_key "masonic_works", "users", column: "reviewer_user_id"
   add_foreign_key "minutes", "lodges"
+  add_foreign_key "minutes", "tenidas"
   add_foreign_key "minutes", "users", column: "created_by_user_id"
   add_foreign_key "monthly_closures", "lodges"
   add_foreign_key "monthly_closures", "users", column: "closed_by_user_id"
@@ -433,6 +458,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
   add_foreign_key "payment_allocations", "payments"
   add_foreign_key "payments", "brothers"
   add_foreign_key "payments", "users", column: "received_by_user_id"
+  add_foreign_key "tenidas", "brothers", column: "presiding_brother_id"
+  add_foreign_key "tenidas", "degrees"
+  add_foreign_key "tenidas", "lodges"
   add_foreign_key "treasury_settings", "lodges"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"

@@ -6,6 +6,7 @@ module Backoffice
     before_action :authorize_minutes_read_access!
     before_action :authorize_minutes_write_access!, only: %i[new create edit update destroy submit_review]
     before_action :authorize_minutes_approval_access!, only: %i[approve publish]
+    before_action :load_tenida_options, only: %i[new edit create update]
 
     def index
       @q = params[:q].to_s.strip
@@ -66,6 +67,13 @@ module Backoffice
 
     def new
       @minute = minutes_scope.new(session_date: Date.current, status: "draft", visibility: "internal", lodge: current_lodge)
+      if params[:tenida_id].present?
+        tenida = Tenida.for_lodge(current_lodge).find_by(id: params[:tenida_id])
+        if tenida
+          @minute.tenida = tenida
+          @minute.session_date = tenida.held_on
+        end
+      end
     end
 
     def create
@@ -135,7 +143,11 @@ module Backoffice
     end
 
     def minute_params
-      params.require(:minute).permit(:title, :session_date, :folio, :summary, :body, :visibility, documents: [])
+      params.require(:minute).permit(:title, :session_date, :folio, :summary, :body, :visibility, :tenida_id, documents: [])
+    end
+
+    def load_tenida_options
+      @tenidas = Tenida.for_lodge(current_lodge).ordered.limit(100)
     end
 
     def attach_documents(minute)
