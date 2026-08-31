@@ -19,17 +19,16 @@
         </p>
         <div class="mt-9 flex flex-wrap gap-3">
           <a href="/historia" class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-night transition hover:bg-amber-200">Conoce nuestra historia</a>
-          <a href="/espiritu-amentino" class="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:border-amber-300/50 hover:text-amber-200">Qué es Amenti</a>
-          <a href="/insignia" class="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:border-amber-300/50 hover:text-amber-200">Insignia</a>
+          <a href="/espiritu-amentino" class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold">Qué es Amenti</a>
+          <a href="/insignia" class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold">Insignia</a>
         </div>
       </div>
 
       <% if amenti_hero_logo_path %>
-        <div class="amenti-rise amenti-rise-delay-1 relative flex items-center justify-center border-t border-white/5 bg-gradient-to-b from-[#0b1220] to-[#070b12] px-8 py-10 lg:border-l lg:border-t-0 lg:px-10 lg:py-12">
-          <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(212,175,55,0.12),transparent_60%)]"></div>
+        <div class="hero-logo-panel amenti-rise amenti-rise-delay-1 relative flex items-center justify-center border-t px-8 py-10 lg:border-l lg:border-t-0 lg:px-10 lg:py-12">
           <%= image_tag amenti_hero_logo_path,
                         alt: "Insignia de la R∴L∴S∴ Amenti Diez N°31",
-                        class: "relative z-10 w-full max-w-[280px] rounded-[1.35rem] shadow-[0_20px_50px_rgba(0,0,0,0.45)] sm:max-w-[320px]",
+                        class: "hero-logo-image relative z-10 w-full max-w-[280px] rounded-[1.35rem] sm:max-w-[320px]",
                         width: 320,
                         height: 320,
                         decoding: "async" %>
@@ -105,7 +104,7 @@
                         class: "absolute inset-0 h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100",
                         loading: "lazy",
                         decoding: "async" %>
-          <div class="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent to-transparent"></div>
+          <div class="gallery-overlay absolute inset-0"></div>
         </div>
         <div class="p-5">
           <h3 class="font-display text-2xl text-ink"><%= title %></h3>

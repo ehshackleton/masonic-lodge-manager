@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Amenti Diez N°31">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#070b12">
+    <meta name="theme-color" content="#070b12" id="theme-color-meta">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -44,66 +44,18 @@
       body { font-family: "Outfit", ui-sans-serif, system-ui, sans-serif; }
       h1, h2, .font-display { font-family: "Cormorant Garamond", serif; }
 
-      input,
-      select,
-      textarea {
+      button, a { text-underline-offset: 3px; }
+
+      html:not(.theme-light) input,
+      html:not(.theme-light) select,
+      html:not(.theme-light) textarea {
         background-color: #121826 !important;
         color: #f4f1ea !important;
         border-color: #2a3344 !important;
       }
-      input::placeholder,
-      textarea::placeholder { color: #8b93a7 !important; }
-      button, a { text-underline-offset: 3px; }
-      .border-zinc-700.text-zinc-200 {
-        color: #e8e4d9 !important;
-        border-color: #3a4558 !important;
-      }
-      .border-zinc-700.text-zinc-200:hover {
-        color: #d4af37 !important;
-        border-color: #d4af37 !important;
-      }
-      .text-amber-300 { color: #e6c86a !important; }
-      .text-amber-300:hover { color: #f0d78a !important; }
+      html:not(.theme-light) input::placeholder,
+      html:not(.theme-light) textarea::placeholder { color: #8b93a7 !important; }
 
-      .theme-light body { background-color: #f7f4ee !important; color: #121826 !important; }
-      .theme-light .amenti-shell {
-        background:
-          radial-gradient(900px 420px at 12% -8%, rgba(30, 77, 140, 0.12), transparent 55%),
-          radial-gradient(800px 400px at 90% 0%, rgba(212, 175, 55, 0.12), transparent 50%),
-          #f7f4ee !important;
-      }
-      .theme-light .bg-zinc-950,
-      .theme-light .bg-night { background-color: #f7f4ee !important; }
-      .theme-light .bg-zinc-950\/95 { background-color: rgba(247, 244, 238, 0.95) !important; }
-      .theme-light .bg-zinc-950\/80 { background-color: rgba(247, 244, 238, 0.88) !important; }
-      .theme-light .bg-zinc-950\/70 { background-color: rgba(247, 244, 238, 0.78) !important; }
-      .theme-light .bg-zinc-950\/40 { background-color: rgba(247, 244, 238, 0.45) !important; }
-      .theme-light .bg-zinc-900,
-      .theme-light .bg-panel { background-color: #ffffff !important; }
-      .theme-light .bg-zinc-900\/80 { background-color: rgba(255, 255, 255, 0.9) !important; }
-      .theme-light .bg-zinc-900\/70 { background-color: rgba(255, 255, 255, 0.82) !important; }
-      .theme-light .border-zinc-800 { border-color: #e4dfd4 !important; }
-      .theme-light .border-zinc-700 { border-color: #d5cfc2 !important; }
-      .theme-light .text-zinc-100,
-      .theme-light .text-ink { color: #121826 !important; }
-      .theme-light .text-zinc-200 { color: #1d2533 !important; }
-      .theme-light .text-zinc-300 { color: #334155 !important; }
-      .theme-light .text-zinc-400 { color: #4b5568 !important; }
-      .theme-light .text-zinc-500 { color: #64748b !important; }
-      .theme-light .bg-black { background-color: #121826 !important; }
-      .theme-light .from-zinc-900,
-      .theme-light .via-zinc-950,
-      .theme-light .to-zinc-900 { background-image: linear-gradient(145deg, #ffffff, #f7f4ee, #eef3f9) !important; }
-      .theme-light .hover\:bg-zinc-700:hover { background-color: #334155 !important; }
-      .theme-light .hover\:bg-zinc-800\/60:hover { background-color: #ebe6db !important; }
-      .theme-light .bg-amber-950\/30 { background-color: rgba(253, 246, 227, 0.85) !important; }
-      .theme-light .bg-amber-950\/50 { background-color: rgba(253, 246, 227, 0.95) !important; }
-      .theme-light .bg-emerald-950\/50 { background-color: rgba(236, 253, 245, 0.95) !important; }
-      .theme-light .text-amber-300,
-      .theme-light .text-amber-200 { color: #8a6a12 !important; }
-      .theme-light .text-emerald-300 { color: #047857 !important; }
-      .theme-light .border-amber-800 { border-color: #c4a035 !important; }
-      .theme-light .border-emerald-800 { border-color: #059669 !important; }
       .theme-light input,
       .theme-light select,
       .theme-light textarea {
@@ -113,14 +65,6 @@
       }
       .theme-light input::placeholder,
       .theme-light textarea::placeholder { color: #64748b !important; }
-      .theme-light .amenti-panel {
-        background: linear-gradient(180deg, #ffffff, #f8f5ef) !important;
-        border-color: #e4dfd4 !important;
-        box-shadow: 0 18px 40px rgba(18, 24, 38, 0.08) !important;
-      }
-      .theme-light .amenti-mark-ring {
-        box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.45), 0 8px 20px rgba(18, 24, 38, 0.08) !important;
-      }
     </style>
     <script>
       (function() {
@@ -129,6 +73,8 @@
           localStorage.setItem("theme", theme);
           var label = document.getElementById("theme-toggle-label");
           if (label) label.textContent = theme === "light" ? "Claro" : "Oscuro";
+          var meta = document.getElementById("theme-color-meta");
+          if (meta) meta.content = theme === "light" ? "#f7f4ee" : "#070b12";
           document.querySelectorAll("[data-logo-dark],[data-logo-light]").forEach(function(img) {
             var dark = img.getAttribute("data-logo-dark");
             var light = img.getAttribute("data-logo-light");
@@ -155,7 +101,7 @@
   <body class="amenti-shell min-h-screen text-ink antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 amenti-grid-fade opacity-60"></div>
 
-    <header class="sticky top-0 z-40 border-b border-white/5 bg-night/75 backdrop-blur-xl">
+    <header class="site-header sticky top-0 z-40">
       <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5">
         <a href="/" class="group flex min-w-0 items-center gap-3">
           <% if amenti_mark_path %>
@@ -180,20 +126,20 @@
             ["/actualidad", "Actualidad"],
             ["/contacto", "Contacto"]
           ].each do |href, label| %>
-            <a href="<%= href %>" class="rounded-lg px-3 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-amber-300"><%= label %></a>
+            <a href="<%= href %>" class="site-nav-link px-3 py-2"><%= label %></a>
           <% end %>
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-3">
-          <button id="theme-toggle" type="button" class="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300">
+          <button id="theme-toggle" type="button" class="btn-outline rounded-lg px-3 py-2 text-xs font-semibold">
             Tema: <span id="theme-toggle-label">Oscuro</span>
           </button>
           <% if user_signed_in? %>
-            <a href="/backoffice/perfil" class="hidden rounded-lg border border-zinc-700 px-3 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300 sm:inline-flex">Mi perfil</a>
+            <a href="/backoffice/perfil" class="btn-outline hidden rounded-lg px-3 py-2 text-sm font-semibold sm:inline-flex">Mi perfil</a>
             <a href="/backoffice" class="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-night transition hover:bg-amber-200 sm:px-4">Backoffice</a>
-            <%= button_to "Salir", "/cerrar-sesion", method: :delete, class: "hidden rounded-lg border border-zinc-700 px-3 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300 sm:inline-flex" %>
+            <%= button_to "Salir", "/cerrar-sesion", method: :delete, class: "btn-outline hidden rounded-lg px-3 py-2 text-sm font-semibold sm:inline-flex" %>
           <% else %>
-            <a href="/iniciar-sesion" class="rounded-lg border border-zinc-700 px-3 py-2 text-sm font-semibold text-zinc-200 transition hover:border-amber-300 hover:text-amber-300">Entrar</a>
+            <a href="/iniciar-sesion" class="btn-outline rounded-lg px-3 py-2 text-sm font-semibold">Entrar</a>
             <a href="/backoffice" class="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-night transition hover:bg-amber-200 sm:px-4">Backoffice</a>
           <% end %>
         </div>
@@ -214,7 +160,7 @@
       <%= yield %>
     </main>
 
-    <footer class="mt-20 border-t border-white/5 bg-black/20">
+    <footer class="site-footer mt-20">
       <div class="mx-auto grid max-w-7xl gap-8 px-6 py-10 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div class="flex items-center gap-4">
           <% if amenti_seal_path %>
@@ -232,10 +178,10 @@
           </div>
         </div>
         <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-400 md:justify-end">
-          <a href="/insignia" class="hover:text-amber-300">Insignia</a>
-          <a href="/sobre-el-sistema" class="hover:text-amber-300">Sobre el sistema</a>
-          <a href="/iniciar-sesion" class="hover:text-amber-300">Acceso miembros</a>
-          <a href="/contacto" class="hover:text-amber-300">Contacto</a>
+          <a href="/insignia" class="site-footer-link">Insignia</a>
+          <a href="/sobre-el-sistema" class="site-footer-link">Sobre el sistema</a>
+          <a href="/iniciar-sesion" class="site-footer-link">Acceso miembros</a>
+          <a href="/contacto" class="site-footer-link">Contacto</a>
         </div>
       </div>
       <div class="h-2 w-full opacity-30 amenti-mosaic"></div>

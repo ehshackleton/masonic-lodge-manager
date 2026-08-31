@@ -12,19 +12,19 @@
 
   <div class="mt-12 grid gap-6 lg:grid-cols-2">
     <figure class="amenti-panel amenti-panel-gold overflow-hidden rounded-3xl">
-      <div class="flex min-h-[22rem] items-center justify-center bg-[#0b1220] p-8">
+      <div class="amenti-asset-stage flex min-h-[22rem] items-center justify-center p-8">
         <% if amenti_master_logo_path %>
           <%= image_tag amenti_hero_logo_path || amenti_master_logo_path,
                         alt: "Insignia maestra de la R∴L∴S∴ Amenti Diez N°31",
-                        class: "max-h-[26rem] w-full max-w-md object-contain",
+                        class: "hero-logo-image max-h-[26rem] w-full max-w-md rounded-[1.35rem] object-contain",
                         decoding: "async",
                         data: {
                           logo_dark: amenti_hero_logo_path || amenti_master_logo_path,
-                          logo_light: amenti_master_light_path || amenti_master_logo_path
+                          logo_light: amenti_hero_logo_path || amenti_master_light_path || amenti_master_logo_path
                         } %>
         <% end %>
       </div>
-      <figcaption class="border-t border-white/5 px-8 py-6">
+      <figcaption class="amenti-asset-caption px-8 py-6">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Insignia maestra</p>
         <p class="mt-2 text-sm leading-relaxed text-zinc-400">
           Triángulo, ave y cadena de unión. Presentada sobre plato institucional
@@ -34,7 +34,7 @@
     </figure>
 
     <figure class="amenti-panel overflow-hidden rounded-3xl">
-      <div class="flex min-h-[22rem] items-center justify-center bg-[#0b1220] p-8">
+      <div class="amenti-asset-stage flex min-h-[22rem] items-center justify-center p-8">
         <% if amenti_seal_path %>
           <%= image_tag amenti_seal_path,
                         alt: "Sello circular de Amenti Diez N°31",
@@ -42,7 +42,7 @@
                         decoding: "async" %>
         <% end %>
       </div>
-      <figcaption class="border-t border-white/5 px-8 py-6">
+      <figcaption class="amenti-asset-caption px-8 py-6">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Sello circular</p>
         <p class="mt-2 text-sm leading-relaxed text-zinc-400">
           Versión compacta con aro dorado para navegación, pie de página y favicon.
@@ -54,7 +54,7 @@
   <div class="mt-8 grid gap-4 sm:grid-cols-3">
     <div class="amenti-panel rounded-2xl p-5">
       <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Nav / badge</p>
-      <div class="mt-5 flex h-24 items-center justify-center rounded-xl bg-black/20">
+      <div class="amenti-preview-well mt-5 flex h-24 items-center justify-center rounded-xl">
         <% if amenti_mark_path %>
           <%= image_tag amenti_mark_path, alt: "Badge de navegación", class: "h-16 w-16 rounded-full object-cover amenti-mark-ring", loading: "lazy" %>
         <% end %>
@@ -64,10 +64,10 @@
     <div class="amenti-panel rounded-2xl p-5">
       <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Paleta</p>
       <div class="mt-5 flex gap-2">
-        <span class="h-12 flex-1 rounded-xl bg-[#070b12] ring-1 ring-white/10" title="Night"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#1e4d8c] ring-1 ring-white/10" title="Blue"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#d4af37] ring-1 ring-white/10" title="Gold"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#f4f1ea] ring-1 ring-white/10" title="Ink"></span>
+        <span class="h-12 flex-1 rounded-xl bg-[#070b12] ring-1 ring-black/10" title="Night"></span>
+        <span class="h-12 flex-1 rounded-xl bg-[#1e4d8c] ring-1 ring-black/10" title="Blue"></span>
+        <span class="h-12 flex-1 rounded-xl bg-[#d4af37] ring-1 ring-black/10" title="Gold"></span>
+        <span class="h-12 flex-1 rounded-xl bg-[#f4f1ea] ring-1 ring-black/10" title="Ivory"></span>
       </div>
       <p class="mt-3 text-xs text-zinc-500">Night · azul del sello · oro · ivory.</p>
     </div>
