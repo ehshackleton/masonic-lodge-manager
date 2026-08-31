@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rqrcode"
-
 module Certificates
   class ActiveMemberPdf
     ACCENT = "C9A227"
@@ -239,6 +237,7 @@ module Certificates
     end
 
     def qr_code_io(url)
+      require "rqrcode"
       png = ::RQRCode::QRCode.new(url).as_png(size: 180, border_modules: 1)
       StringIO.new(png.to_s)
     end
