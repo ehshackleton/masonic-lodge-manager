@@ -1,0 +1,84 @@
+<%= form_with model: @user, url: (@user.persisted? ? backoffice_admin_user_path(@user) : backoffice_admin_users_path), class: "space-y-8" do |f| %>
+  <% if @user.errors.any? %>
+    <div class="rounded-lg border border-rose-800 bg-rose-950/40 px-4 py-3 text-sm text-rose-200">
+      <p class="font-semibold">Revise los campos:</p>
+      <ul class="mt-2 list-disc pl-5">
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <section class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-base font-semibold text-zinc-100">Datos de acceso</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <%= f.label :email, "Correo", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.email_field :email, required: true, class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+      <div>
+        <%= f.label :first_name, "Nombre", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.text_field :first_name, class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+      <div>
+        <%= f.label :last_name, "Apellidos", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.text_field :last_name, class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+      <div>
+        <%= f.label :phone, "Telefono", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.telephone_field :phone, class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+      <div class="flex items-center gap-2 pt-6">
+        <%= f.check_box :active, class: "rounded border-zinc-700 bg-zinc-950 text-amber-300" %>
+        <%= f.label :active, "Cuenta activa", class: "text-sm text-zinc-300" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-base font-semibold text-zinc-100"><%= @user.persisted? ? "Restablecer contraseña" : "Contraseña inicial" %></h2>
+    <p class="mt-1 text-xs text-zinc-500">Minimo 12 caracteres.<%= @user.persisted? ? " Deje en blanco para mantener la actual." : "" %></p>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <div>
+        <%= f.label :password, "Contrasena", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.password_field :password, required: @user.new_record?, autocomplete: "new-password", class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+      <div>
+        <%= f.label :password_confirmation, "Confirmar contrasena", class: "mb-1 block text-xs uppercase tracking-wide text-zinc-500" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <h2 class="text-base font-semibold text-zinc-100">Roles y permisos</h2>
+    <div class="mt-4 space-y-4">
+      <% if @superadmin_role %>
+        <label class="inline-flex items-center gap-2 rounded-lg border border-amber-900/40 bg-amber-950/20 px-4 py-3 text-sm text-amber-200">
+          <%= check_box_tag :superadmin, "1", @user.has_role?(:superadmin), class: "rounded border-zinc-700 bg-zinc-950 text-amber-300" %>
+          <span>Superadmin <span class="text-xs text-amber-400/80">(<%= @superadmin_role.key %>)</span> — acceso total incluida administracion</span>
+        </label>
+      <% end %>
+
+      <% @role_matrix.each do |module_name, module_roles| %>
+        <div class="rounded-xl border border-zinc-800 p-4">
+          <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= module_name %></p>
+          <div class="grid gap-3 md:grid-cols-2">
+            <% module_roles.each do |role| %>
+              <label class="inline-flex items-center gap-2 text-sm text-zinc-300">
+                <%= check_box_tag "role_ids[]", role.id, @user.roles.any? { |r| r.id == role.id }, id: "role_#{role.id}", class: "rounded border-zinc-700 bg-zinc-950 text-amber-300" %>
+                <span><%= role.name %> <span class="text-xs text-zinc-500">(<%= role.key %>)</span></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="flex gap-3">
+    <%= f.submit submit_label, class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white" %>
+    <a href="<%= backoffice_admin_users_path %>" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200">Cancelar</a>
+  </div>
+<% end %>

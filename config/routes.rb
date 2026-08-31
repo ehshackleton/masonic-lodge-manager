@@ -51,10 +51,14 @@ Rails.application.routes.draw do
       post :health
     end
     get "/trabajos", to: redirect("/backoffice/masonic_works")
-    get "/administracion", to: "administration#index"
-    patch "/administracion/logia", to: "administration#update_lodge"
-    patch "/administracion/usuarios/:id/roles", to: "administration#update_user_roles", as: :administration_user_roles
-    patch "/administracion/usuarios/:id/roles-plantilla", to: "administration#apply_role_template", as: :administration_user_role_template
+    get "/administracion", to: "administration#index", as: :administration
+    patch "/administracion/logia", to: "administration#update_lodge", as: :administration_lodge
+    resources :admin_users, path: "administracion/usuarios", only: %i[index new create edit update destroy] do
+      member do
+        patch :unlock
+        patch :apply_role_template
+      end
+    end
     resources :tenidas do
       member do
         patch :mark_cited

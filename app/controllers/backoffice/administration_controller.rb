@@ -1,60 +1,28 @@
+# frozen_string_literal: true
+
 module Backoffice
   class AdministrationController < ApplicationController
-    ROLE_MATRIX = {
-      "Cuadro logial" => %w[registry_manager registry_editor registry_viewer],
-      "Secretaria" => %w[secretario secretariat_manager minute_editor minute_approver correspondence_editor correspondence_approver],
-      "Tesoreria" => %w[tesoreria_manager tesoreria_operator tesoreria_closer tesoreria_exporter],
-      "Trabajos" => %w[work_reviewer work_approver work_presenter work_archiver],
-      "Hospitalario" => %w[hospitalario_manager hospitalario_operator hospitalario_exporter]
-    }.freeze
-    ROLE_TEMPLATES = {
-      "secretario" => {
-        name: "Plantilla Secretario",
-        role_keys: %w[
-          secretario secretariat_manager minute_editor minute_approver correspondence_editor correspondence_approver
-          registry_manager registry_editor
-          work_reviewer work_approver work_presenter work_archiver
-        ]
-      },
-      "cuadro" => {
-        name: "Plantilla Cuadro logial",
-        role_keys: %w[registry_manager registry_editor]
-      },
-      "tesorero" => {
-        name: "Plantilla Tesorero",
-        role_keys: %w[tesoreria_manager tesoreria_operator tesoreria_closer tesoreria_exporter]
-      },
-      "revisor" => {
-        name: "Plantilla Revisor",
-        role_keys: %w[work_reviewer]
-      },
-      "hospitalario" => {
-        name: "Plantilla Hospitalario",
-        role_keys: %w[hospitalario_manager hospitalario_operator hospitalario_exporter]
-      }
-    }.freeze
-    MANAGEABLE_ROLE_KEYS = ROLE_MATRIX.values.flatten.freeze
+    include SuperadminAuthorization
 
     before_action :require_authentication
-    before_action :authorize_administration!
-    before_action :set_target_user, only: %i[update_user_roles apply_role_template]
+    before_action :require_superadmin!
 
     def index
       @lodge = Lodge.first
-      @users = User.includes(:roles).order(:email)
-      @manageable_roles = Role.where(key: MANAGEABLE_ROLE_KEYS).order(:name)
-      @role_matrix = ROLE_MATRIX.transform_values { |keys| @manageable_roles.select { |role| keys.include?(role.key) } }
-      @role_templates = ROLE_TEMPLATES
-      @recent_audit_logs = AuditLog.where(action: "administration.user_roles.update")
-                                   .includes(:user)
-                                   .order(created_at: :desc)
-                                   .limit(20)
+      @recent_audit_logs = AuditLog.where(action: %w[
+        administration.user.create
+        administration.user.update
+        administration.user.deactivate
+        administration.user.unlock
+        administration.user_roles.update
+        administration.lodge.update
+      ]).includes(:user).order(created_at: :desc).limit(30)
     end
 
     def update_lodge
       @lodge = Lodge.first
       unless @lodge
-        redirect_to "/backoffice/administracion", alert: "No existe una logia configurada."
+        redirect_to backoffice_administration_path, alert: "No existe una logia configurada."
         return
       end
 
@@ -70,89 +38,13 @@ module Backoffice
           ip_address: request.remote_ip,
           user_agent: request.user_agent
         )
-        redirect_to "/backoffice/administracion", notice: "Configuracion de la logia actualizada."
+        redirect_to backoffice_administration_path, notice: "Configuracion de la logia actualizada."
       else
-        redirect_to "/backoffice/administracion", alert: @lodge.errors.full_messages.to_sentence
+        redirect_to backoffice_administration_path, alert: @lodge.errors.full_messages.to_sentence
       end
-    end
-
-    def update_user_roles
-      selected_role_ids = Array(params[:role_ids]).map(&:to_i)
-      allowed_ids = Role.where(key: MANAGEABLE_ROLE_KEYS).pluck(:id)
-      final_role_ids = selected_role_ids & allowed_ids
-
-      @target_user.user_roles.where(role_id: allowed_ids).delete_all
-      final_role_ids.each do |role_id|
-        UserRole.find_or_create_by!(user_id: @target_user.id, role_id: role_id)
-      end
-
-      AuditLog.record!(
-        user: current_user,
-        action: "administration.user_roles.update",
-        auditable: @target_user,
-        metadata: {
-          target_user_email: @target_user.email,
-          role_keys: Role.where(id: final_role_ids).pluck(:key)
-        },
-        ip_address: request.remote_ip,
-        user_agent: request.user_agent
-      )
-
-      redirect_to "/backoffice/administracion", notice: "Roles actualizados para #{@target_user.email}."
-    end
-
-    def apply_role_template
-      template_key = params[:template_key].to_s
-      template = ROLE_TEMPLATES[template_key]
-      unless template
-        redirect_to "/backoffice/administracion", alert: "Plantilla de roles no valida."
-        return
-      end
-
-      allowed_ids = Role.where(key: MANAGEABLE_ROLE_KEYS).pluck(:id)
-      template_role_ids = Role.where(key: template[:role_keys]).pluck(:id)
-
-      @target_user.user_roles.where(role_id: allowed_ids).delete_all
-      template_role_ids.each do |role_id|
-        UserRole.find_or_create_by!(user_id: @target_user.id, role_id: role_id)
-      end
-
-      AuditLog.record!(
-        user: current_user,
-        action: "administration.user_roles.update",
-        auditable: @target_user,
-        metadata: {
-          target_user_email: @target_user.email,
-          template_key: template_key,
-          template_name: template[:name],
-          role_keys: template[:role_keys]
-        },
-        ip_address: request.remote_ip,
-        user_agent: request.user_agent
-      )
-
-      redirect_to "/backoffice/administracion", notice: "Plantilla #{template[:name]} aplicada a #{@target_user.email}."
     end
 
     private
-
-    def set_target_user
-      @target_user = User.find(params[:id])
-    end
-
-    def authorize_administration!
-      return if current_user&.has_role?(:superadmin)
-
-      AuditLog.record!(
-        user: current_user,
-        action: "permission.denied.administration",
-        auditable: current_user,
-        metadata: { path: request.path, method: request.request_method },
-        ip_address: request.remote_ip,
-        user_agent: request.user_agent
-      )
-      redirect_to "/backoffice", alert: "No tienes permisos para administrar roles."
-    end
 
     def lodge_params
       params.require(:lodge).permit(:name, :description, :anniversary_date)

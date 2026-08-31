@@ -9,6 +9,11 @@ module Public
     def create
       user = User.find_by(email: session_params[:email].to_s.strip.downcase)
 
+      if user && !user.active?
+        redirect_to "/iniciar-sesion", alert: "Cuenta desactivada. Contacte a Secretaria o al administrador."
+        return
+      end
+
       if user&.locked?
         redirect_to "/iniciar-sesion", alert: "Cuenta bloqueada temporalmente. Contacte al administrador."
         return
