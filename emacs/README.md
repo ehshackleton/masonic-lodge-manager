@@ -1,71 +1,57 @@
-# Emacs en Masonic Lodge Manager
+# Emacs (Doom) — Masonic Lodge Manager
 
-Configuración para editar este proyecto Rails con Emacs 30+.
+Este proyecto se trabaja con **Doom Emacs** (`~/.emacs.d` + `~/.doom.d`).
 
 ## Archivos del repo
 
 | Archivo | Uso |
 |---------|-----|
 | `.editorconfig` | Indentación 2 espacios (Ruby, ERB, YAML) |
-| `.dir-locals.el` | Ajustes al abrir archivos del proyecto |
-| `emacs/project.el` | Projectile, Eglot vía Docker, rutas del repo |
+| `.dir-locals.el` | Ajustes locales al abrir archivos del proyecto |
+| `emacs/doom.el` | Eglot + `ruby-lsp` vía Docker Compose |
+| `emacs/project.el` | Helpers legacy (opcional) |
 
-## Configuración global
+## Credenciales GitHub (ya en Doom)
 
-Se creó `~/.emacs.d/init.el` con:
+El PAT vive en:
 
-- **MELPA** (magit, projectile, eglot, web-mode, flycheck, editorconfig)
-- **Projectile** (`C-c p f` buscar archivo, `C-c p p` cambiar proyecto)
-- **Magit** (`C-c g` estado git)
-- **Eglot** + **ruby-lsp** (dentro del contenedor `web` de Docker)
-- **web-mode** para `.erb`
+```text
+~/.doom.d/token/read-github-token/key.txt
+```
 
-La primera vez que abras Emacs, puede tardar instalando paquetes.
+`~/.doom.d/github.el` lo expone a Forge/Magit vía `auth-source` (usuario `ehshackleton`).
+
+Para `git push` en terminal, el credential store usa ese mismo token (`~/.git-credentials`).
 
 ## Uso diario
 
-1. **Levantar el stack** (necesario para LSP vía Docker):
+1. Stack local:
 
    ```bash
-   cd /home/shackleton/Proyectos/masonic-lodge-manager
+   cd ~/Proyectos/masonic-lodge-manager
    docker compose up -d
    ```
 
-2. **Abrir Emacs** en el proyecto:
+2. Abrir Doom en el proyecto:
 
    ```bash
-   emacs /home/shackleton/Proyectos/masonic-lodge-manager
+   emacs ~/Proyectos/masonic-lodge-manager
    ```
 
-3. Abre un `.rb` o `.erb` — Eglot debería conectar con `ruby-lsp` en el contenedor.
+3. Magit / Forge: `SPC g g` (status), `SPC g i` (issues), `SPC g p` (PRs).
 
-4. **Consola Rails** (terminal):
+4. Consola / tests:
 
    ```bash
    docker compose exec web bash -lc './bin/rails console'
-   ```
-
-5. **Tests**:
-
-   ```bash
    docker compose exec web bash -lc './bin/rails test'
    ```
 
-## Desarrollo local (sin Emacs)
+## Rama de desarrollo
 
-Ver `README.md`. Resumen:
+- `amenti-diez-31` — desarrollo del sistema y sitio para la R∴L∴ Amenti Diez Nº 31  
+- `main` — estable / despliegue
 
-```bash
-cp .env.example .env   # si no existe
-# Editar .env: RAILS_MASTER_KEY desde config/master.key
-docker compose up --build
-# http://localhost:3000
-```
+## Nota
 
-Credenciales admin por defecto (seed): ver `ADMIN_TEMP_PASSWORD` en `.env`.
-
-## Solución de problemas
-
-- **Eglot no conecta**: confirma `docker compose ps` y que el servicio `web` está `Up`.
-- **Paquetes Emacs**: `M-x package-refresh-contents` y `M-x package-install RET magit RET`.
-- **RuboCop en flycheck**: ejecuta tests/linter en el contenedor: `docker compose exec web bundle exec rubocop`.
+No uses un `~/.emacs.d/init.el` vanilla encima de Doom: Doom arranca con `early-init.el` y la config de usuario está en `~/.doom.d/`.
