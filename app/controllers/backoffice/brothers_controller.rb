@@ -12,13 +12,61 @@ module Backoffice
       @status = params[:status].to_s.strip
       @degree_id = params[:degree_id].to_s.strip
 
-      @brothers = Brother.where(lodge_id: current_lodge.id).includes(:current_degree, :lodge).ordered
-      @brothers = apply_search(@brothers, @q)
-      @brothers = @brothers.where(membership_status: @status) if @status.present?
-      @brothers = @brothers.where(current_degree_id: @degree_id) if @degree_id.present?
-
+      @brothers = filtered_brothers
       @degrees = Degree.order(rank_order: :asc)
       @can_write_registry = current_user.can_manage_registry_action?(:write)
+    end
+
+    def export_excel
+      load_brothers_for_export
+      rows = @brothers_for_export.map do |brother|
+        contact = brother.email.presence || brother.mobile_phone.presence || "-"
+        %(<Row><Cell><Data ss:Type="String">#{ERB::Util.h(brother.registry_number.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.full_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.symbolic_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.current_degree&.name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.membership_status.to_s.humanize)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(contact)}</Data></Cell></Row>)
+      end.join("\n")
+
+      xml = <<~XML
+        <?xml version="1.0"?>
+        <?mso-application progid="Excel.Sheet"?>
+        <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+          <Worksheet ss:Name="Cuadro logial">
+            <Table>
+              <Row>
+                <Cell><Data ss:Type="String">Registro</Data></Cell>
+                <Cell><Data ss:Type="String">Hermano</Data></Cell>
+                <Cell><Data ss:Type="String">Nombre simbolico</Data></Cell>
+                <Cell><Data ss:Type="String">Grado</Data></Cell>
+                <Cell><Data ss:Type="String">Estado</Data></Cell>
+                <Cell><Data ss:Type="String">Contacto</Data></Cell>
+              </Row>
+              #{rows}
+            </Table>
+          </Worksheet>
+        </Workbook>
+      XML
+      send_data xml, filename: "cuadro_logial_#{Date.current}.xls", type: "application/vnd.ms-excel"
+    end
+
+    def export_pdf
+      load_brothers_for_export
+      pdf = PrawnDocument.build
+      pdf.text "Cuadro logial - Respetable Logia Simbolica Amenti Diez N°31", size: 16, style: :bold
+      pdf.move_down 4
+      pdf.text "Emitido: #{Date.current} | Registros: #{@brothers_for_export.size}", size: 10
+      pdf.move_down 8
+
+      @brothers_for_export.each do |brother|
+        contact = brother.email.presence || brother.mobile_phone.presence || "-"
+        pdf.text brother.full_name.to_s, style: :bold, size: 11
+        pdf.text "Registro: #{brother.registry_number} | Simbolico: #{brother.symbolic_name.presence || '-'} | Grado: #{brother.current_degree&.name || '-'}", size: 9
+        pdf.text "Estado: #{brother.membership_status.to_s.humanize} | Contacto: #{contact}", size: 9
+        pdf.move_down 4
+      end
+      pdf.text "Sin hermanos para exportar." if @brothers_for_export.empty?
+
+      send_data pdf.render, filename: "cuadro_logial_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def show
@@ -93,6 +141,18 @@ module Backoffice
         "LOWER(first_name) LIKE :q OR LOWER(last_name) LIKE :q OR LOWER(symbolic_name) LIKE :q OR LOWER(registry_number) LIKE :q OR LOWER(national_id) LIKE :q",
         q: pattern
       )
+    end
+
+    def filtered_brothers
+      scope = Brother.where(lodge_id: current_lodge.id).includes(:current_degree, :lodge).ordered
+      scope = apply_search(scope, params[:q].to_s.strip)
+      scope = scope.where(membership_status: params[:status].to_s.strip) if params[:status].present?
+      scope = scope.where(current_degree_id: params[:degree_id].to_s.strip) if params[:degree_id].present?
+      scope
+    end
+
+    def load_brothers_for_export
+      @brothers_for_export = filtered_brothers
     end
 
     def brother_params

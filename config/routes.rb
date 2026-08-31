@@ -63,6 +63,11 @@ Rails.application.routes.draw do
       end
     end
     resources :brothers do
+      collection do
+        get :export_excel
+        get :export_pdf
+      end
+
       member do
         delete "documents/:attachment_id", to: "brothers#purge_document", as: :purge_document
       end
