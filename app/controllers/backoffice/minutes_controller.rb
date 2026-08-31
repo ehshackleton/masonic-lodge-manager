@@ -51,7 +51,7 @@ module Backoffice
 
     def export_pdf
       load_minutes_for_export
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de actas", size: 16, style: :bold
       pdf.move_down 8
       @minutes.each do |m|

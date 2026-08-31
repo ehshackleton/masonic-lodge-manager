@@ -52,7 +52,7 @@ module Backoffice
 
     def export_pdf
       load_correspondences_for_export
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de correspondencia", size: 16, style: :bold
       pdf.move_down 8
       @correspondences.each do |c|

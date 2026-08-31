@@ -143,7 +143,7 @@ module Backoffice
 
     def export_pdf
       load_hospital_data
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Saco Hospitalario - Balance y movimientos", size: 16, style: :bold
       pdf.move_down 8
       pdf.text "Balance actual: #{format_currency(@balance)}"
@@ -193,7 +193,7 @@ module Backoffice
 
     def export_coverage_pdf
       load_hospital_data
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de cobertura mensual - Saco Hospitalario", size: 16, style: :bold
       pdf.move_down 8
       pdf.text "Mes: #{@coverage_month.strftime('%m/%Y')}"

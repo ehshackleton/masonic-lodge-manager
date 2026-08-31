@@ -104,7 +104,7 @@ module Backoffice
 
     def export_pdf
       prepare_dashboard_data
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Tesoreria y contabilidad - Tablero de ingresos", size: 16, style: :bold
       pdf.move_down 8
       pdf.text "Rango: #{@from} a #{@to}"
@@ -148,7 +148,7 @@ module Backoffice
 
     def export_delinquency_pdf
       prepare_dashboard_data
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de morosidad por hermano", size: 16, style: :bold
       pdf.move_down 8
       pdf.text "Fecha de emision: #{Date.current}"

@@ -69,7 +69,7 @@ module Backoffice
 
     def export_pdf
       load_works_for_export
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de trabajos masonicos", size: 16, style: :bold
       pdf.move_down 8
       @works_for_export.each do |work|
@@ -112,7 +112,7 @@ module Backoffice
 
     def export_reviews_pdf
       load_reviews_for_export
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Reporte de revisiones de trabajos", size: 16, style: :bold
       pdf.move_down 8
       @reviews_for_export.each do |review|
@@ -135,7 +135,7 @@ module Backoffice
       build_monthly_productivity_series
       load_works_for_export
 
-      pdf = Prawn::Document.new(page_size: "A4")
+      pdf = PrawnDocument.build
       pdf.text "Tablero de productividad - Trabajos masonicos", size: 16, style: :bold
       pdf.move_down 4
       pdf.text "Periodo: #{@period_from} a #{@period_to}", size: 10

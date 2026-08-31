@@ -36,7 +36,7 @@ module Workspace
 
     def build_pdf
       require "prawn"
-      Prawn::Document.new(page_size: "A4") do |pdf|
+      PrawnDocument.build do |pdf|
         pdf.text "Acta #{@minute.folio}", size: 16, style: :bold
         pdf.move_down 8
         pdf.text "Titulo: #{@minute.title}"
