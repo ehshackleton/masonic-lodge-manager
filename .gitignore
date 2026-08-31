@@ -36,3 +36,8 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Hojas locales con PII / fuentes de importación (nunca versionar).
+*.ods
+*.ODS
+/private_data/
+
