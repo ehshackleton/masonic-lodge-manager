@@ -137,7 +137,7 @@
           <div class="flex items-center gap-3">
             <%= link_to "Ver", rails_blob_path(document, disposition: "attachment"), class: "text-amber-300 hover:underline" %>
             <% if @can_write_registry %>
-              <%= button_to "Eliminar", purge_document_backoffice_brother_path(@brother, attachment_id: document.attachment.id), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+              <%= button_to "Eliminar", purge_document_backoffice_brother_path(@brother, attachment_id: document.id), method: :delete, class: "text-xs font-semibold text-rose-700" %>
             <% end %>
           </div>
         </div>

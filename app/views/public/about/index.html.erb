@@ -1,37 +1,49 @@
 <% content_for :title, "Sobre nosotros | Amenti Diez N°31" %>
 
-<section class="mx-auto max-w-5xl px-6 py-14">
-  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Amenti</p>
-  <h1 class="mt-3 text-4xl font-bold tracking-tight text-zinc-100">Quiénes somos</h1>
-  <p class="mt-5 max-w-3xl text-lg leading-relaxed text-zinc-300">
-    Respetable Logia Simbólica Amenti Diez N°31 · Gran Logia Mixta de Chile · Valle de Santiago.
-    Fundada el 4 de agosto de 1960.
-  </p>
+<section class="mx-auto max-w-6xl px-6 py-14">
+  <div class="grid items-start gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300">Amenti</p>
+      <h1 class="font-display mt-3 text-5xl text-ink sm:text-6xl">Quiénes somos</h1>
+      <p class="mt-5 text-lg leading-relaxed text-zinc-300">
+        Respetable Logia Simbólica Amenti Diez N°31 · Gran Logia Mixta de Chile · Valle de Santiago.
+        Fundada el 4 de agosto de 1960.
+      </p>
+      <% if amenti_master_logo_path %>
+        <div class="amenti-panel amenti-panel-gold mt-8 flex items-center justify-center rounded-3xl p-8">
+          <%= image_tag amenti_master_logo_path,
+                        alt: "Insignia Amenti",
+                        class: "max-h-64 w-full object-contain",
+                        loading: "lazy",
+                        data: {
+                          logo_dark: amenti_master_logo_path,
+                          logo_light: amenti_master_light_path || amenti_master_logo_path
+                        } %>
+        </div>
+      <% end %>
+    </div>
 
-  <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <a href="/historia" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Historia</h2>
-      <p class="mt-3 text-sm text-zinc-400">Línea de tiempo pública: 1960, tránsito institucional, 1982 y N°31.</p>
-    </a>
-    <a href="/espiritu-amentino" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Espíritu amentino</h2>
-      <p class="mt-3 text-sm text-zinc-400">Identidad simbólica: equilibrio, memoria y fraternidad.</p>
-    </a>
-    <a href="/insignia" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Insignia</h2>
-      <p class="mt-3 text-sm text-zinc-400">Activo de marca y criterios de uso público.</p>
-    </a>
-    <a href="/masoneria" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Masonería</h2>
-      <p class="mt-3 text-sm text-zinc-400">Preguntas frecuentes cuidadas, sin inventar requisitos.</p>
-    </a>
-    <a href="/actualidad" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Actualidad</h2>
-      <p class="mt-3 text-sm text-zinc-400">Avisos públicos solo cuando estén autorizados.</p>
-    </a>
-    <a href="/contacto" class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-amber-300/50">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-300">Contacto</h2>
-      <p class="mt-3 text-sm text-zinc-400">Canal institucional para consultas públicas.</p>
-    </a>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <% [
+        ["/historia", "Historia", "Línea de tiempo pública: 1960, tránsito institucional, 1982 y N°31."],
+        ["/espiritu-amentino", "Espíritu amentino", "Identidad simbólica: equilibrio, memoria y fraternidad."],
+        ["/insignia", "Insignia", "Activo de marca y criterios de uso público.", true],
+        ["/masoneria", "Masonería", "Preguntas frecuentes cuidadas, sin inventar requisitos."],
+        ["/actualidad", "Actualidad", "Avisos públicos solo cuando estén autorizados."],
+        ["/contacto", "Contacto", "Canal institucional para consultas públicas."]
+      ].each do |href, title, copy, with_mark| %>
+        <a href="<%= href %>" class="amenti-panel group rounded-2xl p-6 transition hover:border-amber-300/40">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300"><%= title %></h2>
+              <p class="mt-3 text-sm text-zinc-400"><%= copy %></p>
+            </div>
+            <% if with_mark && amenti_mark_path %>
+              <%= image_tag amenti_mark_path, alt: "", class: "h-12 w-12 shrink-0 rounded-full object-cover amenti-mark-ring", width: 48, height: 48, loading: "lazy" %>
+            <% end %>
+          </div>
+        </a>
+      <% end %>
+    </div>
   </div>
 </section>
