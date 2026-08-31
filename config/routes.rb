@@ -3,6 +3,11 @@ Rails.application.routes.draw do
 
   root to: "public/home#index"
   get "/sobre-nosotros", to: "public/about#index"
+  get "/historia", to: "public/pages#historia"
+  get "/espiritu-amentino", to: "public/pages#espiritu"
+  get "/masoneria", to: "public/pages#masoneria"
+  get "/actualidad", to: "public/pages#actualidad"
+  get "/insignia", to: "public/pages#insignia"
   get "/contacto", to: "public/contact#index", as: :contacto
   post "/contacto", to: "public/contact#create"
   get "/sobre-el-sistema", to: "public/system#index"

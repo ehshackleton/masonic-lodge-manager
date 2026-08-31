@@ -198,10 +198,11 @@ Objetivo: que el sitio y la logia en BD digan *Amenti Diez Nº 31*.
 
 ** Fase D — Sitio editorial ampliado
 
-- [ ] Secciones: Historia / Espíritu amentino / Masonería (FAQ cuidadoso) /
-  Actualidad (si hay contenido autorizado).
-- [ ] Activos de marca (insignia) con DAM liviano o =public/= + metadatos.
-- [ ] Galería solo con material autorizado (respetar norma de no capturar templo).
+- [X] Secciones: Historia / Espíritu amentino / Masonería (FAQ cuidadoso) /
+  Actualidad (placeholder default deny) / Insignia.
+- [X] Activos de marca: criterio en =/insignia= + =public/images/README.md=
+  (logo maestro pendiente de archivo).
+- [X] Galería: aviso de ambientación autorizada (no interior de templo).
 
 ** Fase E — Integraciones y portal miembro (posterior)
 
@@ -253,7 +254,26 @@ feature/*  -->  amenti-diez-31  -->  PR  -->  main (protegida)  -->  deploy
 | A Fundación identitaria | HECHA | Seeds + portal + contacto |
 | B Seguridad y tenant | HECHA | =lodge_id= actas, AuthZ cuadro, dashboard |
 | C Secretaría / Tenida | HECHA | Tenidas, preside≠titular, hub atención |
-| D Sitio editorial | Pendiente | |
+| D Sitio editorial | HECHA | Historia, espíritu, masonería, actualidad, insignia |
 | E Integraciones / Mi Amenti | Diferido | |
 
-Última actualización: 2026-08-31 — Fase C: entidad Tenida y dashboard de Secretaría.
+* 10. Validación de coherencia (2026-08-31)
+
+| Check | Resultado |
+|-------+-----------|
+| Lodge Amenti N°31 en BD | OK |
+| Portal reconoce Amenti (home/nav) | OK (Fase D) |
+| Contacto persistente | OK (modelo + POST) |
+| AuthZ cuadro (=registry_*=) | OK (código); superadmin bypass |
+| Tenida ↔ Minute | OK |
+| Folio correspondencia =A31-*= | OK |
+| *Datos de miembros (Brothers)* | *NO cargados* — =Brother.count = 0= |
+| Usuarios | Solo admin seed (=admin@logia.local=) |
+| PII en Git | No (correcto; Registro Maestro queda fuera) |
+
+*Importación de cuadro:* no forma parte del seed. Debe hacerse de forma
+autorizada (manual o ETL) desde el Registro Maestro / Ficha Maestra, sin
+copiar PII a Git, logs ni fixtures. Hasta entonces el backoffice de cuadro
+está vacío pero operable.
+
+Última actualización: 2026-08-31 — Fase D editorial + auditoría de datos.

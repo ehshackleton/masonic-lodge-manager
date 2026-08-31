@@ -1,0 +1,38 @@
+<% content_for :title, "Insignia | Amenti Diez N°31" %>
+
+<section class="mx-auto max-w-3xl px-6 py-14">
+  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Marca institucional</p>
+  <h1 class="mt-3 text-4xl font-bold tracking-tight text-zinc-100">Insignia</h1>
+  <p class="mt-5 text-lg leading-relaxed text-zinc-300">
+    La insignia de Amenti es un activo maestro. Su uso público requiere criterio
+    y, cuando corresponda, autorización explícita.
+  </p>
+
+  <div class="mt-10 grid gap-6 md:grid-cols-2">
+    <div class="flex aspect-square items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 p-8">
+      <% if File.exist?(Rails.root.join("public/images/logo-amenti.png")) || File.exist?(Rails.root.join("public/images/logo-amenti.jpg")) || File.exist?(Rails.root.join("public/images/logo-amenti.webp")) %>
+        <% logo = %w[logo-amenti.webp logo-amenti.png logo-amenti.jpg].find { |f| File.exist?(Rails.root.join("public/images", f)) } %>
+        <%= image_tag "/images/#{logo}", alt: "Insignia de la R∴L∴S∴ Amenti Diez N°31", class: "max-h-full max-w-full object-contain" %>
+      <% else %>
+        <div class="text-center">
+          <p class="text-sm font-semibold text-zinc-200">Archivo pendiente</p>
+          <p class="mt-2 text-xs text-zinc-500">Coloque =logo-amenti.(png|jpg|webp)= en =public/images/=</p>
+        </div>
+      <% end %>
+    </div>
+    <div class="space-y-4 text-sm leading-relaxed text-zinc-400">
+      <p>
+        Variantes deseables del activo maestro: original, monocromática, negativo,
+        favicon y versión pequeña. Preferir vector (SVG) cuando esté disponible.
+      </p>
+      <p>
+        Metadatos mínimos para cualquier imagen publicada: título, derechos,
+        clasificación, alt text y uso permitido.
+      </p>
+      <p class="text-xs text-zinc-500">
+        Existe normativa sobre captura de imágenes en templos: la galería del sitio
+        usa solo ambientación autorizada y no pretende documentar el interior ritual.
+      </p>
+    </div>
+  </div>
+</section>
