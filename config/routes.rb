@@ -3,7 +3,8 @@ Rails.application.routes.draw do
 
   root to: "public/home#index"
   get "/sobre-nosotros", to: "public/about#index"
-  get "/contacto", to: "public/contact#index"
+  get "/contacto", to: "public/contact#index", as: :contacto
+  post "/contacto", to: "public/contact#create"
   get "/sobre-el-sistema", to: "public/system#index"
   get "/iniciar-sesion", to: "public/sessions#new"
   post "/iniciar-sesion", to: "public/sessions#create"

@@ -1,0 +1,958 @@
+#+TITLE: CONTEXTO MAESTRO — AMENTI DIGITAL
+#+SUBTITLE: Sistema Integral de Gestión Logial, Memoria Institucional, Portal de Miembros y Sitio Público
+#+DATE: <2026-08-31>
+#+LANGUAGE: es
+#+OPTIONS: toc:t num:t
+#+STARTUP: overview indent
+#+CATEGORY: Amenti / Transformación Digital / Gestión Logial
+#+DESCRIPTION: Contexto rector para agentes de diseño, producto e ingeniería encargados de imaginar, diseñar e implementar el ecosistema digital de la Respetable Logia Simbólica Amenti Diez N°31.
+#+KEYWORDS: Amenti, Odoo Community, Google Workspace, Masonería, Secretaría, Actas, Tenidas, Miembros, Formación, Biblioteca, IA, Archivo, Sitio Web
+
+* 0. MANDATO AL AGENTE
+Este documento no es una especificación cerrada. Es un contexto rector.
+
+La misión es construir un *Templo Digital* para Amenti Diez N°31: una plataforma capaz de preservar memoria, disminuir carga administrativa, facilitar el trabajo logial, fortalecer la fraternidad, ordenar el conocimiento y proyectar públicamente la identidad de Amenti sin revelar aquello que deba mantenerse interno, confidencial o reservado.
+
+El agente debe pensar simultáneamente como arquitecto de software, diseñador de producto, UX/UI, historiador digital, arquitecto de información, especialista en Odoo Community y Google Workspace, especialista en seguridad, diseñador de automatizaciones y curador de memoria institucional.
+
+Principio rector:
+
+#+begin_quote
+La tecnología debe desaparecer detrás de una experiencia simple, digna y simbólicamente coherente. El sistema debe sentirse como Amenti, no como un ERP genérico adaptado a la fuerza.
+#+end_quote
+
+* 1. IDENTIDAD INSTITUCIONAL
+- Nombre: =Respetable Logia Simbólica Amenti Diez N°31=
+- Obediencia: =Gran Logia Mixta de Chile=
+- Valle: Santiago de Chile
+- Fundación: =4 de agosto de 1960=
+- Dominio: =amenti.cl=
+- Portal referenciado en documentación interna: =logia.amenti.cl=
+- Correo institucional: =amentidiez31@granlogiamixta.cl=
+- Zona horaria: =America/Santiago=
+
+El nombre Amenti es de inspiración egipcia y remite a la Duat/Amenti, al tránsito, al juicio de Osiris y al pesaje del corazón frente a la pluma de Maat. Conceptos útiles para identidad narrativa: verdad, justicia, equilibrio, armonía, conciencia, tránsito, puertas, luz, memoria, construcción, cadena de unión y trabajo interior.
+
+No convertir la experiencia en una caricatura egipcia. La referencia debe ser elegante, abstracta y contemporánea.
+
+* 2. HISTORIA BASE DE AMENTI
+Hitos que deben servir como columna vertebral del relato histórico:
+
+- 4 de agosto de 1960: encendimiento de fuegos y levantamiento de columnas.
+- Nace adscrita al Rito Antiguo y Primitivo de Menfis-Misraim y recibe originalmente el N°10.
+- El relato histórico identifica a Carlos Gómez Nordenflycht como primer Aprendiz iniciado en Amenti.
+- 27 de diciembre de 1960: Amenti participa del nuevo escenario institucional surgido con el Gran Oriente Masónico Chileno.
+- Julio de 1974: retiro de dicho Oriente.
+- 1974-1975: período sin afiliación a un Oriente.
+- Junio de 1975: incorporación a la Gran Logia Metropolitana, adscrita al Benemérito Rito Nacional Mexicano.
+- El trabajo cercano con logias femeninas contribuye al tránsito natural hacia la mixticidad.
+- 26 de junio de 1982: la Gran Asamblea acepta la incorporación de Amenti.
+- 29 de junio de 1982: el Decreto N°456 la incorpora con el N°31.
+- Desde entonces adopta el nombre =Amenti Diez N°31=, conservando “Diez” como memoria de su origen.
+- La historia interna destaca participación en campañas, publicaciones, infraestructura, CLIPSAS y órganos de la Orden.
+- Existe una noción cultural central: =el espíritu amentino=, transmitido entre generaciones.
+
+La plataforma debe preservar no solo archivos, sino también esta cultura: testimonios, biografías, recuerdos, hitos, fotografías autorizadas, antiguas oficialidades, trabajos memorables, efemérides, objetos, símbolos y relatos orales.
+
+* 3. GOBIERNO Y OFICIALIDAD 2026
+Existe una diferencia que el sistema debe modelar correctamente.
+
+El Decreto N°1808 de la Gran Logia Mixta de Chile, de 28 de julio de 2026, aprueba las elecciones de Amenti y registra a Sergio Salinas Díaz como Venerable Maestro electo, con instalación fijada para el 29 de julio de 2026.
+
+Registros operacionales de Tenidas de agosto de 2026 muestran a Luis Valentín Catalán Catalán presidiendo determinadas Tenidas en condición =P.T.=.
+
+Por ello, nunca modelar todo con un único campo =venerable_maestro_actual=.
+
+Deben distinguirse:
+- autoridad titular del período;
+- período administrativo;
+- autoridad instalada;
+- quién preside una Tenida;
+- condición en esa Tenida: titular, adjunto, P.T. u otra;
+- vigencia;
+- fuente documental.
+
+Los registros ya contemplan cargos como Venerable Maestro, Primer Vigilante, Segundo Vigilante, Orador, Secretario, Tesorero, Hospitalario, Experto, Maestro de Ceremonias y Guarda Templo.
+
+Principio de datos:
+=Persona != Miembro != Cargo != Designación != Rol efectivo en Tenida=
+
+* 4. INVENTARIO DIGITAL EXISTENTE
+El proyecto no parte desde cero.
+
+Fuentes relevantes encontradas en Google Drive:
+
+1. =Contexto Maestro — Amenti Digital / Secretaría Google Workspace=
+2. =Amenti — Registro Maestro de Miembros=
+3. =Amenti | Ficha Maestra de Miembros | Respuestas=
+4. =Amenti — Gestión y Automatización de Actas=
+5. =SOURCE — Apps Script — Automatización de Actas Amenti=
+6. =Rituales Amenti Diez Nº31=
+7. =Ritual Tenida Blanca Amenti.pdf=
+8. =Trabajos Primer Grado - 2do Semestre 2026.pdf=
+9. =Trabajos Masonicos de Segundo Grado=
+10. trabajos individuales de miembros
+11. Decreto N°1808 de instalación 2026
+12. Decreto N°1807 relacionado con captura de imágenes en templos
+13. =logo-amenti.jpg=
+14. actas y extractos 2026
+15. formatos de elecciones
+16. biblioteca histórica, simbólica y doctrinal.
+
+No hardcodear IDs o URLs en lógica de negocio. Mantener catálogo/configuración de fuentes.
+
+* 5. REGISTRO Y FICHA MAESTRA DE MIEMBROS
+El Registro Maestro ya separa conceptualmente:
+- miembros privados;
+- directorio operativo;
+- oficialidad de referencia;
+- provisioning Workspace;
+- grupos;
+- altas/bajas.
+
+La Ficha Maestra captura una riqueza de información notable:
+- identidad y contacto;
+- nacimiento/nacionalidad;
+- domicilio;
+- educación;
+- profesión/oficio;
+- organización laboral;
+- áreas de experiencia;
+- competencias que puede aportar;
+- grado;
+- fechas masónicas;
+- Logia de iniciación;
+- cargos anteriores y actual;
+- comisiones de interés;
+- disponibilidad;
+- interés en presentar trabajos;
+- temas de estudio;
+- Calendar/Workspace;
+- contacto de emergencia;
+- consentimientos de directorio, nombre y fotografías;
+- observaciones y sugerencias.
+
+Estos datos permiten personalización interna y un “mapa de talentos”, pero contienen PII.
+
+REGLA CRÍTICA:
+No copiar registros reales a Git, logs, prompts públicos, fixtures de prueba ni frontend público. Referenciar fuentes maestras y consumir solo lo autorizado.
+
+* 6. GESTIÓN Y AUTOMATIZACIÓN DE ACTAS
+La hoja =Amenti — Gestión y Automatización de Actas= ya modela:
+- configuración;
+- Tenidas;
+- oficialidad;
+- asistencia;
+- visitadores;
+- excusas;
+- correspondencia;
+- decretos;
+- trabajos;
+- aportes;
+- bien general;
+- saco/balotajes;
+- cuentas de comisiones;
+- archivos;
+- catálogos;
+- dashboard;
+- auditoría;
+- cache de miembros.
+
+Principio existente:
+Una Tenida registrada debe poder alimentar Acta Narrativa, Extracto, PDFs, Calendar y archivación en Drive.
+
+Convención existente:
+=Actas/<año>/<mes>/<grado>/<TENIDA_ID>/=
+
+Regla:
+No generar documento final si quedan placeholders o si el estado no es =APROBADA=.
+
+Esto debe integrarse al nuevo sistema, no descartarse.
+
+* 7. VISIÓN DEL PRODUCTO
+Nombre recomendado del ecosistema:
+=AMENTI DIGITAL=
+
+Concepto:
+=Una plataforma de memoria, gobierno, formación y fraternidad.=
+
+Arquitectura de experiencia:
+
+#+begin_src text
+                           AMENTI DIGITAL
+                                  |
+          +-----------------------+-----------------------+
+          |                       |                       |
+     SITIO PÚBLICO            PORTAL PRIVADO          OPERACIÓN
+          |                       |                       |
+ Identidad/Historia         Mi Amenti / Biblioteca     Odoo
+ Noticias/Contacto          Formación/Calendario       Workspace
+ Patrimonio público         Trabajos/Directorio        Automatización
+          |                       |                       |
+          +-----------------------+-----------------------+
+                                  |
+                             MEMORIA DIGITAL
+                                  |
+                  Drive + datos estructurados + IA
+#+end_src
+
+Para el usuario debe sentirse como una sola institución, no como Odoo + Drive + Calendar + sitio desconectados.
+
+* 8. CLASIFICACIÓN DE INFORMACIÓN
+Todo contenido debe declarar clasificación.
+
+** PUBLICO
+Historia aprobada, identidad, insignia, noticias públicas, actividades abiertas, patrimonio autorizado, contacto y contenidos expresamente publicados.
+
+** INTERNO
+Calendario general, biblioteca interna, directorio autorizado, comunicaciones y materiales colaborativos.
+
+** CONFIDENCIAL
+Datos personales, contactos de emergencia, correspondencia administrativa, actas, tesorería y solicitudes.
+
+** RESERVADO
+Material ritual/restringido por grado, documentos determinados por autoridad y procesos especialmente sensibles.
+
+Regla:
+=default deny=
+
+Si no existe clasificación, no publicar.
+
+* 9. ODOO COMMUNITY COMO NÚCLEO OPERACIONAL
+Odoo Community puede funcionar como sistema nervioso administrativo.
+
+Separación de responsabilidades:
+- Odoo: estado operacional, relaciones, permisos, workflows, paneles.
+- Google Drive: archivo documental institucional.
+- Google Calendar: calendario cuando se defina como fuente primaria.
+- Gmail: fuente del mensaje/correspondencia.
+- Sitio público: proyección externa.
+- Portal: experiencia del miembro.
+
+No duplicar contenido sin propósito.
+
+No usar =hr.employee= para representar automáticamente a cada miembro.
+- =res.partner=: persona/contacto.
+- =res.users=: capacidad de login.
+- =hr.employee=: solo si un caso real lo requiere.
+- modelo custom =amenti.member=: pertenencia y trayectoria logial.
+
+* 10. MODELO DE DATOS LOGIAL
+Crear módulos funcionales propios, por ejemplo:
+
+- =amenti_base=
+- =amenti_members=
+- =amenti_lodge=
+- =amenti_tenidas=
+- =amenti_minutes=
+- =amenti_correspondence=
+- =amenti_education=
+- =amenti_library=
+- =amenti_committees=
+- =amenti_events=
+- =amenti_archive=
+- =amenti_ai=
+- =amenti_website=
+
+Entidades sugeridas:
+- Lodge
+- Member
+- AdministrativeTerm
+- Office
+- OfficeAppointment
+- Degree
+- DegreeHistory
+- Tenida
+- TenidaRole
+- Attendance
+- Visitor
+- Minute
+- MinuteVersion
+- Work
+- WorkPresentation
+- Committee
+- CommitteeMembership
+- Correspondence
+- Decree
+- DocumentReference
+- ArchiveItem
+- Consent
+- EmergencyContact
+
+Usar UUID o IDs no sensibles. Nunca usar RUT como primary key técnico.
+
+* 11. TENIDA COMO ENTIDAD CENTRAL
+Una Tenida debería contener:
+- ID y correlativo;
+- fecha;
+- grado;
+- tipo;
+- lugar/hora;
+- quién preside;
+- oficialidad efectiva;
+- Tabla;
+- trabajos;
+- visitadores;
+- correspondencia;
+- decretos;
+- asistencia;
+- excusas;
+- bien general;
+- acuerdos;
+- tareas;
+- Acta;
+- Extracto;
+- PDFs;
+- carpeta Drive;
+- evento Calendar;
+- estado;
+- auditoría.
+
+Workflow sugerido:
+=PLANIFICADA -> CITACIÓN EN PREPARACIÓN -> CITADA -> REALIZADA -> ACTA EN BORRADOR -> EN REVISIÓN -> APROBADA -> ARCHIVADA=
+
+Debe soportar cancelación y reprogramación.
+
+* 12. ACTAS Y CORRESPONDENCIA
+Las Actas son memoria institucional y deben ser first-class citizens:
+- pertenecen a una Tenida;
+- tienen versiones;
+- estado;
+- responsable;
+- revisor;
+- fecha de aprobación;
+- documento editable;
+- PDF final;
+- extracto;
+- trazabilidad.
+
+Correspondencia:
+- Gmail sigue siendo fuente primaria del mensaje.
+- Odoo guarda metadata, correlativo, responsable, estado y vínculo al thread.
+- Correlativo existente sugerido: =A31-AAAA-NNN=.
+- Workflow: BORRADOR, PENDIENTE_REVISION, APROBADO, ENVIADO, RECIBIDO, POR_RESPONDER, EN_TRAMITACION, ARCHIVADO, CERRADO.
+- Comunicación sensible: patrón =draft-first= con revisión humana.
+
+* 13. PORTAL PRIVADO — MI AMENTI
+Nombre:
+=Mi Amenti=
+
+Pantalla inicial orientada a la persona:
+- próxima Tenida;
+- confirmación pendiente;
+- grado;
+- cargo;
+- tareas;
+- trabajos;
+- calendario;
+- biblioteca reciente;
+- comunicaciones;
+- solicitudes;
+- formación;
+- accesos rápidos.
+
+No exponer el backend estándar de Odoo a todos los miembros.
+
+La experiencia debe ser móvil, elegante e institucional, no un ERP lleno de tablas.
+
+* 14. DIRECTORIO Y MAPA DE TALENTOS
+El directorio interno debe mostrar solo datos expresamente autorizados.
+
+Puede incluir:
+- fotografía autorizada;
+- nombre;
+- grado;
+- cargo;
+- correo/teléfono autorizado;
+- áreas de conocimiento;
+- habilidades;
+- comisiones;
+- intereses de estudio.
+
+Crear una experiencia:
+=Amenti Sabe=
+
+Permite buscar capacidades:
+“¿Quién puede ayudar con Derecho?”
+“¿Quién conoce tecnología?”
+“¿Quién tiene experiencia docente?”
+“¿Quién quiere trabajar un tema de filosofía?”
+
+Esto transforma la Ficha Maestra en una herramienta de fraternidad y colaboración.
+
+* 15. FORMACIÓN — SENDEROS
+No limitarse a “Cursos”.
+
+Nombre:
+=Senderos de Formación=
+
+Rutas:
+- Aprendiz
+- Compañero
+- Maestro
+
+Cada ruta puede ofrecer:
+- lecturas;
+- biblioteca;
+- trabajos;
+- hitos;
+- actividades;
+- bitácora personal;
+- mentor;
+- agenda;
+- material autorizado por grado.
+
+Respetar estrictamente restricciones por grado. No confiar en ocultar botones: validar ACL en backend.
+
+Evitar gamificación trivial: nada de rankings, “puntos masónicos” o competencias.
+
+* 16. BIBLIOTECA VIVA
+Construir índice de la biblioteca existente en Drive sin mover todo de inmediato.
+
+Metadata:
+- título;
+- autor;
+- tema;
+- grado;
+- tipo;
+- idioma;
+- año;
+- procedencia;
+- clasificación;
+- descripción;
+- tags;
+- Drive file ID;
+- derechos;
+- restricciones.
+
+Tipos:
+trabajo, plancha, ritual, libro, artículo, documento histórico, manual, revista, decreto, acta, audiovisual.
+
+Experiencia:
+=Explorar por símbolo=
+
+Ejemplos:
+Ara, Columnas, Escuadra, Compás, Maat, Templo, Piedra, Luz, Silencio, Cadena.
+
+* 17. MEMORIA AMENTI
+Crear módulo:
+=Memoria Amenti=
+
+Vista principal:
+=Línea del Tiempo=
+
+Cada hito:
+- fecha;
+- narrativa;
+- fuentes;
+- documentos;
+- personas;
+- fotografías autorizadas;
+- tema;
+- nivel de acceso.
+
+La IA puede ayudar a redactar, pero nunca inventar hitos y siempre debe enlazar fuentes.
+
+Objetivo:
+Que un miembro de 2050 pueda comprender la evolución institucional de 1960, 1982, 1996, 2026 y años futuros.
+
+* 18. SITIO PÚBLICO
+Objetivos:
+- presentar Amenti;
+- explicar masonería de forma accesible;
+- preservar historia autorizada;
+- mostrar una institución viva;
+- permitir contacto;
+- comunicar actividades públicas;
+- ofrecer artículos;
+- conectar con la Gran Logia Mixta de Chile.
+
+Arquitectura:
+
+#+begin_src text
+Inicio
+├── Amenti
+│   ├── Quiénes somos
+│   ├── Historia
+│   ├── Línea del tiempo
+│   ├── Nuestra insignia
+│   └── Espíritu amentino
+├── Masonería
+│   ├── Qué es
+│   ├── Grados simbólicos
+│   ├── Trabajo interno
+│   └── Preguntas frecuentes
+├── Biblioteca pública
+├── Actualidad
+├── Patrimonio
+├── Contacto
+└── Acceso miembros
+#+end_src
+
+* 19. DIRECCIÓN CREATIVA DEL SITIO
+Evitar un inicio genérico de “Bienvenidos”.
+
+Hero sugerido:
+=Desde 1960, trabajando la piedra que somos.=
+
+Subtítulo:
+=Respetable Logia Simbólica Amenti Diez N°31 · Gran Logia Mixta de Chile · Santiago=
+
+CTAs:
+- Conoce nuestra historia
+- Qué es Amenti
+- Contacto
+
+Dirección visual:
+- sobria;
+- moderna;
+- editorial;
+- ceremonial;
+- nocturna;
+- luminosa;
+- minimalista.
+
+Paleta derivada de la insignia:
+azul profundo, oro envejecido, marfil, grafito, blanco y negro.
+
+Evitar clichés masónicos excesivos y dorado brillante.
+
+* 20. INSIGNIA E IMÁGENES
+Existe =logo-amenti.jpg= en Drive y una versión publicada previamente en amenti.cl.
+
+Tratar la insignia como activo maestro.
+
+Crear:
+- original;
+- vector/SVG cuando sea posible;
+- monocromática;
+- negativo;
+- favicon;
+- marca de agua;
+- PDF;
+- small-size;
+- accesible.
+
+Crear un DAM liviano para imágenes:
+- título;
+- descripción;
+- fecha;
+- autor;
+- derechos;
+- personas;
+- consentimientos;
+- clasificación;
+- alt text;
+- uso permitido.
+
+Existe además normativa en Drive relacionada con prohibición de captura de imágenes en templos; por tanto, galería y publicación deben diseñarse conservadoramente y exigir validación.
+
+* 21. GOOGLE WORKSPACE
+Workspace ya es parte del sistema.
+
+Integraciones:
+- Drive;
+- Docs;
+- Sheets;
+- Forms;
+- Calendar;
+- Gmail;
+- Directory/Groups solo si existe autoridad administrativa.
+
+El contexto previo ya define:
+- arquitectura Apps Script para MVP;
+- evolución a backend;
+- OAuth2;
+- principios de least privilege;
+- idempotencia;
+- auditoría;
+- draft-first;
+- Calendar;
+- grupos;
+- automatización de Tenidas.
+
+El nuevo sistema debe integrar y reutilizar este trabajo.
+
+Odoo no reemplaza Google Workspace. Lo orquesta y ofrece una experiencia unificada.
+
+* 22. SOURCE OF TRUTH
+Definir fuente primaria por dominio:
+
+| Dominio | Fuente primaria inicial |
+|---------+-------------------------|
+| Identidad administrativa | Registro Maestro |
+| Datos ampliados | Ficha Maestra validada |
+| Tenidas | Gestión de Actas / Calendar según decisión |
+| Actas | Drive + registro |
+| Correspondencia | Gmail |
+| Documentos | Drive |
+| Sitio público | CMS/Odoo Website |
+| Consentimientos | Registro estructurado |
+| Usuarios Odoo | Odoo |
+| Grupos Workspace | Workspace cuando aplique |
+
+Evitar multi-master accidental.
+
+* 23. INTEGRACIÓN Y SINCRONIZACIÓN
+Crear una capa explícita de integración.
+
+No dispersar scripts sin ownership.
+
+Patrones:
+- idempotencia;
+- correlation IDs;
+- retries limitados;
+- outbox;
+- reconciliación;
+- dead letter;
+- auditoría.
+
+Ejemplo:
+=Odoo crea Tenida -> Integration Service -> Calendar + Drive + Docs -> devuelve IDs -> Odoo registra referencias=
+
+Arquitectura posible:
+- Odoo Community
+- módulos Amenti
+- Integration API
+- Google Workspace
+- índice de búsqueda
+- gateway IA.
+
+La integración puede vivir en FastAPI/Python, Node/TypeScript, jobs Odoo o Cloud Run; mantener desacoplamiento suficiente para evolucionar.
+
+* 24. IA — AGENTES
+Agentes conceptuales:
+
+** El Archivista
+Busca documentos, resume actas autorizadas, localiza precedentes, ayuda a preparar Tabla, identifica tareas y responde historia institucional con fuentes.
+
+** El Bibliotecario
+Recomienda lecturas, encuentra trabajos por símbolo/tema y acompaña Senderos de Formación.
+
+** El Cronista
+Construye líneas de tiempo, compara documentos, prepara efemérides y borradores patrimoniales.
+
+Regla:
+=respuesta con fuente=
+
+Si no existe evidencia:
+=No existe evidencia suficiente en las fuentes disponibles.=
+
+La IA nunca debe tener más acceso que el usuario.
+
+* 25. BÚSQUEDA SEMÁNTICA Y KNOWLEDGE GRAPH
+Objetivo futuro:
+buscar significado y relaciones, no solo nombres de archivos.
+
+Preguntas:
+- “Muéstrame trabajos sobre el silencio.”
+- “¿Qué documentos hablan del ingreso de Amenti a la Gran Logia Mixta?”
+- “¿Qué acuerdos existen sobre biblioteca?”
+
+Knowledge graph futuro:
+=Persona -> Cargo -> Período -> Tenida -> Trabajo -> Tema -> Documento -> Hito=
+
+Todo nodo debe respetar ACL y clasificación.
+
+* 26. PRIVACIDAD, CONSENTIMIENTO Y SEGURIDAD
+Reglas:
+- MFA;
+- mínimo privilegio;
+- grupos para autorización;
+- no contraseñas compartidas;
+- no PII en Git;
+- no PII en logs;
+- no RUT como ID;
+- secretos en secret manager;
+- offboarding;
+- auditoría;
+- revisión de permisos;
+- tests con datos ficticios.
+
+Modelar consentimiento como entidad versionada:
+- tipo;
+- texto/version;
+- fecha;
+- respuesta;
+- fuente;
+- revocación.
+
+Consentimiento no es un booleano eterno.
+
+Separar:
+=MemberPublicProfile=
+=MemberOperationalProfile=
+=MemberPrivateProfile=
+
+* 27. SECRETARÍA DIGITAL
+Centro de servicios:
+=Secretaría Digital=
+
+Tipos:
+- actualización de datos;
+- certificado;
+- copia documental;
+- justificación;
+- inclusión de trabajo;
+- solicitud a comisión;
+- consulta;
+- solicitud administrativa;
+- otro.
+
+Cada solicitud:
+ID, fecha, solicitante, tipo, clasificación, adjuntos, responsable, estado, historial y tiempos internos cuando corresponda.
+
+Cambios sensibles a la ficha deben requerir validación de Secretaría.
+
+* 28. COMISIONES, HOSPITALARÍA Y TESORERÍA
+Comisiones:
+propósito, miembros, responsable, período, documentos, reuniones, tareas, entregables y memoria final.
+
+Hospitalaría:
+diseñar con extrema sensibilidad; coordinar apoyo sin convertir el sistema en repositorio de salud. No registrar diagnósticos innecesarios.
+
+Tesorería:
+si se implementa, separar permisos. Gestionar cuotas, pagos, gastos, fondos, rendiciones y reportes. No almacenar datos bancarios personales sin finalidad clara.
+
+* 29. CONTACTO Y POSTULACIÓN PÚBLICA
+Formulario público mínimo:
+- nombre;
+- correo;
+- motivo;
+- mensaje;
+- consentimiento;
+- antispam.
+
+No pedir RUT ni antecedentes extensos inicialmente.
+
+Separar contacto de proceso formal.
+
+Pipeline conceptual:
+=INTERESADO -> CONTACTADO -> CONVERSACIÓN -> PROCESO FORMAL -> RESULTADO=
+
+El agente no debe inventar requisitos de admisión ni rituales.
+
+* 30. DASHBOARDS
+Secretaría:
+=¿Qué requiere mi atención hoy?=
+- próxima Tenida;
+- documentos por aprobar;
+- actas pendientes;
+- correspondencia;
+- solicitudes;
+- confirmaciones;
+- excusas;
+- trabajos;
+- tareas vencidas.
+
+Veneratura:
+visión ejecutiva sin PII innecesaria.
+
+Docencia:
+aprendices, compañeros, trabajos, temas, biblioteca, mentoring y calendario.
+
+No crear métricas por crear. Cada indicador debe facilitar una decisión.
+
+* 31. EXPERIENCIA MÓVIL, ACCESIBILIDAD Y TONO
+Portal mobile-first.
+
+Acciones rápidas:
+- confirmar asistencia;
+- justificar;
+- ver próxima Tenida;
+- abrir Tabla;
+- acceder documento autorizado;
+- enviar solicitud;
+- biblioteca.
+
+WCAG AA como objetivo.
+
+Tono:
+fraterno, culto, claro, sobrio, no comercial y no grandilocuente.
+
+Evitar:
+“únete ahora”, “secretos”, “élite”, “poder”.
+
+Preferir:
+“Conoce”, “Explora”, “Memoria”, “Trabajo”, “Fraternidad”, “Formación”.
+
+* 32. GOBIERNO DOCUMENTAL Y CONTINUIDAD
+Principio del contexto previo:
+=Ningún conocimiento crítico debe depender de la persona que ocupa el cargo.=
+
+Implementar:
+- ownership institucional;
+- backup;
+- export;
+- documentación;
+- runbooks;
+- handover;
+- recuperación;
+- historial.
+
+Runbooks mínimos:
+- cambio de Secretario;
+- cambio de Veneratura;
+- recuperación Drive;
+- reautorización OAuth;
+- error de sincronización;
+- importación;
+- backup;
+- offboarding;
+- incidente de privacidad.
+
+* 33. MIGRACIÓN Y CALIDAD DE DATOS
+No importar todo de una vez.
+
+Fases:
+1. inventario;
+2. clasificación;
+3. source of truth;
+4. normalización;
+5. deduplicación;
+6. validación humana;
+7. piloto;
+8. reconciliación;
+9. migración;
+10. cierre controlado.
+
+Problemas esperables:
+- variantes de nombres;
+- tildes;
+- fechas;
+- abreviaciones;
+- duplicados;
+- PDFs escaneados;
+- nomenclaturas históricas;
+- oficialidades temporales.
+
+Cuando sea relevante, conservar =raw_value= y =normalized_value=.
+
+* 34. ROADMAP
+** Fase 0 — Descubrimiento
+Inventario Drive, web, usuarios, datos, permisos, fuentes maestras, oficialidad, identidad visual.
+
+** Fase 1 — Fundación
+Odoo, auth, roles, miembros, períodos, cargos, Tenidas, integración Drive.
+
+** Fase 2 — Secretaría
+Actas, Calendar, asistencia, excusas, correspondencia, solicitudes, dashboard.
+
+** Fase 3 — Portal
+Mi Amenti, perfil, calendario, biblioteca, solicitudes, documentos.
+
+** Fase 4 — Formación
+Senderos, trabajos, biblioteca por grado, mentoring.
+
+** Fase 5 — Sitio público
+Identidad, historia, patrimonio, artículos, eventos, contacto.
+
+** Fase 6 — IA
+Archivista, Bibliotecario, Cronista, búsqueda semántica.
+
+** Fase 7 — Memoria avanzada
+Timeline, knowledge graph, archivo digital, historia oral.
+
+* 35. MVP
+El MVP no necesita IA.
+
+Es exitoso cuando:
+- miembros están normalizados;
+- roles son correctos;
+- Tenidas funcionan;
+- Actas se generan y archivan;
+- Calendar sincroniza;
+- Drive se enlaza;
+- solicitudes funcionan;
+- portal muestra información relevante;
+- permisos están probados;
+- no existe PII expuesta;
+- existe auditoría;
+- otro Secretario puede recibir y operar el sistema.
+
+* 36. LO QUE EL AGENTE NO DEBE INVENTAR
+No inventar:
+- reglamento interno;
+- requisitos de admisión;
+- rituales;
+- oficialidad;
+- fechas históricas;
+- dirección del Templo;
+- datos de miembros;
+- relaciones familiares;
+- grados;
+- autorizaciones de fotografía;
+- vínculos institucionales;
+- normas de Gran Logia.
+
+Todo dato dinámico debe venir del sistema o de una fuente documental.
+
+* 37. NOMBRES DE EXPERIENCIA
+- Ecosistema: =Amenti Digital=
+- Portal: =Mi Amenti=
+- Archivo: =Memoria Amenti= / =Archivo Amenti=
+- IA documental: =El Archivista=
+- IA formativa: =El Bibliotecario=
+- IA patrimonial: =El Cronista=
+- Centro administrativo: =Secretaría Digital=
+- Formación: =Senderos de Formación=
+- Capacidades: =Amenti Sabe=
+
+* 38. CRITERIOS PARA UN RESULTADO EXTRAORDINARIO
+El resultado debe sentirse:
+- institucional;
+- coherente;
+- elegante;
+- humano;
+- seguro;
+- rápido;
+- móvil;
+- histórico;
+- contemporáneo;
+- mantenible.
+
+“Extraordinario” no significa sobrecargado.
+
+Prueba para cada feature:
+
+#+begin_quote
+¿Ayuda a preservar memoria, trabajar mejor, aprender, relacionarse o proyectar Amenti?
+Si no, probablemente sobra.
+#+end_quote
+
+* 39. VISIÓN A LARGO PLAZO
+En diez años, Amenti no debería depender de recordar “en qué carpeta estaba ese PDF”.
+
+Un miembro autorizado debería poder preguntar:
+
+“¿Qué sabemos sobre nuestro ingreso a la Gran Logia Mixta en 1982?”
+
+Y recibir:
+- síntesis;
+- documentos fuente;
+- protagonistas;
+- cronología;
+- trabajos relacionados;
+- imágenes autorizadas;
+- enlaces al archivo.
+
+Eso es Amenti Digital.
+
+* 40. INSTRUCCIÓN FINAL AL AGENTE
+No te limites a implementar estas páginas y módulos literalmente.
+
+Comprende el espíritu del problema.
+Propón una experiencia superior.
+Conserva la dignidad institucional.
+Reduce carga administrativa.
+Haz visible la memoria.
+Conecta personas con conocimiento.
+Construye automatizaciones discretas.
+Utiliza IA donde aporte valor real.
+No confundas innovación con pérdida de sentido.
+
+Frase rectora:
+
+#+begin_quote
+Construir una plataforma que permita a cada generación recibir una memoria institucional más ordenada, viva y luminosa que la que recibió la generación anterior.
+#+end_quote

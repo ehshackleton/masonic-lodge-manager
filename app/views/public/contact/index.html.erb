@@ -1,39 +1,61 @@
-<% content_for :title, "Contacto | Sistema de Gestion Logial" %>
+<% content_for :title, "Contacto | Amenti Diez N°31" %>
 
 <section class="mx-auto max-w-5xl px-6 py-14">
   <div class="grid gap-8 lg:grid-cols-2">
     <div>
       <h1 class="text-4xl font-bold tracking-tight text-zinc-100">Contacto</h1>
       <p class="mt-4 text-zinc-400">
-        Si requiere informacion institucional, use este canal.
-        El acceso al backoffice es exclusivo para usuarios autorizados.
+        Canal institucional para consultas publicas. No utilice este formulario para
+        datos sensibles ni para tramites internos de miembros.
       </p>
-      <div class="mt-6 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 text-sm text-zinc-400 backdrop-blur">
-        <p><span class="font-semibold text-zinc-100">Correo:</span> contacto@logia.local</p>
-        <p><span class="font-semibold text-zinc-100">Telefono:</span> +56 9 0000 0000</p>
-        <p><span class="font-semibold text-zinc-100">Direccion:</span> Orient de referencia, Chile</p>
+      <div class="mt-6 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 text-sm text-zinc-400">
+        <p><span class="font-semibold text-zinc-100">Correo:</span> amentidiez31@granlogiamixta.cl</p>
+        <p><span class="font-semibold text-zinc-100">Obediencia:</span> Gran Logia Mixta de Chile</p>
+        <p><span class="font-semibold text-zinc-100">Valle:</span> Santiago de Chile</p>
+        <p><span class="font-semibold text-zinc-100">Sitio:</span> amenti.cl · logia.amenti.cl</p>
       </div>
     </div>
 
-    <form class="rounded-3xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-sm backdrop-blur">
-      <h2 class="text-lg font-semibold text-zinc-100">Formulario de contacto</h2>
+    <%= form_with model: @contact_message, url: contacto_path, method: :post, class: "rounded-3xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-sm" do |f| %>
+      <h2 class="text-lg font-semibold text-zinc-100">Escribanos</h2>
+
+      <% if @contact_message.errors.any? %>
+        <div class="mt-4 rounded-lg border border-amber-800 bg-amber-950/40 px-3 py-2 text-sm text-amber-200">
+          <ul class="list-disc pl-4">
+            <% @contact_message.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
       <div class="mt-4 space-y-4">
-        <label class="block text-sm font-medium text-zinc-200">Nombre
-          <input type="text" class="mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40" placeholder="Nombre completo">
-        </label>
-        <label class="block text-sm font-medium text-zinc-200">Correo
-          <input type="email" class="mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40" placeholder="correo@dominio.com">
-        </label>
-        <label class="block text-sm font-medium text-zinc-200">Asunto
-          <input type="text" class="mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40" placeholder="Motivo del mensaje">
-        </label>
-        <label class="block text-sm font-medium text-zinc-200">Mensaje
-          <textarea rows="4" class="mt-1 w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40" placeholder="Escriba su mensaje"></textarea>
-        </label>
-        <button type="button" class="w-full rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700">
-          Enviar mensaje
-        </button>
+        <%# Honeypot antispam: oculto para humanos %>
+        <div class="hidden" aria-hidden="true">
+          <label>Sitio web
+            <input type="text" name="contact_message[website]" tabindex="-1" autocomplete="off">
+          </label>
+        </div>
+
+        <%= f.label :name, "Nombre", class: "block text-sm font-medium text-zinc-200" %>
+        <%= f.text_field :name, required: true, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "Nombre completo" %>
+
+        <%= f.label :email, "Correo", class: "mt-3 block text-sm font-medium text-zinc-200" %>
+        <%= f.email_field :email, required: true, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "correo@dominio.com" %>
+
+        <%= f.label :phone, "Telefono (opcional)", class: "mt-3 block text-sm font-medium text-zinc-200" %>
+        <%= f.telephone_field :phone, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40" %>
+
+        <%= f.label :subject, "Motivo", class: "mt-3 block text-sm font-medium text-zinc-200" %>
+        <%= f.text_field :subject, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "Motivo del mensaje" %>
+
+        <%= f.label :message, "Mensaje", class: "mt-3 block text-sm font-medium text-zinc-200" %>
+        <%= f.text_area :message, rows: 4, required: true, class: "mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-900/40", placeholder: "Escriba su mensaje" %>
+
+        <p class="text-xs text-zinc-500">Al enviar acepta el tratamiento de estos datos solo para responder su consulta.</p>
+
+        <%= f.submit "Enviar mensaje", class: "w-full cursor-pointer rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700" %>
       </div>
-    </form>
+    <% end %>
   </div>
 </section>

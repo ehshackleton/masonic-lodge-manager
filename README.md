@@ -1,6 +1,9 @@
-# Sistema de Gestion Logial
+# Amenti Diez N°31 — Gestion logial
 
-Base inicial del proyecto Rails + PostgreSQL para administracion integral de una logia masonica.
+Aplicacion Rails + PostgreSQL para la **Respetable Logia Simbolica Amenti Diez N°31**
+(Gran Logia Mixta de Chile). Rama de desarrollo: `amenti-diez-31`.
+
+Contexto rector: [`literate.org`](literate.org) · Arquitectura: [`arquitectura.org`](arquitectura.org) · Vision amplia: [`CONTEXT_MASTER_AMENTI_DIGITAL_2026.org`](CONTEXT_MASTER_AMENTI_DIGITAL_2026.org).
 
 ## Requisitos
 - Docker y Docker Compose
@@ -14,12 +17,14 @@ Base inicial del proyecto Rails + PostgreSQL para administracion integral de una
    - `docker compose up --build`
 3. Abrir aplicacion en:
    - `http://localhost:3000`
+4. (Opcional) Reaplicar semillas de identidad Amenti:
+   - `docker compose exec web bash -lc './bin/rails db:seed'`
 
 Credenciales tras el seed (ver `ADMIN_TEMP_PASSWORD` en `.env`):
 - Admin: `admin@logia.local`
 
-## Emacs
-Guia en [`emacs/README.md`](emacs/README.md). Incluye `~/.emacs.d/init.el`, Eglot con `ruby-lsp` en Docker y atajos del proyecto.
+## Emacs (Doom)
+Guia en [`emacs/README.md`](emacs/README.md).
 
 ## Rutas base
 - `/`
@@ -29,9 +34,6 @@ Guia en [`emacs/README.md`](emacs/README.md). Incluye `~/.emacs.d/init.el`, Eglo
 - `/iniciar-sesion`
 - `/backoffice`
 
-## Estructura inicial entregada
-- Proyecto Rails base
-- Namespaces `Public` y `Backoffice`
-- Modelo de datos inicial (migracion core)
-- `Dockerfile` y `docker-compose.yml`
-- Backlog tecnico de Sprint 1 en `docs/sprint-1-backlog.md`
+## Produccion
+- Host documentado: `logia.amenti.cl`
+- Compose: `docker-compose.production.yml` (Traefik)

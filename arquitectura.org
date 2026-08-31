@@ -1,0 +1,417 @@
+#+TITLE: Arquitectura técnica — Sistema de Gestión Logial
+#+SUBTITLE: Contexto de diseño de software y datos · R∴L∴ Amenti Diez Nº 31
+#+AUTHOR: Proyecto masonic-lodge-manager
+#+LANGUAGE: es
+#+OPTIONS: toc:3 num:2 H:4 ^:nil
+#+STARTUP: overview indent
+#+FILETAGS: :arquitectura:rails:amenti:
+
+* Propósito de este documento
+
+Este archivo es el *contexto técnico vivo* del diseño de software y de datos
+del repositorio =masonic-lodge-manager=. Sirve para:
+
+- Orientar desarrollo en la rama protegida =amenti-diez-31=.
+- Alinear decisiones de dominio (logia, cuadro, tesorería, secretaría, etc.).
+- Dar contexto a humanos y a agentes (Emacs/Org, Cursor) sin releer todo el código.
+
+Fuente de verdad del esquema: [[file:db/schema.rb][db/schema.rb]] (versión migraciones =2026_03_27_152000=).
+Rutas: [[file:config/routes.rb][config/routes.rb]]. Semillas: [[file:db/seeds.rb][db/seeds.rb]].
+
+* Visión del producto
+
+** Qué es
+
+Aplicación web *Rails 8.1 + PostgreSQL* para la administración integral de una
+logia masónica, con:
+
+1. *Portal público institucional* (sitio web de la logia).
+2. *Backoffice operativo* autenticado (gestión interna).
+
+El despliegue productivo actual apunta a =logia.amenti.cl= (Compose + Traefik).
+La rama de desarrollo orientada a la *Respetable Logia Amenti Diez Nº 31* es
+=amenti-diez-31=; =main= permanece como línea estable / despliegue.
+
+** Qué no es (aún)
+
+- Un SaaS multi-logia plenamente aislado (el schema admite =lodge_id=, pero la
+  operación actual es *single-tenant* implícito vía =Lodge.first= / seeds).
+- Un CMS completo de contenidos públicos (=PublicPage= existe en BD sin uso).
+- Un ERP contable: la tesorería es *operativa logial* (cuotas, pagos, cierres,
+  ledger simple), no contabilidad de partida doble normativa.
+
+* Stack tecnológico
+
+| Capa              | Tecnología                         | Notas |
+|-------------------+------------------------------------+-------|
+| Runtime           | Ruby 3.3.11                        | =.ruby-version= |
+| Framework         | Rails ~> 8.1.3                     | App =App= |
+| BD                | PostgreSQL 16                      | Adapter =pg= |
+| Auth              | =has_secure_password= (bcrypt)     | Sesión cookie =session[:user_id]= |
+| Front             | ERB + Turbo/Stimulus + Tailwind CDN | Sin build CSS/JS real en =package.json= |
+| Assets            | Propshaft                          | =application.css= mínimo |
+| PDF               | Prawn                              | Exportes en controllers |
+| Archivos          | Active Storage (disco)             | Avatares, documentos |
+| Cola/caché/cable  | Solid Queue / Cache / Cable        | Activos en producción |
+| Contenedores      | Docker multi-stage + Compose       | Dev y prod |
+| Proxy prod        | Traefik (red externa =proxy=)      | Labels en compose producción |
+| CI                | GitHub Actions                     | Brakeman, bundler-audit, RuboCop, tests |
+| Deploy            | =workflow_dispatch= → SSH → Compose | Kamal en Gemfile *sin config* |
+
+* Arquitectura de capas
+
+#+BEGIN_SRC artist
+  Navegador
+      |
+      v
+  [Traefik TLS] ----prod----> [Thruster :80] --> [Puma / Rails 8.1]
+                                      |
+                                      v
+                          ApplicationController
+                            current_user
+                            require_authentication (backoffice)
+                                      |
+                 +--------------------+--------------------+
+                 |                                         |
+                 v                                         v
+        namespace Public::*                        namespace Backoffice::*
+        (sin auth)                                (sesión + RBAC en User)
+                 |                                         |
+                 v                                         v
+              Vistas ERB                            Controllers "ricos"
+              estáticas                             (negocio + exports)
+                                                           |
+                                                           v
+                                                    ActiveRecord
+                                                           |
+                           +-------------------------------+------------------+
+                           |                               |                  |
+                           v                               v                  v
+                     PostgreSQL primary            Active Storage         Solid*
+                     (dominio logial)              (/rails/storage)    cache/queue/cable
+#+END_SRC
+
+** Flujo de autenticación
+
+1. =GET /iniciar-sesion= → =Public::SessionsController#new=
+2. =POST /iniciar-sesion= → autenticación bcrypt → =session[:user_id]=
+3. Tras éxito → redirect =/backoffice=
+4. Fallos: incremento de =failed_attempts=; a 5 intentos → =locked_at=
+5. =DELETE /cerrar-sesion= limpia la sesión
+
+** Principio estructural actual
+
+La lógica de negocio vive *en controllers* (tesorería, hospitalario, trabajos),
+no en =app/services/= (directorios preparados pero vacíos). Policies
+(=app/policies/=) son stub. Forms / presenters / queries: scaffolding vacío.
+
+Esto implica: alta velocidad de entrega a costa de acoplamiento y reutilización
+limitada. La evolución natural hacia Amenti Nº 31 debería *extraer servicios*
+por módulo sin romper contratos de rutas.
+
+* Mapa de dominios funcionales
+
+** Portal público
+
+| Ruta                | Controller                 | Estado |
+|---------------------+----------------------------+--------|
+| =/=                 | =public/home#index=        | Galería WebP, contenido institucional |
+| =/sobre-nosotros=   | =public/about#index=       | Estático |
+| =/contacto=         | =public/contact#index=     | UI sin persistencia real |
+| =/sobre-el-sistema= | =public/system#index=      | Estático |
+| Sesión              | =public/sessions=          | Login / logout |
+
+Tablas =public_pages= y =contact_messages= existen en schema; modelos vacíos;
+el formulario de contacto *no* escribe en BD todavía.
+
+** Backoffice — módulos
+
+| Módulo            | Ruta base / recurso              | Controller(s) | Capacidad |
+|-------------------+----------------------------------+---------------+-----------|
+| Dashboard         | =/backoffice=                    | =dashboard=   | KPIs (hermanos, morosidad, pagos, trabajos) |
+| Perfil            | =/backoffice/perfil=             | =profiles=    | Datos usuario + avatar |
+| Cuadro logial     | =/backoffice/brothers=           | =brothers*=   | CRUD fichas, grados, cargos, documentos |
+| Tesorería         | =/backoffice/tesoreria=          | =treasury=    | Cuota, cargos, pagos, cierres, ledger, exports |
+| Hospitalario      | =/backoffice/hospitalario=       | =hospital=    | Saco, aportes, ajustes, beneficio defunción |
+| Secretaría        | =/backoffice/secretaria= + CRUD  | =secretariat=, =minutes=, =correspondences= | Hub + workflows |
+| Trabajos          | =/backoffice/masonic_works=      | =masonic_works=, =work_reviews= | Ciclo de vida + revisiones |
+| Administración    | =/backoffice/administracion=     | =administration= | Lodge, roles, plantillas (superadmin) |
+
+* Modelo de datos
+
+** Diagrama entidad-relación (conceptual)
+
+#+BEGIN_SRC artist
+  Lodge ─────────────┬─────────────── has_one TreasurySetting
+       │             ├─────────────── has_one HospitalFundSetting
+       │             ├─────────────── has_many HospitalFundTransaction
+       │             ├─────────────── has_many MonthlyClosure
+       │             ├─────────────── has_many LedgerEntry
+       │             ├─────────────── has_many Correspondence
+       │             ├─────────────── has_many MasonicWork
+       │             └─────────────── has_many Brother
+                     │
+                     Brother ──┬── Charge ── PaymentAllocation ── Payment
+                     │         ├── MasonicWork ── WorkReview
+                     │         ├── BrotherDegreeHistory ── Degree
+                     │         └── BrotherOfficeAssignment ── Office
+                     │
+  User ── UserRole ── Role
+  User ── AuditLog (polimórfico)
+  User (opcional) en Payment, Closure, Minute, Correspondence,
+       HospitalFundTransaction, MasonicWork.reviewer, WorkReview
+
+  Minute  (sin lodge_id en schema — deuda multi-logia)
+  PublicPage, ContactMessage  (schema listo, producto incompleto)
+#+END_SRC
+
+** Entidades núcleo
+
+*** Lodge (logia)
+
+Tabla =lodges=. Datos institucionales: nombre, número, oriente, rito,
+jurisdicción, contacto público, aniversario, descripción.
+
+- Operación actual: una logia sembrada ("Logia Demo").
+- Objetivo Amenti: sustituir/actualizar seeds y admin para
+  *Amenti Diez Nº 31* (oriente, rito, jurisdicción según datos oficiales).
+
+*** Brother (cuadro logial)
+
+Tabla =brothers=. Persona del cuadro: identidad civil, nombre simbólico,
+registro, grado actual, estado de membresía, fechas iniciáticas, contacto,
+filiación, documentos (Active Storage).
+
+Enum =membership_status=: =active=, =inactive=, =suspended=, =retired=, =deceased=.
+
+Relaciones históricas:
+
+- =brother_degree_histories= → catálogo =degrees= (aprendiz, compañero, maestro).
+- =brother_office_assignments= → catálogo =offices= (VM, vigilantes, orador,
+  secretario, tesorero, …).
+
+*** User / Role (acceso al sistema)
+
+Usuarios de *aplicación* (no necesariamente 1:1 con Brother). Autorización
+embebida en =User= (=can_access_module?=, =can_manage_*_action?=).
+
+Roles sembrados (keys):
+
+- =superadmin=
+- =secretario= (+ roles granulares de secretaría)
+- Tesorería: =tesoreria_manager=, =tesoreria_operator=, =tesoreria_closer=, =tesoreria_exporter=
+- Hospitalario: =hospitalario_manager=, =hospitalario_operator=, =hospitalario_exporter=
+- Trabajos: =work_reviewer=, =work_approver=, =work_presenter=, =work_archiver=
+
+*** Tesorería
+
+| Tabla                | Rol |
+|----------------------+-----|
+| =treasury_settings=  | Cuota mensual, moneda (CLP), día de vencimiento |
+| =charges=            | Cargo por hermano/periodo (=pending/partial/paid/cancelled=) |
+| =payments=           | Cobro recibido |
+| =payment_allocations=| Aplicación pago → cargo(s) |
+| =monthly_closures=   | Cierre único por lodge+año+mes |
+| =ledger_entries=     | Asiento simple (débito/crédito textual + referencia polimórfica) |
+
+Flujo típico: configurar cuota → generar cargos del periodo → registrar pago →
+asignar a cargos → (opcional) cerrar mes → exportar Excel/PDF.
+
+*** Hospitalario (saco)
+
+| Tabla                         | Rol |
+|-------------------------------+-----|
+| =hospital_fund_settings=      | Aporte periódico y monto de beneficio por defunción |
+| =hospital_fund_transactions=  | Movimientos (=entry_type=, =category=) |
+
+Soporta aportes, ajustes y pago de beneficio por fallecimiento, con exports
+de cobertura.
+
+*** Secretaría documental
+
+**** Actas (=minutes=)
+
+Workflow de estado:
+
+: draft → review → approved → published
+
+Visibilidad: =internal= | =restricted= | =confidential=.
+Folio automático: =ACTA-YYYY-####=.
+
+*Deuda:* no hay =lodge_id=; en multi-logia las actas quedarían globales.
+
+**** Correspondencia (=correspondences=)
+
+Con =lodge_id=. Dirección, confidencialidad, folio =CORR-YYYY-####=.
+Mismo patrón de workflow submit/approve/publish que actas.
+
+*** Trabajos masónicos
+
+=masonic_works= + =work_reviews=.
+
+Estados:
+
+: assigned → draft → in_review → approved → presented → archived
+
+Revisiones con status =commented= | =needs_changes= | =approved=.
+Documentos adjuntos vía Active Storage.
+
+*** Auditoría
+
+=audit_logs=: acción, recurso polimórfico, usuario, IP, user-agent, metadata JSONB.
+Se usa en denegaciones y cambios sensibles.
+
+* Seguridad y autorización
+
+** Autenticación
+
+- Cookie de sesión Rails + =password_digest=.
+- Lockout tras 5 intentos fallidos.
+- Password mínima 12 caracteres (=User=).
+- Locale por defecto =es=, TZ =America/Santiago=.
+
+** Autorización
+
+- RBAC fino por *módulo* y *acción*, implementado en el modelo =User=.
+- =superadmin= bypasea casi todo.
+- Módulo Administración restringido a superadmin.
+- *Hueco conocido:* cuadro logial (=BrothersController=), dashboard y perfil
+  suelen exigir solo autenticación, *sin* check de módulo. Cualquier usuario
+  con sesión válida puede operar el cuadro si llega a la URL.
+
+** CSP / front
+
+Layout con Tailwind CDN implica consideraciones de CSP y control de versión
+en producción (=config/initializers/content_security_policy.rb=).
+
+* Persistencia y entornos
+
+** Desarrollo
+
+=docker-compose.yml=:
+
+- Servicio =web= (Rails, volume del código).
+- Servicio =db= (Postgres 16).
+- =worker= bajo profile (Solid Queue).
+
+Variables: =.env= (no versionado). =RAILS_MASTER_KEY= debe coincidir con
+=config/master.key=.
+
+** Producción
+
+=docker-compose.production.yml=:
+
+- =db= + =web= + =worker=.
+- Red externa =proxy= (Traefik compartido con otras instancias).
+- Host documentado: =logia.amenti.cl=.
+
+Solid usa bases adicionales (=CACHE_DATABASE_URL=, =QUEUE_DATABASE_URL=,
+=CABLE_DATABASE_URL=) cuando están definidas.
+
+* UI y experiencia
+
+- Un solo layout =application.html.erb= para público y backoffice.
+- Tema dark/light vía JS en layout.
+- Galería institucional: =public/images/galeria_*.webp= (zoom hover en home).
+- Exports: XML-as-Excel + PDF Prawn desde controllers (no gem xlsx dedicada).
+
+* Decisiones de diseño (ADRs ligeros)
+
+** ADR-001 — Rails omakase 8.x sin Devise
+
+Decisión: sesión propia + bcrypt.
+Motivo: control del flujo de lockout y superficie mínima.
+Consecuencia: menos ecosistema Devise; hay que mantener auth a mano.
+
+** ADR-002 — Autorización en el modelo User
+
+Decisión: métodos =can_*= en =User= en lugar de Pundit/CanCan.
+Motivo: velocidad y centralización.
+Consecuencia: policies vacías; riesgo de olvidos en controllers nuevos.
+
+** ADR-003 — Controllers ricos, services vacíos
+
+Decisión: lógica en controllers de módulo.
+Motivo: entrega rápida de Sprint 1+.
+Consecuencia: archivos grandes (p.ej. tesorería); refactor pendiente a
+=app/services/{treasury,hospital,...}=.
+
+** ADR-004 — Single-tenant operativo con schema multi-lodge
+
+Decisión: FK =lodge_id= presente; UI asume una logia.
+Motivo: preparar extensión sin bloquear MVP.
+Consecuencia: actas sin =lodge_id=; seeds "Logia Demo"; Amenti requiere
+datos reales en =lodges= + revisión de scopes.
+
+** ADR-005 — Tailwind CDN
+
+Decisión: CDN en layout.
+Motivo: iteración visual rápida.
+Consecuencia: no hay pipeline CSS reproducible; revisar para hardening prod.
+
+** ADR-006 — Deploy Compose + Traefik (no Kamal)
+
+Decisión: producción vía Compose en VM.
+Motivo: alineado con infra existente (=Odoo-Community-Deploy-Instance/proxy/=).
+Consecuencia: gem =kamal= sin uso efectivo.
+
+* Deuda técnica priorizada
+
+| Prioridad | Ítem | Impacto |
+|-----------+------+---------|
+| Alta | Autorización del cuadro logial / dashboard | Seguridad operativa |
+| Alta | Contacto público sin persistencia | Funcionalidad incompleta vs tabla |
+| Media | Extraer services desde treasury/hospital/works | Mantenibilidad |
+| Media | =minutes.lodge_id= + scopes por lodge | Preparar Amenti / multi-logia |
+| Media | Sustituir Tailwind CDN por build propio | Prod / CSP |
+| Media | Actualizar =docs/sprint-1-backlog.md= | Documentación vs realidad |
+| Baja | Activar jobs Solid de dominio (avisos, generación de cargos) | Automatización |
+| Baja | Cobertura de tests (hoy casi solo =/up=) | Regresiones |
+| Baja | =PublicPage= CMS o eliminar tablas huérfanas | Claridad de dominio |
+
+* Orientación Amenti Diez Nº 31
+
+Trabajo previsto sobre rama =amenti-diez-31=:
+
+1. *Identidad institucional*: nombre, número 31, oriente, rito, textos del
+   portal, imágenes, datos de contacto en =Lodge= y vistas públicas.
+2. *Cuadro real*: migración/carga de hermanos (respetando =registry_number=
+   único y privacidad de =notes_private=).
+3. *Roles oficiales*: mapear cargos del taller a =offices= y usuarios a =roles=.
+4. *Parámetros financieros*: cuota, saco hospitalario, moneda CLP.
+5. *Gobernanza*: flujos de actas/correspondencia/trabajos alineados a la
+   práctica de la logia; política de quién aprueba qué.
+6. *Despliegue*: mantener =main= estable; integrar por PR desde =amenti-diez-31=.
+
+Protección GitHub (estado deseado):
+
+- =amenti-diez-31=: sin force-push ni borrado; push de desarrollo permitido.
+- =main=: requiere PR; sin force-push ni borrado.
+
+* Mapa de archivos clave
+
+| Path | Rol |
+|------|-----|
+| =config/routes.rb= | Contrato HTTP |
+| =db/schema.rb= | Contrato de datos |
+| =db/seeds.rb= | Bootstrap demo |
+| =app/models/user.rb= | AuthZ |
+| =app/models/brother.rb= | Cuadro |
+| =app/models/lodge.rb= | Tenant institucional |
+| =app/controllers/backoffice/treasury_controller.rb= | Núcleo financiero |
+| =app/controllers/backoffice/hospital_controller.rb= | Saco hospitalario |
+| =app/controllers/backoffice/masonic_works_controller.rb= | Trabajos |
+| =app/views/public/home/index.html.erb= | Home institucional |
+| =docker-compose.yml= / =docker-compose.production.yml= | Runtime |
+| =docs/sprint-1-backlog.md= | Backlog histórico Sprint 1 |
+| =emacs/= | Contexto editor Doom |
+
+* Cómo mantener este documento
+
+1. Tras cambios de schema → actualizar sección *Modelo de datos*.
+2. Tras nuevos módulos o rutas → actualizar *Mapa de dominios* y tabla de rutas.
+3. Tras decisiones estructurales → añadir ADR (ADR-007…).
+4. Preferir hechos verificables en código a aspiraciones no implementadas.
+
+Última revisión basada en el árbol del proyecto en rama =amenti-diez-31=
+(análisis de modelos, schema, routes, seeds, compose y controllers backoffice).

@@ -1,13 +1,21 @@
 admin_email = "admin@logia.local"
 admin_password = ENV.fetch("ADMIN_TEMP_PASSWORD", "Logia.Temp.2026!A9")
 
-lodge = Lodge.find_or_create_by!(name: "Logia Demo") do |record|
-  record.number = "001"
-  record.orient = "Santiago"
-  record.rite = "Escoces Antiguo y Aceptado"
-  record.jurisdiction = "Chile"
-  record.active = true
-end
+lodge = Lodge.find_by(number: "31") || Lodge.order(:id).first || Lodge.new
+lodge.assign_attributes(
+  name: "Respetable Logia Simbolica Amenti Diez N°31",
+  number: "31",
+  orient: "Santiago de Chile",
+  rite: "Simbolico",
+  jurisdiction: "Gran Logia Mixta de Chile",
+  public_email: "amentidiez31@granlogiamixta.cl",
+  description: "Fundada el 4 de agosto de 1960. Valle de Santiago. " \
+               "Conserva la memoria del N°10 en el nombre Diez y el N°31 " \
+               "desde su incorporacion a la Gran Logia Mixta de Chile (1982).",
+  anniversary_date: Date.new(1960, 8, 4),
+  active: true
+)
+lodge.save!
 
 superadmin_role = Role.find_or_create_by!(key: "superadmin") do |record|
   record.name = "Superadmin"
@@ -69,7 +77,11 @@ end
   { key: "segundo_vigilante", name: "Segundo Vigilante", description: "Apoyo de columna" },
   { key: "orador", name: "Orador", description: "Guia de doctrina y legalidad" },
   { key: "secretario", name: "Secretario", description: "Gestion documental y actas" },
-  { key: "tesorero", name: "Tesorero", description: "Gestion financiera de la logia" }
+  { key: "tesorero", name: "Tesorero", description: "Gestion financiera de la logia" },
+  { key: "hospitalario", name: "Hospitalario", description: "Coordinacion del saco hospitalario y apoyo fraterno" },
+  { key: "experto", name: "Experto", description: "Apoyo ritual y de instruccion" },
+  { key: "maestro_de_ceremonias", name: "Maestro de Ceremonias", description: "Orden ceremonial de la Tenida" },
+  { key: "guarda_templo", name: "Guarda Templo", description: "Custodia del templo durante la Tenida" }
 ].each do |office_attrs|
   office = Office.find_or_initialize_by(key: office_attrs[:key])
   office.assign_attributes(name: office_attrs[:name], description: office_attrs[:description])
@@ -83,8 +95,15 @@ treasury_setting.due_day = 10
 treasury_setting.active = true
 treasury_setting.save!
 
+hospital_setting = HospitalFundSetting.find_or_initialize_by(lodge: lodge)
+hospital_setting.contribution_amount ||= 0
+hospital_setting.death_benefit_amount ||= 0
+hospital_setting.currency = "CLP"
+hospital_setting.active = true
+hospital_setting.save!
+
 puts "Seed listo."
 puts "Usuario admin: #{admin_email}"
 puts "Contrasena temporal: #{admin_password}"
-puts "Lodge base: #{lodge.name}"
+puts "Lodge: #{lodge.name} (N°#{lodge.number})"
 puts "Cuota mensual base: #{treasury_setting.monthly_fee} #{treasury_setting.currency}"
