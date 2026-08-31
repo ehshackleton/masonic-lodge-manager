@@ -143,22 +143,46 @@ module Backoffice
 
     def export_pdf
       load_hospital_data
-      pdf = PrawnDocument.build
-      pdf.text "Saco Hospitalario - Balance y movimientos", size: 16, style: :bold
-      pdf.move_down 8
-      pdf.text "Balance actual: #{format_currency(@balance)}"
-      pdf.text "Total ingresos: #{format_currency(@total_income)}"
-      pdf.text "Total egresos: #{format_currency(@total_expense)}"
-      pdf.text "Pagos de defuncion: #{@death_benefits_count}"
-      pdf.move_down 10
-      pdf.text "Movimientos recientes", style: :bold
-      @transactions.first(40).each do |tx|
-        brother_text = tx.brother&.full_name.presence || "-"
-        pdf.text "#{tx.occurred_on} | #{tx.entry_type.humanize} | #{tx.category.humanize} | #{brother_text} | #{format_currency(tx.amount)}"
-      end
-      pdf.text "Sin movimientos." if @transactions.empty?
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Saco Hospitalario",
+        subtitle: "Balance y movimientos",
+        lodge: @lodge,
+        meta_lines: [ "Periodo: #{@from} a #{@to}" ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        report.section(pdf, "Resumen") do
+          report.key_values(pdf, [
+            [ "Balance actual", format_currency(@balance) ],
+            [ "Total ingresos", format_currency(@total_income) ],
+            [ "Total egresos", format_currency(@total_expense) ],
+            [ "Pagos de defuncion", @death_benefits_count ]
+          ])
+        end
 
-      send_data pdf.render, filename: "hospitalario_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+        report.section(pdf, "Movimientos recientes") do
+          txs = @transactions.first(40)
+          if txs.empty?
+            report.paragraph(pdf, "Sin movimientos.", muted: true)
+          else
+            report.table(
+              pdf,
+              headers: %w[Fecha Tipo Categoria Hermano Monto],
+              rows: txs.map do |tx|
+                [
+                  tx.occurred_on,
+                  tx.entry_type.humanize,
+                  tx.category.humanize,
+                  tx.brother&.full_name.presence || "-",
+                  format_currency(tx.amount)
+                ]
+              end,
+              widths: [ 58, 52, 72, 120, 68 ]
+            )
+          end
+        end
+      end
+
+      send_data pdf_bytes, filename: "hospitalario_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def export_coverage_excel
@@ -193,22 +217,44 @@ module Backoffice
 
     def export_coverage_pdf
       load_hospital_data
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de cobertura mensual - Saco Hospitalario", size: 16, style: :bold
-      pdf.move_down 8
-      pdf.text "Mes: #{@coverage_month.strftime('%m/%Y')}"
-      pdf.text "Activos: #{@coverage_total_active}"
-      pdf.text "Aportaron: #{@coverage_contributed_count}"
-      pdf.text "Pendientes: #{@coverage_pending_count}"
-      pdf.text "Cobertura: #{@coverage_percentage}%"
-      pdf.move_down 10
-      pdf.text "Detalle por hermano", style: :bold
-      @coverage_rows.each do |row|
-        status = row[:contributed] ? "Aporto" : "Pendiente"
-        pdf.text "#{row[:brother].full_name} (#{row[:brother].registry_number}) | #{status} | #{format_currency(row[:contributed_amount])}", size: 10
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Cobertura mensual",
+        subtitle: "Saco Hospitalario",
+        lodge: @lodge,
+        meta_lines: [ "Mes: #{@coverage_month.strftime('%m/%Y')}" ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        report.section(pdf, "Resumen") do
+          report.key_values(pdf, [
+            [ "Activos", @coverage_total_active ],
+            [ "Aportaron", @coverage_contributed_count ],
+            [ "Pendientes", @coverage_pending_count ],
+            [ "Cobertura", "#{@coverage_percentage}%" ]
+          ])
+        end
+
+        report.section(pdf, "Detalle por hermano") do
+          if @coverage_rows.empty?
+            report.paragraph(pdf, "Sin hermanos activos para reporte.", muted: true)
+          else
+            report.table(
+              pdf,
+              headers: %w[Hermano Registro Estado Monto],
+              rows: @coverage_rows.map do |row|
+                [
+                  row[:brother].full_name,
+                  row[:brother].registry_number,
+                  row[:contributed] ? "Aporto" : "Pendiente",
+                  format_currency(row[:contributed_amount])
+                ]
+              end,
+              widths: [ 130, 58, 58, 72 ]
+            )
+          end
+        end
       end
-      pdf.text "Sin hermanos activos para reporte." if @coverage_rows.empty?
-      send_data pdf.render, filename: "hospitalario_cobertura_#{@coverage_month.strftime('%Y_%m')}.pdf", type: "application/pdf", disposition: "attachment"
+
+      send_data pdf_bytes, filename: "hospitalario_cobertura_#{@coverage_month.strftime('%Y_%m')}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     private

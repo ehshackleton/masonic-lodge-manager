@@ -69,16 +69,11 @@ module Backoffice
 
     def export_pdf
       load_works_for_export
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de trabajos masonicos", size: 16, style: :bold
-      pdf.move_down 8
-      @works_for_export.each do |work|
-        pdf.text "#{work.title} | #{work.brother&.full_name}"
-        pdf.text "Estado: #{work.status.humanize} | Asignado: #{work.assigned_on || '-'} | Compromiso: #{work.due_on || '-'}", size: 10
-        pdf.move_down 4
-      end
-      pdf.text "Sin trabajos para exportar." if @works_for_export.empty?
-      send_data pdf.render, filename: "trabajos_masonicos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+      pdf_bytes = build_works_list_pdf(
+        title: "Trabajos masonicos",
+        subtitle: "Reporte de trabajos"
+      )
+      send_data pdf_bytes, filename: "trabajos_masonicos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def export_reviews_excel
@@ -112,17 +107,38 @@ module Backoffice
 
     def export_reviews_pdf
       load_reviews_for_export
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de revisiones de trabajos", size: 16, style: :bold
-      pdf.move_down 8
-      @reviews_for_export.each do |review|
-        pdf.text "#{review.reviewed_on} | #{review.masonic_work&.title}"
-        pdf.text "Revisor: #{review.reviewer_user&.email} | Resultado: #{review.status.humanize}", size: 10
-        pdf.text "Comentarios: #{review.comments.presence || '-'}", size: 10
-        pdf.move_down 4
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Revisiones de trabajos",
+        subtitle: "Reporte de revisiones",
+        lodge: current_lodge,
+        meta_lines: [
+          "Emitido: #{I18n.l(Date.current, format: :long)}",
+          "Registros: #{@reviews_for_export.size}",
+          ("Estado trabajo: #{params[:status]}" if params[:status].present?)
+        ].compact,
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @reviews_for_export.empty?
+          report.paragraph(pdf, "Sin revisiones para exportar.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Fecha Trabajo Revisor Estado Comentarios],
+            rows: @reviews_for_export.map do |review|
+              [
+                review.reviewed_on,
+                review.masonic_work&.title,
+                review.reviewer_user&.email,
+                review.status.humanize,
+                review.comments.presence || "-"
+              ]
+            end,
+            widths: [ 52, 110, 90, 52, 96 ]
+          )
+        end
       end
-      pdf.text "Sin revisiones para exportar." if @reviews_for_export.empty?
-      send_data pdf.render, filename: "revisiones_trabajos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+
+      send_data pdf_bytes, filename: "revisiones_trabajos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def export_dashboard_pdf
@@ -135,35 +151,64 @@ module Backoffice
       build_monthly_productivity_series
       load_works_for_export
 
-      pdf = PrawnDocument.build
-      pdf.text "Tablero de productividad - Trabajos masonicos", size: 16, style: :bold
-      pdf.move_down 4
-      pdf.text "Periodo: #{@period_from} a #{@period_to}", size: 10
-      pdf.text "Filtros: estado=#{@status.presence || 'todos'} | hermano_id=#{@brother_id.presence || 'todos'} | busqueda=#{@q.presence || '-'}", size: 9
-      pdf.move_down 10
+      brother_label = @brother_id.present? ? Brother.find_by(id: @brother_id)&.full_name : nil
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Tablero de productividad",
+        subtitle: "Trabajos masonicos",
+        lodge: current_lodge,
+        meta_lines: [
+          "Periodo: #{@period_from} a #{@period_to}",
+          "Estado: #{@status.presence || 'todos'}",
+          "Hermano: #{brother_label || 'todos'}",
+          "Busqueda: #{@q.presence || '-'}"
+        ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        report.section(pdf, "Resumen KPI") do
+          report.key_values(pdf, [
+            [ "Pendientes", @productivity_pending ],
+            [ "Aprobados", @productivity_approved ],
+            [ "Presentados", @productivity_presented ],
+            [ "Vencidos", @productivity_overdue ]
+          ])
+        end
 
-      pdf.text "Resumen KPI", style: :bold, size: 12
-      pdf.text "Pendientes: #{@productivity_pending}"
-      pdf.text "Aprobados: #{@productivity_approved}"
-      pdf.text "Presentados: #{@productivity_presented}"
-      pdf.text "Vencidos: #{@productivity_overdue}"
-      pdf.move_down 10
+        report.section(pdf, "Productividad mensual (12 meses)") do
+          report.table(
+            pdf,
+            headers: %w[Mes Creados Aprobados Presentados],
+            rows: @monthly_productivity_series.map do |row|
+              [ row[:label], row[:created], row[:approved], row[:presented] ]
+            end,
+            widths: [ 120, 80, 80, 80 ]
+          )
+        end
 
-      pdf.text "Productividad mensual (12 meses)", style: :bold, size: 12
-      @monthly_productivity_series.each do |row|
-        pdf.text "#{row[:label]} | Creados: #{row[:created]} | Aprobados: #{row[:approved]} | Presentados: #{row[:presented]}", size: 9
+        report.section(pdf, "Detalle de trabajos") do
+          works = @works_for_export.limit(200)
+          if works.empty?
+            report.paragraph(pdf, "Sin trabajos para detallar.", muted: true)
+          else
+            report.table(
+              pdf,
+              headers: %w[Trabajo Hermano Estado Asignacion Compromiso Revisor],
+              rows: works.map do |work|
+                [
+                  work.title,
+                  work.brother&.full_name,
+                  work.status.humanize,
+                  work.assigned_on || "-",
+                  work.due_on || "-",
+                  work.reviewer_user&.email || "-"
+                ]
+              end,
+              widths: [ 120, 90, 52, 58, 58, 90 ]
+            )
+          end
+        end
       end
-      pdf.move_down 10
 
-      pdf.text "Detalle de trabajos", style: :bold, size: 12
-      @works_for_export.limit(200).each do |work|
-        pdf.text "#{work.title} | #{work.brother&.full_name}", size: 10
-        pdf.text "Estado: #{work.status.humanize} | Asignado: #{work.assigned_on || '-'} | Compromiso: #{work.due_on || '-'} | Revisor: #{work.reviewer_user&.email || '-'}", size: 9
-        pdf.move_down 3
-      end
-      pdf.text "Sin trabajos para detallar." if @works_for_export.empty?
-
-      send_data pdf.render, filename: "tablero_trabajos_masonicos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+      send_data pdf_bytes, filename: "tablero_trabajos_masonicos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def show
@@ -376,6 +421,41 @@ module Backoffice
       to = parse_date(params[:period_to])
       if from.present? && to.present?
         @reviews_for_export = @reviews_for_export.where(reviewed_on: from..to)
+      end
+    end
+
+    def build_works_list_pdf(title:, subtitle:)
+      Pdf::InstitutionalReport.new(
+        title: title,
+        subtitle: subtitle,
+        lodge: current_lodge,
+        meta_lines: [
+          "Emitido: #{I18n.l(Date.current, format: :long)}",
+          "Registros: #{@works_for_export.size}",
+          ("Estado: #{params[:status]}" if params[:status].present?),
+          ("Hermano ID: #{params[:brother_id]}" if params[:brother_id].present?),
+          ("Busqueda: #{params[:q]}" if params[:q].present?)
+        ].compact,
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @works_for_export.empty?
+          report.paragraph(pdf, "Sin trabajos para exportar.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Trabajo Hermano Estado Asignacion Compromiso],
+            rows: @works_for_export.map do |work|
+              [
+                work.title,
+                work.brother&.full_name,
+                work.status.humanize,
+                work.assigned_on || "-",
+                work.due_on || "-"
+              ]
+            end,
+            widths: [ 145, 100, 52, 58, 58 ]
+          )
+        end
       end
     end
   end

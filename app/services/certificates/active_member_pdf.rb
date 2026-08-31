@@ -5,12 +5,6 @@ module Certificates
     ACCENT = "C9A227"
     MUTED = "666666"
 
-    ASSETS = {
-      logo: %w[logo-amenti-light.png logo-amenti.png logo-amenti-hero.png].freeze,
-      insignia: %w[insignia-sello.png logo-amenti-badge.png].freeze,
-      mark: %w[logo-amenti-badge.png logo-amenti-mark.png].freeze
-    }.freeze
-
     def initialize(brother:, issue:, verification_url:, issued_on: Date.current, issued_by: nil)
       @brother = brother
       @lodge = brother.lodge
@@ -229,11 +223,7 @@ module Certificates
     end
 
     def asset_path(kind)
-      ASSETS.fetch(kind).each do |name|
-        path = Rails.root.join("public/images", name)
-        return path.to_s if File.exist?(path)
-      end
-      nil
+      Pdf::BrandAssets.path_for(kind)
     end
 
     def qr_code_io(url)

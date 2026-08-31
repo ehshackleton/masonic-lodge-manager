@@ -104,22 +104,39 @@ module Backoffice
 
     def export_pdf
       prepare_dashboard_data
-      pdf = PrawnDocument.build
-      pdf.text "Tesoreria y contabilidad - Tablero de ingresos", size: 16, style: :bold
-      pdf.move_down 8
-      pdf.text "Rango: #{@from} a #{@to}"
-      pdf.text "Ingresos: #{format_currency(@total_income)}"
-      pdf.text "Pagos registrados: #{@payments_count}"
-      pdf.text "Esperado mensual: #{format_currency(@expected_month_income)}"
-      pdf.text "Recaudado mes actual: #{format_currency(@collected_month_income)}"
-      pdf.text "Cuotas vencidas: #{@overdue_count}"
-      pdf.move_down 12
-      pdf.text "Morosidad por hermano", style: :bold
-      @delinquency_rows.first(25).each do |row|
-        pdf.text "- #{row[:brother].full_name}: saldo #{format_currency(row[:balance])}, antiguedad #{row[:aging_days]} dias"
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Tesoreria y contabilidad",
+        subtitle: "Tablero de ingresos",
+        lodge: @lodge,
+        meta_lines: [ "Rango: #{@from} a #{@to}" ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        report.section(pdf, "Resumen") do
+          report.key_values(pdf, [
+            [ "Ingresos", format_currency(@total_income) ],
+            [ "Pagos registrados", @payments_count ],
+            [ "Esperado mensual", format_currency(@expected_month_income) ],
+            [ "Recaudado mes actual", format_currency(@collected_month_income) ],
+            [ "Cuotas vencidas", @overdue_count ]
+          ])
+        end
+
+        report.section(pdf, "Morosidad por hermano (top 25)") do
+          rows = @delinquency_rows.first(25)
+          if rows.empty?
+            report.paragraph(pdf, "Sin morosidad registrada.", muted: true)
+          else
+            report.table(
+              pdf,
+              headers: %w[Hermano Saldo Antiguedad],
+              rows: rows.map { |row| [ row[:brother].full_name, format_currency(row[:balance]), "#{row[:aging_days]} dias" ] },
+              widths: [ 200, 90, 80 ]
+            )
+          end
+        end
       end
 
-      send_data pdf.render, filename: "tesoreria_ingresos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+      send_data pdf_bytes, filename: "tesoreria_ingresos_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def export_delinquency_excel
@@ -148,18 +165,34 @@ module Backoffice
 
     def export_delinquency_pdf
       prepare_dashboard_data
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de morosidad por hermano", size: 16, style: :bold
-      pdf.move_down 8
-      pdf.text "Fecha de emision: #{Date.current}"
-      pdf.move_down 10
-      @delinquency_rows.each do |row|
-        pdf.text "#{row[:brother].full_name} (#{row[:brother].registry_number})"
-        pdf.text "Saldo: #{format_currency(row[:balance])} | Vencida desde: #{row[:oldest_due_on]} | Antiguedad: #{row[:aging_days]} dias", size: 10
-        pdf.move_down 4
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Reporte de morosidad",
+        subtitle: "Detalle por hermano",
+        lodge: @lodge,
+        meta_lines: [ "Rango: #{@from} a #{@to}" ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @delinquency_rows.empty?
+          report.paragraph(pdf, "Sin morosidad registrada.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Hermano Registro Saldo Vencida Antiguedad],
+            rows: @delinquency_rows.map do |row|
+              [
+                row[:brother].full_name,
+                row[:brother].registry_number,
+                format_currency(row[:balance]),
+                row[:oldest_due_on],
+                "#{row[:aging_days]} dias"
+              ]
+            end,
+            widths: [ 120, 58, 72, 58, 62 ]
+          )
+        end
       end
-      pdf.text "Sin morosidad registrada." if @delinquency_rows.empty?
-      send_data pdf.render, filename: "morosidad_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+
+      send_data pdf_bytes, filename: "morosidad_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     private

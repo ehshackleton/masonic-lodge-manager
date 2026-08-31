@@ -52,22 +52,45 @@ module Backoffice
 
     def export_pdf
       load_brothers_for_export
-      pdf = PrawnDocument.build
-      pdf.text "Cuadro logial - Respetable Logia Simbolica Amenti Diez N°31", size: 16, style: :bold
-      pdf.move_down 4
-      pdf.text "Emitido: #{Date.current} | Registros: #{@brothers_for_export.size}", size: 10
-      pdf.move_down 8
+      filter_meta = []
+      filter_meta << "Busqueda: #{@q}" if @q.present?
+      filter_meta << "Estado: #{@status}" if @status.present?
+      filter_meta << "Grado ID: #{@degree_id}" if @degree_id.present?
 
-      @brothers_for_export.each do |brother|
-        contact = brother.email.presence || brother.mobile_phone.presence || "-"
-        pdf.text brother.full_name.to_s, style: :bold, size: 11
-        pdf.text "Registro: #{brother.registry_number} | Simbolico: #{brother.symbolic_name.presence || '-'} | Grado: #{brother.current_degree&.name || '-'}", size: 9
-        pdf.text "Estado: #{brother.membership_status.to_s.humanize} | Contacto: #{contact}", size: 9
-        pdf.move_down 4
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Cuadro logial",
+        subtitle: "Listado de hermanos",
+        lodge: current_lodge,
+        meta_lines: [
+          "Emitido: #{I18n.l(Date.current, format: :long)}",
+          "Registros: #{@brothers_for_export.size}",
+          *filter_meta
+        ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @brothers_for_export.empty?
+          report.paragraph(pdf, "Sin hermanos para exportar.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Registro Hermano Simbolico Grado Estado Contacto],
+            rows: @brothers_for_export.map do |brother|
+              contact = brother.email.presence || brother.mobile_phone.presence || "-"
+              [
+                brother.registry_number,
+                brother.full_name,
+                brother.symbolic_name.presence || "-",
+                brother.current_degree&.name || "-",
+                brother.membership_status.to_s.humanize,
+                contact
+              ]
+            end,
+            widths: [ 58, 130, 72, 58, 52, 110 ]
+          )
+        end
       end
-      pdf.text "Sin hermanos para exportar." if @brothers_for_export.empty?
 
-      send_data pdf.render, filename: "cuadro_logial_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+      send_data pdf_bytes, filename: "cuadro_logial_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def show

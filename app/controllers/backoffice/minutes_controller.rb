@@ -51,16 +51,42 @@ module Backoffice
 
     def export_pdf
       load_minutes_for_export
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de actas", size: 16, style: :bold
-      pdf.move_down 8
-      @minutes.each do |m|
-        pdf.text "#{m.folio} | #{m.session_date} | #{m.title}"
-        pdf.text "Estado: #{m.status.humanize} | Visibilidad: #{m.visibility.humanize}", size: 10
-        pdf.move_down 4
+      filter_meta = []
+      filter_meta << "Busqueda: #{@q}" if @q.present?
+      filter_meta << "Estado: #{@status}" if @status.present?
+
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Reporte de actas",
+        subtitle: "Listado de actas",
+        lodge: current_lodge,
+        meta_lines: [
+          "Emitido: #{I18n.l(Date.current, format: :long)}",
+          "Registros: #{@minutes.size}",
+          *filter_meta
+        ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @minutes.empty?
+          report.paragraph(pdf, "Sin actas para exportar.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Folio Sesion Titulo Estado Visibilidad],
+            rows: @minutes.map do |m|
+              [
+                m.folio,
+                m.session_date,
+                m.title,
+                m.status.humanize,
+                m.visibility.humanize
+              ]
+            end,
+            widths: [ 58, 58, 150, 52, 62 ]
+          )
+        end
       end
-      pdf.text "Sin actas para exportar." if @minutes.empty?
-      send_data pdf.render, filename: "actas_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+
+      send_data pdf_bytes, filename: "actas_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def show; end

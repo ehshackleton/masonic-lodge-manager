@@ -35,21 +35,25 @@ module Workspace
     private
 
     def build_pdf
-      require "prawn"
-      PrawnDocument.build do |pdf|
-        pdf.text "Acta #{@minute.folio}", size: 16, style: :bold
-        pdf.move_down 8
-        pdf.text "Titulo: #{@minute.title}"
-        pdf.text "Sesion: #{@minute.session_date}"
-        pdf.text "Estado: #{@minute.status}"
-        pdf.text "Visibilidad: #{@minute.visibility}"
-        pdf.move_down 10
-        pdf.text "Resumen", style: :bold
-        pdf.text @minute.summary.to_s
-        pdf.move_down 10
-        pdf.text "Cuerpo", style: :bold
-        pdf.text @minute.body.to_s
-      end.render
+      Pdf::InstitutionalReport.new(
+        title: "Acta #{@minute.folio}",
+        subtitle: @minute.title,
+        lodge: @lodge,
+        meta_lines: [
+          "Sesion: #{@minute.session_date}",
+          "Estado: #{@minute.status.humanize}",
+          "Visibilidad: #{@minute.visibility.humanize}"
+        ],
+        confidential: @minute.visibility != "public"
+      ).render do |report, pdf|
+        report.section(pdf, "Resumen") do
+          report.paragraph(pdf, @minute.summary.to_s.presence || "Sin resumen.", muted: @minute.summary.blank?)
+        end
+
+        report.section(pdf, "Cuerpo") do
+          report.paragraph(pdf, @minute.body.to_s.presence || "Sin contenido.", muted: @minute.body.blank?)
+        end
+      end
     end
   end
 end

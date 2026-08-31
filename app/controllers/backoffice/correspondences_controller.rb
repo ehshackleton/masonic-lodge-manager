@@ -52,16 +52,43 @@ module Backoffice
 
     def export_pdf
       load_correspondences_for_export
-      pdf = PrawnDocument.build
-      pdf.text "Reporte de correspondencia", size: 16, style: :bold
-      pdf.move_down 8
-      @correspondences.each do |c|
-        pdf.text "#{c.folio} | #{c.subject}"
-        pdf.text "Direccion: #{c.direction.humanize} | Estado: #{c.status.humanize} | Confidencialidad: #{c.confidentiality_level.humanize}", size: 10
-        pdf.move_down 4
+      filter_meta = []
+      filter_meta << "Busqueda: #{@q}" if @q.present?
+      filter_meta << "Estado: #{@status}" if @status.present?
+      filter_meta << "Direccion: #{@direction}" if @direction.present?
+
+      pdf_bytes = Pdf::InstitutionalReport.new(
+        title: "Reporte de correspondencia",
+        subtitle: "Listado de correspondencia",
+        lodge: current_lodge,
+        meta_lines: [
+          "Emitido: #{I18n.l(Date.current, format: :long)}",
+          "Registros: #{@correspondences.size}",
+          *filter_meta
+        ],
+        emitted_by: current_user.full_name
+      ).render do |report, pdf|
+        if @correspondences.empty?
+          report.paragraph(pdf, "Sin correspondencia para exportar.", muted: true)
+        else
+          report.table(
+            pdf,
+            headers: %w[Folio Asunto Direccion Estado Confidencialidad],
+            rows: @correspondences.map do |c|
+              [
+                c.folio,
+                c.subject,
+                c.direction.humanize,
+                c.status.humanize,
+                c.confidentiality_level.humanize
+              ]
+            end,
+            widths: [ 58, 150, 52, 52, 68 ]
+          )
+        end
       end
-      pdf.text "Sin correspondencia para exportar." if @correspondences.empty?
-      send_data pdf.render, filename: "correspondencia_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
+
+      send_data pdf_bytes, filename: "correspondencia_#{Date.current}.pdf", type: "application/pdf", disposition: "attachment"
     end
 
     def show; end
