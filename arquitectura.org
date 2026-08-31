@@ -229,16 +229,23 @@ de cobertura.
 
 *** Secretaría documental
 
+**** Tenidas (=tenidas=)
+
+Entidad operativa de una reunión: fecha, tipo, grado, estado
+(=planned= → … → =approved= / =cancelled=), código =TEN-YYYY-####=.
+
+Campos =presiding_brother= + =presiding_capacity= (=titular= / =adjunto= /
+=pt= / =otro=) capturan *quién preside esa Tenida*, sin confundir con los
+cargos titulares vigentes del cuadro (=BrotherOfficeAssignment= en la fecha).
+
 **** Actas (=minutes=)
 
 Workflow de estado:
 
 : draft → review → approved → published
 
-Visibilidad: =internal= | =restricted= | =confidential=.
+Con =lodge_id= y =tenida_id= opcional. Visibilidad: =internal= | =restricted= | =confidential=.
 Folio automático: =ACTA-YYYY-####=.
-
-*Deuda:* no hay =lodge_id=; en multi-logia las actas quedarían globales.
 
 **** Correspondencia (=correspondences=)
 
