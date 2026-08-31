@@ -6,8 +6,9 @@
       <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300">Amenti</p>
       <h1 class="font-display mt-3 text-5xl text-ink sm:text-6xl">Quiénes somos</h1>
       <p class="mt-5 text-lg leading-relaxed text-zinc-300">
-        Respetable Logia Simbólica Amenti Diez N°31 · Gran Logia Mixta de Chile · Valle de Santiago.
-        Fundada el 4 de agosto de 1960.
+        Somos la Respetable Logia Simbólica Amenti Diez N°31, del Valle de Santiago,
+        adscrita a la Gran Logia Mixta de Chile. Nacimos el 4 de agosto de 1960 y seguimos
+        labrando nuestra piedra con continuidad y sobriedad.
       </p>
       <% if amenti_master_logo_path %>
         <div class="amenti-panel amenti-panel-gold mt-8 flex items-center justify-center rounded-3xl p-8">
@@ -25,12 +26,12 @@
 
     <div class="grid gap-4 sm:grid-cols-2">
       <% [
-        ["/historia", "Historia", "Línea de tiempo pública: 1960, tránsito institucional, 1982 y N°31."],
-        ["/espiritu-amentino", "Espíritu amentino", "Identidad simbólica: equilibrio, memoria y fraternidad."],
-        ["/insignia", "Insignia", "Activo de marca y criterios de uso público.", true],
-        ["/masoneria", "Masonería", "Preguntas frecuentes cuidadas, sin inventar requisitos."],
-        ["/actualidad", "Actualidad", "Avisos públicos solo cuando estén autorizados."],
-        ["/contacto", "Contacto", "Canal institucional para consultas públicas."]
+        ["/historia", "Historia", "Recorremos juntos los hitos que nos trajeron hasta hoy: 1960, nuestros tránsitos y el N°31."],
+        ["/espiritu-amentino", "Espíritu amentino", "Compartimos la identidad simbólica que nos orienta: equilibrio, memoria y fraternidad."],
+        ["/insignia", "Insignia", "Mostramos nuestra marca y los criterios con que la usamos en público.", true],
+        ["/masoneria", "Masonería", "Respondemos, con cuidado, las preguntas que suelen hacerse sobre nuestra Orden."],
+        ["/actualidad", "Actualidad", "Publicamos avisos solo cuando hemos autorizado expresamente hacerlo."],
+        ["/contacto", "Contacto", "Abrimos un canal para consultas públicas, con respeto y claridad."]
       ].each do |href, title, copy, with_mark| %>
         <a href="<%= href %>" class="amenti-panel group rounded-2xl p-6 transition hover:border-amber-300/40">
           <div class="flex items-start justify-between gap-3">
