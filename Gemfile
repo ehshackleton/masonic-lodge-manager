@@ -78,3 +78,5 @@ group :test do
   gem "selenium-webdriver"
   gem "webmock"
 end
+
+gem "rqrcode", "~> 2.0"

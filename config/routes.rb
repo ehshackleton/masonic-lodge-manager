@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "/insignia", to: "public/pages#insignia"
   get "/contacto", to: "public/contact#index", as: :contacto
   post "/contacto", to: "public/contact#create"
+  get "/verificar-certificado/:token", to: "public/certificate_verifications#show", as: :verify_certificate
   get "/sobre-el-sistema", to: "public/system#index"
   get "/iniciar-sesion", to: "public/sessions#new"
   post "/iniciar-sesion", to: "public/sessions#create"
@@ -69,6 +70,7 @@ Rails.application.routes.draw do
       end
 
       member do
+        get :active_member_certificate
         delete "documents/:attachment_id", to: "brothers#purge_document", as: :purge_document
       end
 

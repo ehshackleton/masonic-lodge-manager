@@ -1,0 +1,51 @@
+<% content_for :title, "Verificación de certificado | Amenti Diez N°31" %>
+
+<section class="mx-auto max-w-2xl px-6 py-16">
+  <div class="amenti-panel rounded-3xl p-8">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Secretaría · Verificación</p>
+    <h1 class="font-display mt-3 text-3xl text-ink">Autenticidad del certificado</h1>
+
+    <% if @valid %>
+      <div class="mt-6 rounded-2xl border border-emerald-800/50 bg-emerald-950/30 px-5 py-4">
+        <p class="text-sm font-semibold text-emerald-300">Certificado auténtico</p>
+        <p class="mt-2 text-sm text-zinc-300">Este documento fue emitido por Secretaría de la logia y su marca digital coincide con nuestros registros.</p>
+      </div>
+
+      <dl class="mt-8 space-y-4 text-sm">
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Folio</dt>
+          <dd class="mt-1 font-medium text-zinc-100"><%= @issue.folio %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Hermano</dt>
+          <dd class="mt-1 text-zinc-200"><%= @issue.brother.full_name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Logia</dt>
+          <dd class="mt-1 text-zinc-200"><%= @issue.lodge.name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Fecha de emisión</dt>
+          <dd class="mt-1 text-zinc-200"><%= l(@issue.issued_on, format: :long) %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Código de verificación</dt>
+          <dd class="mt-1 font-mono text-zinc-200"><%= @issue.verification_code %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-zinc-500">Sello digital</dt>
+          <dd class="mt-1 font-mono text-xs text-zinc-300"><%= @issue.digital_seal %></dd>
+        </div>
+      </dl>
+    <% else %>
+      <div class="mt-6 rounded-2xl border border-rose-800/50 bg-rose-950/30 px-5 py-4">
+        <p class="text-sm font-semibold text-rose-300">Certificado no verificado</p>
+        <p class="mt-2 text-sm text-zinc-400">El enlace no corresponde a un certificado vigente en nuestros registros, o la marca digital no coincide.</p>
+      </div>
+    <% end %>
+
+    <p class="mt-8 text-xs text-zinc-500">
+      Verificación administrativa de Amenti Diez N°31. No expone datos sensibles ni sustituye la revisión presencial del documento impreso.
+    </p>
+  </div>
+</section>

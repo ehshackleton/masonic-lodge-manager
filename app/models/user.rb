@@ -86,6 +86,10 @@ class User < ApplicationRecord
     end
   end
 
+  def can_issue_member_certificate?
+    has_role?(:superadmin) || has_role?(:secretario) || has_role?(:secretariat_manager)
+  end
+
   def can_manage_secretariat_action?(action)
     key = action.to_s
     return true if has_role?(:superadmin) || has_role?(:secretario) || has_role?(:secretariat_manager)

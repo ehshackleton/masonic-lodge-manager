@@ -7,6 +7,7 @@ class Brother < ApplicationRecord
   has_many :charges, dependent: :restrict_with_error
   has_many :payments, dependent: :restrict_with_error
   has_many :masonic_works, dependent: :restrict_with_error
+  has_many :certificate_issues, dependent: :restrict_with_error
   has_many :hospital_fund_transactions, dependent: :nullify
   has_many :presided_tenidas, class_name: "Tenida", foreign_key: :presiding_brother_id, dependent: :nullify
   has_many_attached :documents

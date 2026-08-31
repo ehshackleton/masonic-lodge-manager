@@ -4,7 +4,8 @@ module Backoffice
     before_action :require_current_lodge!
     before_action :authorize_registry_read_access!
     before_action :authorize_registry_write_access!, only: %i[new create edit update destroy purge_document]
-    before_action :set_brother, only: %i[show edit update destroy purge_document]
+    before_action :set_brother, only: %i[show edit update destroy purge_document active_member_certificate]
+    before_action :authorize_member_certificate_access!, only: :active_member_certificate
     before_action :load_select_options, only: %i[new edit create update]
 
     def index
@@ -77,6 +78,41 @@ module Backoffice
       @degrees = Degree.order(rank_order: :asc)
       @offices = Office.order(:name)
       @can_write_registry = current_user.can_manage_registry_action?(:write)
+      @can_issue_member_certificate = current_user.can_issue_member_certificate?
+      @certificate_eligible = Certificates::ActiveMemberPdf.eligible?(@brother)
+    end
+
+    def active_member_certificate
+      unless Certificates::ActiveMemberPdf.eligible?(@brother)
+        redirect_to backoffice_brother_path(@brother),
+                    alert: "No se puede emitir el certificado: el hermano debe estar activo y tener grado registrado."
+        return
+      end
+
+      issue, pdf_bytes = Certificates::IssueActiveMember.new(
+        brother: @brother,
+        issued_by_user: current_user,
+        verification_host: request.base_url
+      ).call
+
+      AuditLog.record!(
+        user: current_user,
+        action: "brother.active_member_certificate",
+        auditable: @brother,
+        metadata: {
+          certificate_issue_id: issue.id,
+          folio: issue.folio,
+          verification_code: issue.verification_code,
+          brother_name: @brother.full_name,
+          registry_number: @brother.registry_number,
+          membership_status: @brother.membership_status
+        },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
+
+      filename = "certificado_miembro_activo_#{@brother.last_name.to_s.parameterize}_#{Date.current}.pdf"
+      send_data pdf_bytes, filename: filename, type: "application/pdf", disposition: "attachment"
     end
 
     def new
@@ -217,6 +253,13 @@ module Backoffice
         ip_address: request.remote_ip,
         user_agent: request.user_agent
       )
+    end
+
+    def authorize_member_certificate_access!
+      return if current_user&.can_issue_member_certificate?
+
+      audit_permission_denied("member_certificate")
+      redirect_to backoffice_brother_path(@brother), alert: "Solo Secretaría puede emitir certificados de miembro activo."
     end
   end
 end

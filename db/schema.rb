@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_31_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -118,6 +118,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_160000) do
     t.index ["membership_status"], name: "index_brothers_on_membership_status"
     t.index ["registry_number"], name: "index_brothers_on_registry_number"
     t.index ["symbolic_name"], name: "index_brothers_on_symbolic_name"
+  end
+
+  create_table "certificate_issues", force: :cascade do |t|
+    t.bigint "brother_id", null: false
+    t.string "certificate_type", default: "active_member", null: false
+    t.datetime "created_at", null: false
+    t.string "digest", null: false
+    t.string "folio", null: false
+    t.bigint "issued_by_user_id", null: false
+    t.date "issued_on", null: false
+    t.bigint "lodge_id", null: false
+    t.datetime "revoked_at"
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.string "verification_code", null: false
+    t.index ["brother_id"], name: "index_certificate_issues_on_brother_id"
+    t.index ["folio"], name: "index_certificate_issues_on_folio", unique: true
+    t.index ["issued_by_user_id"], name: "index_certificate_issues_on_issued_by_user_id"
+    t.index ["lodge_id", "certificate_type", "issued_on"], name: "idx_on_lodge_id_certificate_type_issued_on_ac57944241"
+    t.index ["lodge_id"], name: "index_certificate_issues_on_lodge_id"
+    t.index ["token"], name: "index_certificate_issues_on_token", unique: true
+    t.index ["verification_code"], name: "index_certificate_issues_on_verification_code", unique: true
   end
 
   create_table "charges", force: :cascade do |t|
@@ -470,6 +492,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_160000) do
   add_foreign_key "brother_office_assignments", "offices"
   add_foreign_key "brothers", "degrees", column: "current_degree_id"
   add_foreign_key "brothers", "lodges"
+  add_foreign_key "certificate_issues", "brothers"
+  add_foreign_key "certificate_issues", "lodges"
+  add_foreign_key "certificate_issues", "users", column: "issued_by_user_id"
   add_foreign_key "charges", "brothers"
   add_foreign_key "contact_messages", "users", column: "handled_by_user_id"
   add_foreign_key "correspondences", "lodges"

@@ -7,6 +7,17 @@
       <p class="mt-1 text-sm text-zinc-400">Registro: <%= @brother.registry_number %> - Estado: <%= @brother.membership_status.to_s.humanize %></p>
     </div>
     <div class="flex gap-2">
+      <% if @can_issue_member_certificate %>
+        <% if @certificate_eligible %>
+          <a href="/backoffice/brothers/<%= @brother.id %>/active_member_certificate" class="rounded-lg border border-amber-700/60 px-4 py-2 text-sm font-semibold text-amber-300 hover:border-amber-300">
+            Certificado miembro activo
+          </a>
+        <% else %>
+          <span title="El hermano debe estar activo y tener grado registrado" class="cursor-not-allowed rounded-lg border border-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-600">
+            Certificado miembro activo
+          </span>
+        <% end %>
+      <% end %>
       <% if @can_write_registry %>
         <a href="/backoffice/brothers/<%= @brother.id %>/edit" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Editar</a>
       <% end %>

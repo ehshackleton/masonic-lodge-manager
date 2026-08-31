@@ -1,6 +1,7 @@
 class Lodge < ApplicationRecord
   has_many :brothers, dependent: :restrict_with_error
   has_many :masonic_works, dependent: :restrict_with_error
+  has_many :certificate_issues, dependent: :restrict_with_error
   has_many :minutes, dependent: :restrict_with_error
   has_many :correspondences, dependent: :restrict_with_error
   has_many :tenidas, dependent: :restrict_with_error
