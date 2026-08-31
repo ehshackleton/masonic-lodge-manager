@@ -1,6 +1,7 @@
 module Backoffice
   class AdministrationController < ApplicationController
     ROLE_MATRIX = {
+      "Cuadro logial" => %w[registry_manager registry_editor registry_viewer],
       "Secretaria" => %w[secretario secretariat_manager minute_editor minute_approver correspondence_editor correspondence_approver],
       "Tesoreria" => %w[tesoreria_manager tesoreria_operator tesoreria_closer tesoreria_exporter],
       "Trabajos" => %w[work_reviewer work_approver work_presenter work_archiver],
@@ -11,8 +12,13 @@ module Backoffice
         name: "Plantilla Secretario",
         role_keys: %w[
           secretario secretariat_manager minute_editor minute_approver correspondence_editor correspondence_approver
+          registry_manager registry_editor
           work_reviewer work_approver work_presenter work_archiver
         ]
+      },
+      "cuadro" => {
+        name: "Plantilla Cuadro logial",
+        role_keys: %w[registry_manager registry_editor]
       },
       "tesorero" => {
         name: "Plantilla Tesorero",

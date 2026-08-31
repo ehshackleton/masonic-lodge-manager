@@ -182,9 +182,9 @@ Objetivo: que el sitio y la logia en BD digan *Amenti Diez Nº 31*.
 
 ** Fase B — Seguridad y tenant
 
-- [ ] =lodge_id= en =minutes= + backfill.
-- [ ] Scopes por logia en queries sensibles.
-- [ ] =require= de módulo/rol en =BrothersController= (y dashboard coherente).
+- [X] =lodge_id= en =minutes= + backfill.
+- [X] Scopes por logia en queries sensibles.
+- [X] =require= de módulo/rol en =BrothersController= (y dashboard coherente).
 - [X] Contacto: guardar =ContactMessage=, estado =new=, sin PII en logs.
 
 ** Fase C — Secretaría y gobierno
@@ -249,11 +249,10 @@ feature/*  -->  amenti-diez-31  -->  PR  -->  main (protegida)  -->  deploy
 
 | Fase | Estado | Notas |
 |------+--------+-------|
-| A Fundación identitaria | HECHA (código) | Reaplicar =db:seed= en entorno local/prod |
-| B Seguridad y tenant | Pendiente | Contacto persistente ya incluido |
+| A Fundación identitaria | HECHA | Seeds + portal + contacto |
+| B Seguridad y tenant | HECHA | =lodge_id= actas, AuthZ cuadro, dashboard |
 | C Secretaría / Tenida | Pendiente | |
 | D Sitio editorial | Pendiente | |
 | E Integraciones / Mi Amenti | Diferido | |
 
-Última actualización: 2026-08-31 — contexto maestro final + arranque Fase A
-(identidad Amenti en seeds, portal y contacto persistente).
+Última actualización: 2026-08-31 — Fase B: tenant en actas y AuthZ de cuadro logial.

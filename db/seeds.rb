@@ -28,6 +28,9 @@ Role.find_or_create_by!(key: "secretario") do |record|
 end
 
 [
+  { key: "registry_manager", name: "Gestor de cuadro logial", description: "Acceso total al cuadro logial" },
+  { key: "registry_editor", name: "Editor de cuadro logial", description: "Puede crear y editar fichas del cuadro" },
+  { key: "registry_viewer", name: "Consulta de cuadro logial", description: "Puede consultar el cuadro sin modificarlo" },
   { key: "secretariat_manager", name: "Gestor de Secretaria", description: "Acceso total a Secretaria" },
   { key: "minute_editor", name: "Editor de actas", description: "Puede crear y editar actas" },
   { key: "minute_approver", name: "Aprobador de actas", description: "Puede aprobar y publicar actas" },

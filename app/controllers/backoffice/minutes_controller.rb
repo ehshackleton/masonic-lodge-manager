@@ -1,6 +1,7 @@
 module Backoffice
   class MinutesController < ApplicationController
     before_action :require_authentication
+    before_action :require_current_lodge!
     before_action :set_minute, only: %i[show edit update destroy submit_review approve publish]
     before_action :authorize_minutes_read_access!
     before_action :authorize_minutes_write_access!, only: %i[new create edit update destroy submit_review]
@@ -9,7 +10,7 @@ module Backoffice
     def index
       @q = params[:q].to_s.strip
       @status = params[:status].to_s.strip
-      @minutes = Minute.order(session_date: :desc)
+      @minutes = minutes_scope.ordered
       @minutes = @minutes.where(status: @status) if @status.present?
       if @q.present?
         pattern = "%#{@q.downcase}%"
@@ -64,11 +65,12 @@ module Backoffice
     def show; end
 
     def new
-      @minute = Minute.new(session_date: Date.current, status: "draft", visibility: "internal")
+      @minute = minutes_scope.new(session_date: Date.current, status: "draft", visibility: "internal", lodge: current_lodge)
     end
 
     def create
-      @minute = Minute.new(minute_params)
+      @minute = minutes_scope.new(minute_params)
+      @minute.lodge = current_lodge
       @minute.created_by_user = current_user
       if @minute.save
         attach_documents(@minute)
@@ -124,8 +126,12 @@ module Backoffice
 
     private
 
+    def minutes_scope
+      Minute.for_lodge(current_lodge)
+    end
+
     def set_minute
-      @minute = Minute.find(params[:id])
+      @minute = minutes_scope.find(params[:id])
     end
 
     def minute_params
@@ -134,11 +140,12 @@ module Backoffice
 
     def attach_documents(minute)
       return unless params.dig(:minute, :documents).present?
+
       minute.documents.attach(params[:minute][:documents])
     end
 
     def load_minutes_for_export
-      @minutes = Minute.order(session_date: :desc)
+      @minutes = minutes_scope.ordered
       @minutes = @minutes.where(status: params[:status]) if params[:status].present?
       if params[:q].present?
         pattern = "%#{params[:q].to_s.strip.downcase}%"

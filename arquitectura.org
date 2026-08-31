@@ -362,10 +362,7 @@ Consecuencia: gem =kamal= sin uso efectivo.
 | Alta | Autorización del cuadro logial / dashboard | Seguridad operativa |
 | Alta | Contacto público sin persistencia | Funcionalidad incompleta vs tabla |
 | Media | Extraer services desde treasury/hospital/works | Mantenibilidad |
-| Media | =minutes.lodge_id= + scopes por lodge | Preparar Amenti / multi-logia |
-| Media | Sustituir Tailwind CDN por build propio | Prod / CSP |
-| Media | Actualizar =docs/sprint-1-backlog.md= | Documentación vs realidad |
-| Baja | Activar jobs Solid de dominio (avisos, generación de cargos) | Automatización |
+| Baja | Activar jobs Solid de dominio | Automatización |
 | Baja | Cobertura de tests (hoy casi solo =/up=) | Regresiones |
 | Baja | =PublicPage= CMS o eliminar tablas huérfanas | Claridad de dominio |
 

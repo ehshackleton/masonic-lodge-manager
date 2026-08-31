@@ -6,9 +6,11 @@
       <h1 class="text-3xl font-bold tracking-tight text-zinc-100">Cuadro logial</h1>
       <p class="mt-1 text-sm text-zinc-400">Gestion integral de fichas de hermanos del taller.</p>
     </div>
-    <a href="/backoffice/brothers/new" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">
-      Agregar hermano
-    </a>
+    <% if @can_write_registry %>
+      <a href="/backoffice/brothers/new" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700">
+        Agregar hermano
+      </a>
+    <% end %>
   </div>
 
   <div class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
@@ -45,7 +47,9 @@
             <td class="px-4 py-3">
               <div class="flex gap-2">
                 <a href="/backoffice/brothers/<%= brother.id %>" class="text-amber-300 hover:underline">Ver</a>
-                <a href="/backoffice/brothers/<%= brother.id %>/edit" class="text-zinc-200 hover:underline">Editar</a>
+                <% if @can_write_registry %>
+                  <a href="/backoffice/brothers/<%= brother.id %>/edit" class="text-zinc-200 hover:underline">Editar</a>
+                <% end %>
               </div>
             </td>
           </tr>

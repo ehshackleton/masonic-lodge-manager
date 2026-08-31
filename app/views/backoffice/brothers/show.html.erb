@@ -7,7 +7,9 @@
       <p class="mt-1 text-sm text-zinc-400">Registro: <%= @brother.registry_number %> - Estado: <%= @brother.membership_status.to_s.humanize %></p>
     </div>
     <div class="flex gap-2">
-      <a href="/backoffice/brothers/<%= @brother.id %>/edit" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Editar</a>
+      <% if @can_write_registry %>
+        <a href="/backoffice/brothers/<%= @brother.id %>/edit" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200">Editar</a>
+      <% end %>
       <a href="/backoffice/brothers" class="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Volver al listado</a>
     </div>
   </div>
@@ -60,11 +62,13 @@
   <div class="mt-6 grid gap-4 lg:grid-cols-2">
     <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
       <h2 class="text-base font-semibold text-zinc-100">Historial de grados</h2>
-      <%= form_with model: [:backoffice, @brother, @new_degree_history], class: "mt-4 grid gap-3 md:grid-cols-3" do |f| %>
-        <%= f.collection_select :degree_id, @degrees, :id, :name, {}, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
-        <%= f.date_field :ceremony_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
-        <%= f.submit "Agregar", class: "rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white" %>
-        <%= f.text_area :notes, rows: 2, placeholder: "Notas", class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-3" %>
+      <% if @can_write_registry %>
+        <%= form_with model: [:backoffice, @brother, @new_degree_history], class: "mt-4 grid gap-3 md:grid-cols-3" do |f| %>
+          <%= f.collection_select :degree_id, @degrees, :id, :name, {}, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+          <%= f.date_field :ceremony_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+          <%= f.submit "Agregar", class: "rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white" %>
+          <%= f.text_area :notes, rows: 2, placeholder: "Notas", class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-3" %>
+        <% end %>
       <% end %>
       <div class="mt-4 space-y-2 text-sm">
         <% @degree_histories.each do |history| %>
@@ -73,7 +77,9 @@
               <p class="font-medium text-zinc-100"><%= history.degree.name %> - <%= history.ceremony_date %></p>
               <p class="text-zinc-400"><%= history.notes.presence || "-" %></p>
             </div>
-            <%= button_to "Quitar", backoffice_brother_brother_degree_history_path(@brother, history), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% if @can_write_registry %>
+              <%= button_to "Quitar", backoffice_brother_brother_degree_history_path(@brother, history), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% end %>
           </div>
         <% end %>
         <% if @degree_histories.empty? %>
@@ -84,12 +90,14 @@
 
     <article class="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
       <h2 class="text-base font-semibold text-zinc-100">Historial de cargos/oficios</h2>
-      <%= form_with model: [:backoffice, @brother, @new_office_assignment], class: "mt-4 grid gap-3 md:grid-cols-4" do |f| %>
-        <%= f.collection_select :office_id, @offices, :id, :name, {}, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-2" %>
-        <%= f.date_field :start_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
-        <%= f.date_field :end_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
-        <%= f.text_area :notes, rows: 2, placeholder: "Notas", class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-3" %>
-        <%= f.submit "Asignar cargo", class: "rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white md:col-span-1" %>
+      <% if @can_write_registry %>
+        <%= form_with model: [:backoffice, @brother, @new_office_assignment], class: "mt-4 grid gap-3 md:grid-cols-4" do |f| %>
+          <%= f.collection_select :office_id, @offices, :id, :name, {}, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-2" %>
+          <%= f.date_field :start_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+          <%= f.date_field :end_date, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+          <%= f.text_area :notes, rows: 2, placeholder: "Notas", class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm md:col-span-3" %>
+          <%= f.submit "Asignar cargo", class: "rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white md:col-span-1" %>
+        <% end %>
       <% end %>
       <div class="mt-4 space-y-2 text-sm">
         <% @office_assignments.each do |assignment| %>
@@ -99,7 +107,9 @@
               <p class="text-zinc-400">Desde <%= assignment.start_date %> hasta <%= assignment.end_date || "vigente" %></p>
               <p class="text-zinc-400"><%= assignment.notes.presence || "-" %></p>
             </div>
-            <%= button_to "Quitar", backoffice_brother_brother_office_assignment_path(@brother, assignment), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% if @can_write_registry %>
+              <%= button_to "Quitar", backoffice_brother_brother_office_assignment_path(@brother, assignment), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% end %>
           </div>
         <% end %>
         <% if @office_assignments.empty? %>
@@ -111,9 +121,11 @@
 
   <article class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
     <h2 class="text-base font-semibold text-zinc-100">Adjuntos y documentos</h2>
-    <%= form_with model: [:backoffice, @brother], method: :patch, class: "mt-4 flex flex-wrap items-center gap-3" do |f| %>
-      <%= f.file_field :documents, multiple: true, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
-      <%= f.submit "Subir documentos", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white" %>
+    <% if @can_write_registry %>
+      <%= form_with model: [:backoffice, @brother], method: :patch, class: "mt-4 flex flex-wrap items-center gap-3" do |f| %>
+        <%= f.file_field :documents, multiple: true, class: "rounded-lg border border-zinc-700 px-3 py-2 text-sm" %>
+        <%= f.submit "Subir documentos", class: "rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white" %>
+      <% end %>
     <% end %>
     <div class="mt-4 space-y-2 text-sm">
       <% @brother.documents.each do |document| %>
@@ -124,7 +136,9 @@
           </div>
           <div class="flex items-center gap-3">
             <%= link_to "Ver", rails_blob_path(document, disposition: "attachment"), class: "text-amber-300 hover:underline" %>
-            <%= button_to "Eliminar", purge_document_backoffice_brother_path(@brother, attachment_id: document.attachment.id), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% if @can_write_registry %>
+              <%= button_to "Eliminar", purge_document_backoffice_brother_path(@brother, attachment_id: document.attachment.id), method: :delete, class: "text-xs font-semibold text-rose-700" %>
+            <% end %>
           </div>
         </div>
       <% end %>

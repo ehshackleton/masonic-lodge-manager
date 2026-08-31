@@ -1,6 +1,7 @@
 module Backoffice
   class CorrespondencesController < ApplicationController
     before_action :require_authentication
+    before_action :require_current_lodge!
     before_action :set_correspondence, only: %i[show edit update destroy submit_review approve publish]
     before_action :set_default_lodge, only: %i[new create]
     before_action :authorize_correspondences_read_access!
@@ -11,7 +12,7 @@ module Backoffice
       @q = params[:q].to_s.strip
       @status = params[:status].to_s.strip
       @direction = params[:direction].to_s.strip
-      @correspondences = Correspondence.includes(:lodge).order(created_at: :desc)
+      @correspondences = Correspondence.where(lodge_id: current_lodge.id).includes(:lodge).order(created_at: :desc)
       @correspondences = @correspondences.where(status: @status) if @status.present?
       @correspondences = @correspondences.where(direction: @direction) if @direction.present?
       if @q.present?
@@ -127,11 +128,11 @@ module Backoffice
     private
 
     def set_correspondence
-      @correspondence = Correspondence.find(params[:id])
+      @correspondence = Correspondence.where(lodge_id: current_lodge.id).find(params[:id])
     end
 
     def set_default_lodge
-      @default_lodge = Lodge.first
+      @default_lodge = current_lodge
     end
 
     def correspondence_params
@@ -147,7 +148,7 @@ module Backoffice
     end
 
     def load_correspondences_for_export
-      @correspondences = Correspondence.order(created_at: :desc)
+      @correspondences = Correspondence.where(lodge_id: current_lodge.id).order(created_at: :desc)
       @correspondences = @correspondences.where(status: params[:status]) if params[:status].present?
       @correspondences = @correspondences.where(direction: params[:direction]) if params[:direction].present?
       if params[:q].present?

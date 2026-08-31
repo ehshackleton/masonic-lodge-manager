@@ -55,6 +55,8 @@ class User < ApplicationRecord
     return true if has_role?(:superadmin)
 
     case key
+    when "registry"
+      has_role?(:secretario) || has_role?(:registry_manager) || has_role?(:registry_editor) || has_role?(:registry_viewer)
     when "works"
       has_role?(:secretario) || has_role?(:work_reviewer) || has_role?(:work_approver) || has_role?(:work_presenter) || has_role?(:work_archiver)
     when "secretariat"
@@ -63,6 +65,22 @@ class User < ApplicationRecord
       has_role?(:tesoreria_manager) || has_role?(:tesoreria_operator) || has_role?(:tesoreria_closer) || has_role?(:tesoreria_exporter)
     when "hospital"
       has_role?(:hospitalario_manager) || has_role?(:hospitalario_operator) || has_role?(:hospitalario_exporter)
+    when "administration"
+      false # solo superadmin (arriba)
+    else
+      false
+    end
+  end
+
+  def can_manage_registry_action?(action)
+    key = action.to_s
+    return true if has_role?(:superadmin) || has_role?(:secretario) || has_role?(:registry_manager)
+
+    case key
+    when "read"
+      has_role?(:registry_editor) || has_role?(:registry_viewer)
+    when "write"
+      has_role?(:registry_editor)
     else
       false
     end

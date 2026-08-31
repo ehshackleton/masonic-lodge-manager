@@ -1,6 +1,8 @@
 module Backoffice
   class BrotherOfficeAssignmentsController < ApplicationController
     before_action :require_authentication
+    before_action :require_current_lodge!
+    before_action :authorize_registry_write_access!
     before_action :set_brother
 
     def create
@@ -22,11 +24,25 @@ module Backoffice
     private
 
     def set_brother
-      @brother = Brother.find(params[:brother_id])
+      @brother = Brother.where(lodge_id: current_lodge.id).find(params[:brother_id])
     end
 
     def assignment_params
       params.require(:brother_office_assignment).permit(:office_id, :start_date, :end_date, :notes)
+    end
+
+    def authorize_registry_write_access!
+      return if current_user&.can_access_module?(:registry) && current_user&.can_manage_registry_action?(:write)
+
+      AuditLog.record!(
+        user: current_user,
+        action: "permission.denied.registry",
+        auditable: current_user,
+        metadata: { denied_action: "registry_write", path: request.path, method: request.request_method },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
+      redirect_to "/backoffice", alert: "No tienes permisos para modificar el cuadro logial."
     end
   end
 end

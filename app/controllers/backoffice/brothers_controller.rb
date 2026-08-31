@@ -1,6 +1,9 @@
 module Backoffice
   class BrothersController < ApplicationController
     before_action :require_authentication
+    before_action :require_current_lodge!
+    before_action :authorize_registry_read_access!
+    before_action :authorize_registry_write_access!, only: %i[new create edit update destroy purge_document]
     before_action :set_brother, only: %i[show edit update destroy purge_document]
     before_action :load_select_options, only: %i[new edit create update]
 
@@ -9,12 +12,13 @@ module Backoffice
       @status = params[:status].to_s.strip
       @degree_id = params[:degree_id].to_s.strip
 
-      @brothers = Brother.includes(:current_degree, :lodge).ordered
+      @brothers = Brother.where(lodge_id: current_lodge.id).includes(:current_degree, :lodge).ordered
       @brothers = apply_search(@brothers, @q)
       @brothers = @brothers.where(membership_status: @status) if @status.present?
       @brothers = @brothers.where(current_degree_id: @degree_id) if @degree_id.present?
 
       @degrees = Degree.order(rank_order: :asc)
+      @can_write_registry = current_user.can_manage_registry_action?(:write)
     end
 
     def show
@@ -24,11 +28,12 @@ module Backoffice
       @new_office_assignment = @brother.brother_office_assignments.new
       @degrees = Degree.order(rank_order: :asc)
       @offices = Office.order(:name)
+      @can_write_registry = current_user.can_manage_registry_action?(:write)
     end
 
     def new
       @brother = Brother.new(
-        lodge: default_lodge,
+        lodge: current_lodge,
         active: true,
         membership_status: "active"
       )
@@ -36,6 +41,7 @@ module Backoffice
 
     def create
       @brother = Brother.new(brother_params)
+      @brother.lodge = current_lodge
 
       if @brother.save
         redirect_to backoffice_brother_path(@brother), notice: "Hermano creado correctamente."
@@ -47,7 +53,9 @@ module Backoffice
     def edit; end
 
     def update
-      if @brother.update(brother_params)
+      attrs = brother_params
+      attrs = attrs.except(:lodge_id) # tenant fijo
+      if @brother.update(attrs)
         attach_documents if params.dig(:brother, :documents).present?
         redirect_to backoffice_brother_path(@brother), notice: "Ficha del hermano actualizada."
       else
@@ -69,16 +77,12 @@ module Backoffice
     private
 
     def set_brother
-      @brother = Brother.find(params[:id])
+      @brother = Brother.where(lodge_id: current_lodge.id).find(params[:id])
     end
 
     def load_select_options
-      @lodges = Lodge.order(:name)
+      @lodges = [ current_lodge ]
       @degrees = Degree.order(rank_order: :asc)
-    end
-
-    def default_lodge
-      Lodge.first
     end
 
     def apply_search(scope, query)
@@ -128,6 +132,31 @@ module Backoffice
 
     def attach_documents
       @brother.documents.attach(params[:brother][:documents])
+    end
+
+    def authorize_registry_read_access!
+      return if current_user&.can_access_module?(:registry) && current_user&.can_manage_registry_action?(:read)
+
+      audit_permission_denied("registry_read")
+      redirect_to "/backoffice", alert: "No tienes permisos para acceder al cuadro logial."
+    end
+
+    def authorize_registry_write_access!
+      return if current_user&.can_manage_registry_action?(:write)
+
+      audit_permission_denied("registry_write")
+      redirect_to backoffice_brothers_path, alert: "No tienes permisos para modificar el cuadro logial."
+    end
+
+    def audit_permission_denied(denied_action)
+      AuditLog.record!(
+        user: current_user,
+        action: "permission.denied.registry",
+        auditable: @brother || current_user,
+        metadata: { denied_action: denied_action, path: request.path, method: request.request_method },
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
     end
   end
 end

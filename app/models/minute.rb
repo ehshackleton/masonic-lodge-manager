@@ -1,4 +1,5 @@
 class Minute < ApplicationRecord
+  belongs_to :lodge
   belongs_to :created_by_user, class_name: "User", optional: true
   has_many_attached :documents
 
@@ -19,6 +20,10 @@ class Minute < ApplicationRecord
 
   validates :title, presence: true
   validates :session_date, presence: true
+  validates :lodge, presence: true
+
+  scope :for_lodge, ->(lodge) { where(lodge_id: lodge.is_a?(Lodge) ? lodge.id : lodge) }
+  scope :ordered, -> { order(session_date: :desc, folio: :desc) }
 
   def can_submit_review?
     status_draft?
@@ -39,7 +44,8 @@ class Minute < ApplicationRecord
 
     year = (session_date || Date.current).year
     prefix = "ACTA-#{year}-"
-    last_folio = Minute.where("folio LIKE ?", "#{prefix}%").order(:folio).pluck(:folio).last
+    scope = lodge_id.present? ? Minute.where(lodge_id: lodge_id) : Minute.all
+    last_folio = scope.where("folio LIKE ?", "#{prefix}%").order(:folio).pluck(:folio).last
     sequence = if last_folio.present?
                  last_folio.split("-").last.to_i + 1
     else

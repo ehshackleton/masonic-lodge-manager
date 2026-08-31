@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_152000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -269,12 +269,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_152000) do
     t.datetime "created_at", null: false
     t.bigint "created_by_user_id"
     t.string "folio"
+    t.bigint "lodge_id", null: false
     t.date "session_date"
     t.string "status", default: "draft"
     t.text "summary"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.string "visibility", default: "internal"
+    t.index ["lodge_id", "session_date"], name: "index_minutes_on_lodge_id_and_session_date"
+    t.index ["lodge_id"], name: "index_minutes_on_lodge_id"
     t.index ["session_date"], name: "index_minutes_on_session_date"
   end
 
@@ -422,6 +425,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_152000) do
   add_foreign_key "masonic_works", "degrees"
   add_foreign_key "masonic_works", "lodges"
   add_foreign_key "masonic_works", "users", column: "reviewer_user_id"
+  add_foreign_key "minutes", "lodges"
   add_foreign_key "minutes", "users", column: "created_by_user_id"
   add_foreign_key "monthly_closures", "lodges"
   add_foreign_key "monthly_closures", "users", column: "closed_by_user_id"
