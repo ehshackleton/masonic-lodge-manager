@@ -24,7 +24,8 @@ module Backoffice
       @period_from = parse_date(params[:period_from]) || Date.current.beginning_of_month
       @period_to = parse_date(params[:period_to]) || Date.current.end_of_month
 
-      @masonic_works = MasonicWork.includes(:brother, :degree, :reviewer_user).order(created_at: :desc)
+      @masonic_works = MasonicWork.includes(:brother, :degree, :reviewer_user)
+                                  .order(Arel.sql("due_on ASC NULLS LAST, created_at DESC"))
       @masonic_works = @masonic_works.where(status: @status) if @status.present?
       @masonic_works = @masonic_works.where(brother_id: @brother_id) if @brother_id.present?
       if @q.present?

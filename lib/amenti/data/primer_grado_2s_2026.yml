@@ -1,0 +1,47 @@
+# Programa de Trabajos de Primer Grado — Segundo semestre 2026
+# Fuente: Trabajos Primer Grado - 2do Semestre 2026.pdf
+program_key: primer_grado_2s_2026
+label: "Primer Grado — 2do Semestre 2026"
+degree_key: aprendiz
+assigned_on: 2026-08-31
+works:
+  - number: 1
+    topic: "Qué se entiende por Tolerancia en Masonería, y cuál es la diferencia con el mundo profano"
+    due_on: 2026-09-10
+    brother: "Juan Torres Nuñez"
+  - number: 2
+    topic: "La escuadra, simbología y aplicaciones prácticas"
+    due_on: 2026-09-17
+    brother: "Pedro Henríquez Faúndez"
+  - number: 3
+    topic: "El compás, simbología y aplicaciones prácticas"
+    due_on: 2026-10-01
+    brother: "Ricardo Sanchez Moreno"
+  - number: 4
+    topic: "Significado de Oriente para los Masones"
+    due_on: 2026-10-08
+    brother: "Héctor Salamanca Bastidas"
+  - number: 5
+    topic: "Concepto del G:.A:.D:.U:."
+    due_on: 2026-10-15
+    brother: "John Alexander Rodríguez"
+  - number: 6
+    topic: "Simbolismo del Mandil"
+    due_on: 2026-10-22
+    brother: "Patricio González Castro"
+  - number: 7
+    topic: "He recorrido el atrio y los exteriores del Templo"
+    due_on: 2026-11-05
+    brother: "Cristian Vergara Sepúlveda"
+  - number: 8
+    topic: "Las joyas y las luces, su espejo en el ser humano"
+    due_on: 2026-11-12
+    brother: "Juan Torres Nuñez"
+  - number: 9
+    topic: "Concepto de Libertad – Igualdad – Fraternidad"
+    due_on: 2026-11-19
+    brother: "Pedro Henríquez Faúndez"
+  - number: 10
+    topic: "Simbolismo del signo penal"
+    due_on: 2026-12-03
+    brother: "Ricardo Sanchez Moreno"

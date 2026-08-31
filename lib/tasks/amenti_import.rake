@@ -26,4 +26,25 @@ namespace :amenti do
     puts "Brothers=#{Brother.where(lodge: lodge).count} Tenidas=#{Tenida.where(lodge: lodge).count} " \
          "Correspondencias=#{Correspondence.where(lodge: lodge).count} Trabajos=#{MasonicWork.where(lodge: lodge).count}"
   end
+
+  desc "Importa programa de trabajos desde YAML. Uso: bin/rails amenti:import_works_program [PROGRAM=lib/amenti/data/primer_grado_2s_2026.yml]"
+  task import_works_program: :environment do
+    require Rails.root.join("lib/amenti/import_works_program")
+
+    program = ENV.fetch("PROGRAM") { Rails.root.join("lib/amenti/data/primer_grado_2s_2026.yml") }
+    abort "No existe el archivo de programa: #{program}" unless File.exist?(program)
+
+    lodge = Lodge.find_by(number: "31") || Lodge.order(:id).first
+    abort "No hay Lodge en BD; ejecute db:seed primero" unless lodge
+
+    puts "Importando programa: #{File.basename(program)}"
+    stats = Amenti::ImportWorksProgram.new(lodge: lodge, program_path: program).call
+    puts "Listo: #{stats.inspect}"
+    puts "Trabajos en logia: #{MasonicWork.where(lodge: lodge).count}"
+
+    if stats[:missing_brothers].any?
+      puts "Hermano(s) no encontrados en cuadro logial:"
+      stats[:missing_brothers].uniq.each { |name| puts "  - #{name}" }
+    end
+  end
 end
