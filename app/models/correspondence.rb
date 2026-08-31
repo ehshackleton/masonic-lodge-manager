@@ -2,6 +2,11 @@ class Correspondence < ApplicationRecord
   belongs_to :lodge
   belongs_to :created_by_user, class_name: "User", optional: true
   has_many_attached :documents
+  has_many :workspace_links, as: :linkable, dependent: :destroy
+
+  def gmail_link
+    workspace_links.gmail_messages.order(created_at: :desc).first
+  end
 
   before_validation :assign_folio, on: :create
 

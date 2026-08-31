@@ -15,7 +15,7 @@ del repositorio =masonic-lodge-manager=. Sirve para:
 - Alinear decisiones de dominio (logia, cuadro, tesorería, secretaría, etc.).
 - Dar contexto a humanos y a agentes (Emacs/Org, Cursor) sin releer todo el código.
 
-Fuente de verdad del esquema: [[file:db/schema.rb][db/schema.rb]] (versión migraciones =2026_03_27_152000=).
+Fuente de verdad del esquema: [[file:db/schema.rb][db/schema.rb]].
 Rutas: [[file:config/routes.rb][config/routes.rb]]. Semillas: [[file:db/seeds.rb][db/seeds.rb]].
 
 * Visión del producto
@@ -133,9 +133,13 @@ el formulario de contacto *no* escribe en BD todavía.
 | Cuadro logial     | =/backoffice/brothers=           | =brothers*=   | CRUD fichas, grados, cargos, documentos |
 | Tesorería         | =/backoffice/tesoreria=          | =treasury=    | Cuota, cargos, pagos, cierres, ledger, exports |
 | Hospitalario      | =/backoffice/hospitalario=       | =hospital=    | Saco, aportes, ajustes, beneficio defunción |
-| Secretaría        | =/backoffice/secretaria= + CRUD  | =secretariat=, =minutes=, =correspondences= | Hub + workflows |
+| Secretaría        | =/backoffice/secretaria= + CRUD  | =secretariat=, =minutes=, =correspondences=, =tenidas=, =workspace= | Hub + workflows + Google Workspace |
 | Trabajos          | =/backoffice/masonic_works=      | =masonic_works=, =work_reviews= | Ciclo de vida + revisiones |
 | Administración    | =/backoffice/administracion=     | =administration= | Lodge, roles, plantillas (superadmin) |
+
+Integración Google Workspace (OAuth buzón =amentidiez31@…=): modelos
+=WorkspaceConnection= / =WorkspaceLink=; servicios en =app/services/workspace/=;
+jobs Solid Queue; runbook =docs/workspace-runbook.md=.
 
 * Modelo de datos
 

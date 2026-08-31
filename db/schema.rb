@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_31_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -427,6 +427,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_150000) do
     t.index ["reviewer_user_id"], name: "index_work_reviews_on_reviewer_user_id"
   end
 
+  create_table "workspace_connections", force: :cascade do |t|
+    t.text "access_token_ciphertext"
+    t.string "account_email"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.text "last_error"
+    t.datetime "last_synced_at"
+    t.bigint "lodge_id", null: false
+    t.string "provider", default: "google", null: false
+    t.text "refresh_token_ciphertext"
+    t.text "scopes"
+    t.string "status", default: "disconnected", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lodge_id", "provider"], name: "index_workspace_connections_on_lodge_id_and_provider", unique: true
+    t.index ["lodge_id"], name: "index_workspace_connections_on_lodge_id"
+  end
+
+  create_table "workspace_links", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.string "external_url"
+    t.bigint "linkable_id", null: false
+    t.string "linkable_type", null: false
+    t.bigint "lodge_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "provider", default: "google", null: false
+    t.string "resource_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["linkable_type", "linkable_id"], name: "index_workspace_links_on_linkable_type_and_linkable_id"
+    t.index ["lodge_id", "resource_type"], name: "index_workspace_links_on_lodge_id_and_resource_type"
+    t.index ["lodge_id"], name: "index_workspace_links_on_lodge_id"
+    t.index ["provider", "resource_type", "external_id"], name: "idx_workspace_links_external", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "audit_logs", "users"
@@ -466,4 +500,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_150000) do
   add_foreign_key "user_roles", "users"
   add_foreign_key "work_reviews", "masonic_works"
   add_foreign_key "work_reviews", "users", column: "reviewer_user_id"
+  add_foreign_key "workspace_connections", "lodges"
+  add_foreign_key "workspace_links", "lodges"
 end

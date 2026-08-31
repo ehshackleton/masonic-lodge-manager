@@ -2,9 +2,9 @@ module Backoffice
   class MinutesController < ApplicationController
     before_action :require_authentication
     before_action :require_current_lodge!
-    before_action :set_minute, only: %i[show edit update destroy submit_review approve publish]
+    before_action :set_minute, only: %i[show edit update destroy submit_review approve publish archive_drive]
     before_action :authorize_minutes_read_access!
-    before_action :authorize_minutes_write_access!, only: %i[new create edit update destroy submit_review]
+    before_action :authorize_minutes_write_access!, only: %i[new create edit update destroy submit_review archive_drive]
     before_action :authorize_minutes_approval_access!, only: %i[approve publish]
     before_action :load_tenida_options, only: %i[new edit create update]
 
@@ -129,10 +129,31 @@ module Backoffice
 
       @minute.update!(status: "published")
       audit_action("minute.publish", @minute, folio: @minute.folio, status_to: "published")
+      enqueue_drive_archive
       redirect_to backoffice_minute_path(@minute), notice: "Acta publicada."
     end
 
+    def archive_drive
+      result = WorkspaceArchiveMinuteJob.perform_now(@minute.id, true)
+      audit_action("workspace.minute.archive_drive", @minute, result)
+      if result[:skipped]
+        redirect_to backoffice_minute_path(@minute), notice: "Archivo Drive omitido (#{result[:reason]})."
+      else
+        redirect_to backoffice_minute_path(@minute), notice: "Acta archivada en Drive."
+      end
+    rescue StandardError => e
+      redirect_to backoffice_minute_path(@minute), alert: "Error archivando en Drive: #{e.message.truncate(160)}"
+    end
+
     private
+
+    def enqueue_drive_archive
+      return unless WorkspaceConnection.google.exists?(lodge: current_lodge, status: "connected")
+
+      WorkspaceArchiveMinuteJob.perform_later(@minute.id)
+    rescue StandardError => e
+      Rails.logger.warn("[MinutesController] drive archive: #{e.message}")
+    end
 
     def minutes_scope
       Minute.for_lodge(current_lodge)

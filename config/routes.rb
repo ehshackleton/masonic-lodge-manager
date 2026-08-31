@@ -42,6 +42,13 @@ Rails.application.routes.draw do
     get "/hospitalario/export/cobertura/excel", to: "hospital#export_coverage_excel"
     get "/hospitalario/export/cobertura/pdf", to: "hospital#export_coverage_pdf"
     get "/secretaria", to: "secretariat#index"
+    resource :workspace, only: %i[show], controller: "workspace" do
+      post :connect
+      get :callback
+      delete :disconnect
+      post :import_gmail
+      post :health
+    end
     get "/trabajos", to: redirect("/backoffice/masonic_works")
     get "/administracion", to: "administration#index"
     patch "/administracion/logia", to: "administration#update_lodge"
@@ -52,6 +59,7 @@ Rails.application.routes.draw do
         patch :mark_cited
         patch :mark_held
         patch :cancel
+        post :sync_calendar
       end
     end
     resources :brothers do
@@ -71,6 +79,7 @@ Rails.application.routes.draw do
         patch :submit_review
         patch :approve
         patch :publish
+        post :archive_drive
       end
     end
 

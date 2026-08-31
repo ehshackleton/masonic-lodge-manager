@@ -2,9 +2,9 @@ module Backoffice
   class TenidasController < ApplicationController
     before_action :require_authentication
     before_action :require_current_lodge!
-    before_action :set_tenida, only: %i[show edit update destroy mark_held cancel mark_cited]
+    before_action :set_tenida, only: %i[show edit update destroy mark_held cancel mark_cited sync_calendar]
     before_action :authorize_secretariat_read!
-    before_action :authorize_secretariat_write!, only: %i[new create edit update destroy mark_held cancel mark_cited]
+    before_action :authorize_secretariat_write!, only: %i[new create edit update destroy mark_held cancel mark_cited sync_calendar]
     before_action :load_form_options, only: %i[new edit create update]
 
     def index
@@ -39,6 +39,7 @@ module Backoffice
           ip_address: request.remote_ip,
           user_agent: request.user_agent
         )
+        enqueue_calendar_sync
         redirect_to backoffice_tenida_path(@tenida), notice: "Tenida registrada."
       else
         load_form_options
@@ -58,6 +59,7 @@ module Backoffice
           ip_address: request.remote_ip,
           user_agent: request.user_agent
         )
+        enqueue_calendar_sync
         redirect_to backoffice_tenida_path(@tenida), notice: "Tenida actualizada."
       else
         load_form_options
@@ -80,6 +82,7 @@ module Backoffice
 
     def mark_cited
       @tenida.update!(status: "cited")
+      enqueue_calendar_sync
       redirect_to backoffice_tenida_path(@tenida), notice: "Tenida marcada como citada."
     end
 
@@ -87,6 +90,7 @@ module Backoffice
       return redirect_to(backoffice_tenida_path(@tenida), alert: "Transicion no permitida.") unless @tenida.can_mark_held?
 
       @tenida.update!(status: "held")
+      enqueue_calendar_sync
       redirect_to backoffice_tenida_path(@tenida), notice: "Tenida marcada como realizada."
     end
 
@@ -94,7 +98,13 @@ module Backoffice
       return redirect_to(backoffice_tenida_path(@tenida), alert: "No se puede cancelar.") unless @tenida.can_cancel?
 
       @tenida.update!(status: "cancelled")
+      enqueue_calendar_sync
       redirect_to backoffice_tenida_path(@tenida), notice: "Tenida cancelada."
+    end
+
+    def sync_calendar
+      enqueue_calendar_sync(force_now: true)
+      redirect_to backoffice_tenida_path(@tenida), notice: "Sincronizacion Calendar encolada/ejecutada."
     end
 
     private
@@ -155,6 +165,18 @@ module Backoffice
         user_agent: request.user_agent
       )
       redirect_to "/backoffice/secretaria", alert: "No tienes permisos para esta accion de Tenidas."
+    end
+
+    def enqueue_calendar_sync(force_now: false)
+      return unless WorkspaceConnection.google.exists?(lodge: current_lodge, status: "connected")
+
+      if force_now
+        WorkspaceSyncTenidaCalendarJob.perform_now(@tenida.id)
+      else
+        WorkspaceSyncTenidaCalendarJob.perform_later(@tenida.id)
+      end
+    rescue StandardError => e
+      Rails.logger.warn("[TenidasController] calendar sync: #{e.message}")
     end
   end
 end

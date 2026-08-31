@@ -3,6 +3,11 @@ class Tenida < ApplicationRecord
   belongs_to :degree, optional: true
   belongs_to :presiding_brother, class_name: "Brother", optional: true
   has_many :minutes, dependent: :nullify
+  has_many :workspace_links, as: :linkable, dependent: :destroy
+
+  def calendar_link
+    workspace_links.calendar_events.order(created_at: :desc).first
+  end
 
   before_validation :assign_code, on: :create
 
