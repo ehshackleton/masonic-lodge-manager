@@ -81,7 +81,7 @@ module Backoffice
                 m.visibility.humanize
               ]
             end,
-            widths: [ 58, 58, 150, 52, 62 ]
+            widths: [ 0.9, 0.9, 2.8, 0.9, 1.0 ]
           )
         end
       end

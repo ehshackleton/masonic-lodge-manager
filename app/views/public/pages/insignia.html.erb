@@ -1,91 +1,111 @@
 <% content_for :title, "Insignia | Amenti Diez N°31" %>
 
-<section class="mx-auto max-w-6xl px-6 py-14">
-  <div class="max-w-3xl">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300">Marca institucional</p>
-    <h1 class="font-display mt-3 text-5xl text-ink sm:text-6xl">Insignia</h1>
-    <p class="mt-5 text-lg leading-relaxed text-zinc-300">
+<section class="page-shell mx-auto max-w-7xl px-6 py-10 sm:py-14">
+  <div class="page-intro max-w-3xl amenti-rise">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-line" aria-hidden="true"></span>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.26em] text-amber-300/90">Marca institucional</p>
+    </div>
+
+    <h1 class="font-display mt-5 text-[2.65rem] leading-[1.04] text-ink sm:text-6xl">Insignia</h1>
+
+    <p class="mt-5 text-[15px] leading-relaxed text-zinc-400 sm:text-base">
       Esta es nuestra insignia maestra. La usamos en público con criterio y, cuando corresponde,
       con autorización explícita de la Logia.
     </p>
   </div>
 
-  <div class="mt-12 grid gap-6 lg:grid-cols-2">
-    <figure class="amenti-panel amenti-panel-gold overflow-hidden rounded-3xl">
-      <div class="amenti-asset-stage flex min-h-[22rem] items-center justify-center p-8">
+  <div class="mt-10 grid gap-5 lg:grid-cols-2">
+    <figure class="brand-figure amenti-panel amenti-panel-gold overflow-hidden rounded-[1.35rem] amenti-rise amenti-rise-delay-1">
+      <div class="brand-figure-stage flex min-h-[22rem] items-center justify-center px-8 py-10">
         <% if amenti_master_logo_path %>
-          <%= image_tag amenti_hero_logo_path || amenti_master_logo_path,
-                        alt: "Insignia maestra de la R∴L∴S∴ Amenti Diez N°31",
-                        class: "hero-logo-image max-h-[26rem] w-full max-w-md rounded-[1.35rem] object-contain",
-                        decoding: "async",
-                        data: {
-                          logo_dark: amenti_hero_logo_path || amenti_master_logo_path,
-                          logo_light: amenti_hero_logo_path || amenti_master_light_path || amenti_master_logo_path
-                        } %>
+          <div class="hero-medallion relative flex items-center justify-center">
+            <div class="hero-medallion-plate absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <div class="hero-medallion-ring absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <div class="hero-medallion-glow absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <%= image_tag amenti_hero_logo_dark_path || amenti_master_logo_path,
+                          alt: "Insignia maestra de la R∴L∴S∴ Amenti Diez N°31",
+                          class: "hero-logo-image relative z-10 max-h-[18rem] w-full max-w-sm object-contain sm:max-h-[20rem]",
+                          decoding: "async",
+                          data: {
+                            logo_dark: amenti_hero_logo_dark_path || amenti_master_logo_path,
+                            logo_light: amenti_hero_logo_light_path || amenti_master_light_path || amenti_master_logo_path
+                          } %>
+          </div>
         <% end %>
       </div>
-      <figcaption class="amenti-asset-caption px-8 py-6">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Insignia maestra</p>
+      <figcaption class="brand-figure-caption px-6 py-5 sm:px-8 sm:py-6">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Insignia maestra</p>
         <p class="mt-2 text-sm leading-relaxed text-zinc-400">
-          En ella reunimos triángulo, ave y cadena de unión. La presentamos sobre plato institucional
-          para un uso digital limpio — documentos, hero y marca.
+          Reunimos triángulo, ave y cadena de unión. La presentamos con aire y fondo neutro
+          para documentos, hero y comunicaciones institucionales.
         </p>
       </figcaption>
     </figure>
 
-    <figure class="amenti-panel overflow-hidden rounded-3xl">
-      <div class="amenti-asset-stage flex min-h-[22rem] items-center justify-center p-8">
+    <figure class="brand-figure amenti-panel overflow-hidden rounded-[1.35rem] amenti-rise amenti-rise-delay-2">
+      <div class="brand-figure-stage flex min-h-[22rem] items-center justify-center px-8 py-10">
         <% if amenti_seal_path %>
-          <%= image_tag amenti_seal_path,
-                        alt: "Sello circular de Amenti Diez N°31",
-                        class: "max-h-[20rem] w-full max-w-sm object-contain",
-                        decoding: "async" %>
+          <div class="hero-medallion relative flex max-w-[15rem] items-center justify-center sm:max-w-[16rem]">
+            <div class="hero-medallion-plate absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <div class="hero-medallion-ring absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <%= image_tag amenti_seal_path,
+                          alt: "Sello circular de Amenti Diez N°31",
+                          class: "hero-logo-image hero-seal-image relative z-10 w-full object-contain p-3",
+                          decoding: "async" %>
+          </div>
         <% end %>
       </div>
-      <figcaption class="amenti-asset-caption px-8 py-6">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Sello circular</p>
+      <figcaption class="brand-figure-caption px-6 py-5 sm:px-8 sm:py-6">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Sello circular</p>
         <p class="mt-2 text-sm leading-relaxed text-zinc-400">
-          Usamos esta versión compacta, con aro dorado, en la navegación, el pie de página y el favicon.
+          Versión compacta para navegación, pie de página, favicon y aplicaciones donde
+          el espacio es reducido.
         </p>
       </figcaption>
     </figure>
   </div>
 
   <div class="mt-8 grid gap-4 sm:grid-cols-3">
-    <div class="amenti-panel rounded-2xl p-5">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Nav / badge</p>
-      <div class="amenti-preview-well mt-5 flex h-24 items-center justify-center rounded-xl">
+    <div class="guide-card amenti-panel rounded-2xl p-5 amenti-rise amenti-rise-delay-1">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Nav / badge</p>
+      <div class="brand-preview-well mt-5 flex h-24 items-center justify-center rounded-xl">
         <% if amenti_mark_path %>
-          <%= image_tag amenti_mark_path, alt: "Badge de navegación", class: "h-16 w-16 rounded-full object-cover amenti-mark-ring", loading: "lazy" %>
+          <span class="site-brand-mark h-16 w-16">
+            <%= image_tag amenti_mark_path, alt: "Badge de navegación", class: "h-full w-full object-contain p-2", loading: "lazy" %>
+          </span>
         <% end %>
       </div>
-      <p class="mt-3 text-xs text-zinc-500">Cabecera sticky y accesos rápidos.</p>
+      <p class="mt-3 text-xs leading-relaxed text-zinc-500">Cabecera sticky y accesos rápidos del sitio público.</p>
     </div>
-    <div class="amenti-panel rounded-2xl p-5">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Paleta</p>
-      <div class="mt-5 flex gap-2">
-        <span class="h-12 flex-1 rounded-xl bg-[#070b12] ring-1 ring-black/10" title="Night"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#1e4d8c] ring-1 ring-black/10" title="Blue"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#d4af37] ring-1 ring-black/10" title="Gold"></span>
-        <span class="h-12 flex-1 rounded-xl bg-[#f4f1ea] ring-1 ring-black/10" title="Ivory"></span>
+
+    <div class="guide-card amenti-panel rounded-2xl p-5 amenti-rise amenti-rise-delay-2">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Paleta</p>
+      <div class="mt-5 grid grid-cols-4 gap-2">
+        <% [["Night", "#070b12"], ["Blue", "#1e4d8c"], ["Gold", "#d4af37"], ["Ivory", "#f4f1ea"]].each do |label, color| %>
+          <div>
+            <span class="block h-12 rounded-xl ring-1 ring-white/10" style="background-color: <%= color %>;" title="<%= label %>"></span>
+            <span class="mt-1.5 block text-center text-[10px] text-zinc-500"><%= label %></span>
+          </div>
+        <% end %>
       </div>
-      <p class="mt-3 text-xs text-zinc-500">Night · azul del sello · oro · ivory.</p>
+      <p class="mt-3 text-xs leading-relaxed text-zinc-500">Colores base para fondos, acentos y tipografía.</p>
     </div>
-    <div class="amenti-panel rounded-2xl p-5">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Criterio</p>
-      <p class="mt-5 text-sm leading-relaxed text-zinc-400">
-        No alteramos proporciones ni recortamos símbolos fuera de contexto.
-        Preferimos fondos neutros y aire alrededor del activo.
-      </p>
+
+    <div class="guide-card amenti-panel rounded-2xl p-5 amenti-rise amenti-rise-delay-3">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Criterio de uso</p>
+      <ul class="mt-4 space-y-2 text-sm leading-relaxed text-zinc-400">
+        <li>No alteramos proporciones ni recortamos símbolos fuera de contexto.</li>
+        <li>Preferimos fondos neutros y aire alrededor del activo.</li>
+        <li>La galería pública usa solo ambientación autorizada.</li>
+      </ul>
     </div>
   </div>
 
-  <div class="mt-10 max-w-3xl space-y-4 text-sm leading-relaxed text-zinc-400">
-    <p>
-      Aspiramos a variantes adicionales — monocromática, negativo y SVG vectorial — cuando estén disponibles.
-    </p>
-    <p class="text-xs text-zinc-500">
-      Nuestra galería pública usa solo ambientación autorizada y no pretende documentar el interior ritual.
+  <div class="page-note amenti-panel mt-8 rounded-2xl px-6 py-5 sm:px-8">
+    <p class="text-sm leading-relaxed text-zinc-400">
+      Aspiramos a variantes adicionales — monocromática, negativo y SVG vectorial — cuando estén disponibles
+      y aprobados por la Logia.
     </p>
   </div>
 </section>

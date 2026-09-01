@@ -71,8 +71,11 @@
         function applyTheme(theme) {
           document.documentElement.classList.toggle("theme-light", theme === "light");
           localStorage.setItem("theme", theme);
-          var label = document.getElementById("theme-toggle-label");
-          if (label) label.textContent = theme === "light" ? "Claro" : "Oscuro";
+          var labelText = theme === "light" ? "Claro" : "Oscuro";
+          ["theme-toggle-label", "mobile-theme-toggle-label"].forEach(function(id) {
+            var label = document.getElementById(id);
+            if (label) label.textContent = labelText;
+          });
           var meta = document.getElementById("theme-color-meta");
           if (meta) meta.content = theme === "light" ? "#f7f4ee" : "#070b12";
           document.querySelectorAll("[data-logo-dark],[data-logo-light]").forEach(function(img) {
@@ -83,16 +86,49 @@
           });
         }
 
+        function toggleTheme() {
+          var isLight = document.documentElement.classList.contains("theme-light");
+          applyTheme(isLight ? "dark" : "light");
+        }
+
+        function setMobileNav(open) {
+          var panel = document.getElementById("mobile-nav-panel");
+          var toggle = document.getElementById("mobile-nav-toggle");
+          if (!panel || !toggle) return;
+          panel.hidden = !open;
+          toggle.setAttribute("aria-expanded", open ? "true" : "false");
+          toggle.setAttribute("aria-label", open ? "Cerrar menú de navegación" : "Abrir menú de navegación");
+          document.body.classList.toggle("mobile-nav-open", open);
+          toggle.querySelector(".mobile-nav-toggle-open").classList.toggle("hidden", open);
+          toggle.querySelector(".mobile-nav-toggle-close").classList.toggle("hidden", !open);
+        }
+
         var saved = localStorage.getItem("theme");
         applyTheme(saved || "dark");
 
         document.addEventListener("DOMContentLoaded", function() {
-          var button = document.getElementById("theme-toggle");
-          if (!button) return;
-          button.addEventListener("click", function() {
-            var isLight = document.documentElement.classList.contains("theme-light");
-            applyTheme(isLight ? "dark" : "light");
-          });
+          var themeButton = document.getElementById("theme-toggle");
+          if (themeButton) themeButton.addEventListener("click", toggleTheme);
+
+          var mobileThemeButton = document.getElementById("mobile-theme-toggle");
+          if (mobileThemeButton) mobileThemeButton.addEventListener("click", toggleTheme);
+
+          var mobileToggle = document.getElementById("mobile-nav-toggle");
+          var mobilePanel = document.getElementById("mobile-nav-panel");
+          if (mobileToggle && mobilePanel) {
+            mobileToggle.addEventListener("click", function() {
+              setMobileNav(mobilePanel.hidden);
+            });
+            mobilePanel.querySelectorAll("a").forEach(function(link) {
+              link.addEventListener("click", function() { setMobileNav(false); });
+            });
+            document.addEventListener("keydown", function(event) {
+              if (event.key === "Escape") setMobileNav(false);
+            });
+            window.addEventListener("resize", function() {
+              if (window.innerWidth >= 1024) setMobileNav(false);
+            });
+          }
         });
       })();
     </script>
@@ -101,48 +137,78 @@
   <body class="amenti-shell min-h-screen text-ink antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 amenti-grid-fade opacity-60"></div>
 
+    <% nav_links = [
+      ["/", "Inicio"],
+      ["/sobre-nosotros", "Amenti"],
+      ["/historia", "Historia"],
+      ["/masoneria", "Masonería"],
+      ["/actualidad", "Actualidad"],
+      ["/contacto", "Contacto"]
+    ] %>
+
     <header class="site-header sticky top-0 z-40">
-      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5">
-        <a href="/" class="group flex min-w-0 items-center gap-3">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
+        <a href="/" class="site-brand group flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3.5 lg:flex-none">
           <% if amenti_mark_path %>
-            <%= image_tag amenti_mark_path,
-                          alt: "Amenti Diez N°31",
-                          class: "h-11 w-11 rounded-full object-cover amenti-mark-ring transition duration-300 group-hover:scale-[1.03]",
-                          width: 44,
-                          height: 44 %>
+            <span class="site-brand-mark h-10 w-10 sm:h-11 sm:w-11">
+              <%= image_tag amenti_mark_path,
+                            alt: "",
+                            class: "h-full w-full object-contain p-1.5",
+                            width: 44,
+                            height: 44 %>
+            </span>
           <% end %>
           <span class="min-w-0 leading-tight">
-            <span class="font-display block truncate text-xl text-ink sm:text-2xl">Amenti Diez N°31</span>
-            <span class="block text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-500">R∴L∴S∴ · Gran Logia Mixta</span>
+            <span class="font-display block truncate text-lg text-ink sm:text-xl lg:text-[1.35rem]">Amenti Diez N°31</span>
+            <span class="site-brand-sub block truncate text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-500 sm:tracking-[0.22em]">R∴L∴S∴ · Gran Logia Mixta</span>
           </span>
         </a>
 
-        <nav class="hidden items-center gap-1 text-sm font-medium lg:flex">
-          <% [
-            ["/", "Inicio"],
-            ["/sobre-nosotros", "Amenti"],
-            ["/historia", "Historia"],
-            ["/masoneria", "Masonería"],
-            ["/actualidad", "Actualidad"],
-            ["/contacto", "Contacto"]
-          ].each do |href, label| %>
+        <nav class="hidden items-center gap-0.5 text-[13px] font-medium lg:flex" aria-label="Principal">
+          <% nav_links.each do |href, label| %>
             <a href="<%= href %>" class="site-nav-link px-3 py-2"><%= label %></a>
           <% end %>
         </nav>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-          <button id="theme-toggle" type="button" class="btn-outline rounded-lg px-3 py-2 text-xs font-semibold">
-            Tema: <span id="theme-toggle-label">Oscuro</span>
+        <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <button id="theme-toggle" type="button" class="btn-icon hidden sm:inline-flex" title="Cambiar tema" aria-label="Cambiar tema">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Tema</span>
+            <span id="theme-toggle-label" class="text-[11px] font-semibold text-amber-300/90">Oscuro</span>
           </button>
           <% if user_signed_in? %>
-            <a href="/backoffice/perfil" class="btn-outline hidden rounded-lg px-3 py-2 text-sm font-semibold sm:inline-flex">Mi perfil</a>
-            <a href="/backoffice" class="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-night transition hover:bg-amber-200 sm:px-4">Backoffice</a>
-            <%= button_to "Salir", "/cerrar-sesion", method: :delete, class: "btn-outline hidden rounded-lg px-3 py-2 text-sm font-semibold sm:inline-flex" %>
+            <a href="/backoffice/perfil" class="btn-outline hidden rounded-lg px-3 py-2 text-xs font-semibold md:inline-flex">Perfil</a>
+            <a href="/backoffice" class="btn-primary rounded-lg px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Backoffice</a>
+            <%= button_to "Salir", "/cerrar-sesion", method: :delete, class: "btn-outline hidden rounded-lg px-3 py-2 text-xs font-semibold lg:inline-flex" %>
           <% else %>
-            <a href="/iniciar-sesion" class="btn-outline rounded-lg px-3 py-2 text-sm font-semibold">Entrar</a>
-            <a href="/backoffice" class="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-night transition hover:bg-amber-200 sm:px-4">Backoffice</a>
+            <a href="/backoffice" class="btn-primary rounded-lg px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Backoffice</a>
           <% end %>
+          <button
+            id="mobile-nav-toggle"
+            type="button"
+            class="mobile-nav-toggle btn-icon inline-flex lg:hidden"
+            aria-expanded="false"
+            aria-controls="mobile-nav-panel"
+            aria-label="Abrir menú de navegación">
+            <svg class="mobile-nav-toggle-open h-5 w-5 text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+              <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/>
+            </svg>
+            <svg class="mobile-nav-toggle-close hidden h-5 w-5 text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+              <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+            </svg>
+          </button>
         </div>
+      </div>
+
+      <div id="mobile-nav-panel" class="mobile-nav-panel lg:hidden" hidden>
+        <nav class="mx-auto max-w-7xl px-4 pb-4 sm:px-6" aria-label="Principal móvil">
+          <% nav_links.each do |href, label| %>
+            <a href="<%= href %>" class="mobile-nav-link"><%= label %></a>
+          <% end %>
+          <button id="mobile-theme-toggle" type="button" class="mobile-nav-theme btn-icon mt-3 w-full justify-center sm:hidden">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Tema</span>
+            <span id="mobile-theme-toggle-label" class="text-[11px] font-semibold text-amber-300/90">Oscuro</span>
+          </button>
+        </nav>
       </div>
     </header>
 
@@ -161,30 +227,64 @@
     </main>
 
     <footer class="site-footer mt-20">
-      <div class="mx-auto grid max-w-7xl gap-8 px-6 py-10 md:grid-cols-[1.2fr_1fr] md:items-center">
-        <div class="flex items-center gap-4">
-          <% if amenti_seal_path %>
-            <%= image_tag amenti_seal_path,
-                          alt: "Sello de Amenti Diez N°31",
-                          class: "h-16 w-16 rounded-full object-cover amenti-mark-ring",
-                          width: 64,
-                          height: 64,
-                          loading: "lazy",
-                          decoding: "async" %>
-          <% end %>
+      <div class="site-footer-accent" aria-hidden="true"></div>
+      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div class="grid gap-10 md:grid-cols-[1.15fr_0.85fr_1fr] md:items-start">
+          <div class="site-footer-brand flex items-start gap-4">
+            <% if amenti_seal_path %>
+              <span class="site-brand-mark h-16 w-16 shrink-0">
+                <%= image_tag amenti_seal_path,
+                              alt: "",
+                              class: "h-full w-full object-contain p-2",
+                              width: 64,
+                              height: 64,
+                              loading: "lazy",
+                              decoding: "async" %>
+              </span>
+            <% end %>
+            <div>
+              <p class="font-display text-2xl text-ink sm:text-[1.65rem]">Amenti Diez N°31</p>
+              <p class="mt-1.5 text-sm leading-relaxed text-zinc-400">R∴L∴S∴ G∴L∴M∴Ch∴</p>
+              <p class="mt-3 max-w-sm text-xs leading-relaxed text-zinc-500">
+                Presencia pública sobria de nuestra Logia. Lo ritual, lo interno y lo confidencial
+                se cuidan con el mismo rigor institucional.
+              </p>
+            </div>
+          </div>
+
           <div>
-            <p class="font-display text-2xl text-ink">R∴L∴S∴ Amenti Diez N°31</p>
-            <p class="mt-1 text-sm text-zinc-400">Gran Logia Mixta de Chile · Valle de Santiago</p>
+            <p class="site-footer-heading">Explorar</p>
+            <nav class="mt-4 flex flex-col gap-2.5" aria-label="Pie de página">
+              <% [
+                ["/sobre-nosotros", "Quiénes somos"],
+                ["/historia", "Historia"],
+                ["/insignia", "Insignia"],
+                ["/contacto", "Contacto"]
+              ].each do |href, label| %>
+                <a href="<%= href %>" class="site-footer-link text-sm"><%= label %></a>
+              <% end %>
+            </nav>
+          </div>
+
+          <div>
+            <p class="site-footer-heading">Acceso</p>
+            <nav class="mt-4 flex flex-col gap-2.5" aria-label="Acceso">
+              <% [
+                ["/iniciar-sesion", "Acceso miembros"],
+                ["/backoffice", "Backoffice"],
+                ["/sobre-el-sistema", "Sobre el sistema"]
+              ].each do |href, label| %>
+                <a href="<%= href %>" class="site-footer-link text-sm"><%= label %></a>
+              <% end %>
+            </nav>
           </div>
         </div>
-        <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-400 md:justify-end">
-          <a href="/insignia" class="site-footer-link">Insignia</a>
-          <a href="/sobre-el-sistema" class="site-footer-link">Sobre el sistema</a>
-          <a href="/iniciar-sesion" class="site-footer-link">Acceso miembros</a>
-          <a href="/contacto" class="site-footer-link">Contacto</a>
+
+        <div class="site-footer-bottom mt-10 flex flex-col gap-3 border-t border-white/5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-xs text-zinc-500">© <%= Date.current.year %> Amenti Diez N°31 · Uso institucional</p>
+          <p class="text-xs text-zinc-500">logia.amenti.cl · amenti.cl</p>
         </div>
       </div>
-      <div class="h-2 w-full opacity-30 amenti-mosaic"></div>
     </footer>
   </body>
 </html>

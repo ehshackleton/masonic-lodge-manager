@@ -1,34 +1,47 @@
 <% content_for :title, "Sobre el sistema | Amenti Diez N°31" %>
 
-<section class="mx-auto max-w-6xl px-6 py-14">
-  <h1 class="font-display text-4xl text-ink sm:text-5xl">Nuestra secretaría digital</h1>
-  <p class="mt-4 max-w-4xl text-zinc-300">
-    Hemos construido esta plataforma para ordenar nuestro trabajo administrativo:
-    cuadro logial, tesorería, hospitalario, actas, correspondencia y trabajos masónicos,
-    con acceso restringido según el rol de cada hermano y hermana.
-  </p>
+<section class="page-shell mx-auto max-w-7xl px-6 py-10 sm:py-14">
+  <div class="page-intro max-w-3xl amenti-rise">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-line" aria-hidden="true"></span>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.26em] text-amber-300/90">Amenti Digital</p>
+    </div>
+
+    <h1 class="font-display mt-5 text-[2.65rem] leading-[1.04] text-ink sm:text-5xl">Nuestra secretaría digital</h1>
+
+    <p class="mt-5 text-[15px] leading-relaxed text-zinc-400 sm:text-base">
+      Hemos construido esta plataforma para ordenar nuestro trabajo administrativo:
+      cuadro logial, tesorería, hospitalario, actas, correspondencia y trabajos masónicos,
+      con acceso restringido según el rol de cada hermano y hermana.
+    </p>
+  </div>
 
   <div class="mt-10 grid gap-4 md:grid-cols-2">
-    <article class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
-      <h2 class="text-lg font-semibold text-zinc-100">Para nuestro trabajo interno</h2>
-      <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-400">
-        <li>Centralizamos información operativa sin exponer lo confidencial en el sitio público.</li>
-        <li>Gestionamos actas, correspondencia y trabajos con trazabilidad.</li>
-        <li>Registramos tesorería y saco hospitalario con permisos granulares.</li>
+    <article class="content-card amenti-panel rounded-2xl p-6 sm:p-7 amenti-rise amenti-rise-delay-1">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Operación</p>
+      <h2 class="mt-2 font-display text-2xl text-ink">Para nuestro trabajo interno</h2>
+      <ul class="mt-4 space-y-2.5 text-sm leading-relaxed text-zinc-400">
+        <li class="content-list-item">Centralizamos información operativa sin exponer lo confidencial en el sitio público.</li>
+        <li class="content-list-item">Gestionamos actas, correspondencia y trabajos con trazabilidad.</li>
+        <li class="content-list-item">Registramos tesorería y saco hospitalario con permisos granulares.</li>
       </ul>
     </article>
-    <article class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
-      <h2 class="text-lg font-semibold text-zinc-100">Cómo cuidamos la información</h2>
-      <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-400">
-        <li>Clasificamos lo público, interno, confidencial y reservado — por defecto, no publicamos.</li>
-        <li>Accedemos con sesión autenticada y autorización por roles (RBAC).</li>
-        <li>Auditamos acciones sensibles; no guardamos datos personales en el código fuente.</li>
+
+    <article class="content-card amenti-panel rounded-2xl p-6 sm:p-7 amenti-rise amenti-rise-delay-2">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">Gobernanza</p>
+      <h2 class="mt-2 font-display text-2xl text-ink">Cómo cuidamos la información</h2>
+      <ul class="mt-4 space-y-2.5 text-sm leading-relaxed text-zinc-400">
+        <li class="content-list-item">Clasificamos lo público, interno, confidencial y reservado — por defecto, no publicamos.</li>
+        <li class="content-list-item">Accedemos con sesión autenticada y autorización por roles (RBAC).</li>
+        <li class="content-list-item">Auditamos acciones sensibles; no guardamos datos personales en el código fuente.</li>
       </ul>
     </article>
   </div>
 
-  <p class="mt-8 text-sm text-zinc-500">
-    Este sistema forma parte de nuestro ecosistema Amenti Digital. Incorporamos integraciones
-    — como Workspace — por fases, sin perder la dignidad ni la continuidad institucional.
-  </p>
+  <div class="page-note amenti-panel mt-8 rounded-2xl px-6 py-5 sm:px-8 amenti-rise amenti-rise-delay-3">
+    <p class="text-sm leading-relaxed text-zinc-400">
+      Este sistema forma parte de nuestro ecosistema Amenti Digital. Incorporamos integraciones
+      — como Workspace — por fases, sin perder la dignidad ni la continuidad institucional.
+    </p>
+  </div>
 </section>

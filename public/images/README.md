@@ -4,8 +4,9 @@ Clasificación por defecto: **PUBLICO** solo si hay autorización explícita.
 
 | Archivo | Uso |
 |---------|-----|
-| `logo-amenti.jpg` | Original de trabajo (fondo blanco) |
-| `logo-amenti.png` | Insignia maestra para UI oscura (trazo dorado, transparente) |
+| `logo-amenti.jpg` | Original maestro (triángulo + ave) |
+| `amenti.png` (raíz del repo) | Sello circular fuente para nav/footer |
+| `logo-amenti.png` | Insignia maestra para UI oscura (transparente) |
 | `logo-amenti-light.png` | Insignia maestra para tema claro |
 | `logo-amenti-hero.png` | Hero con sombra suave |
 | `insignia-sello.png` | Sello circular transparente |
@@ -16,3 +17,5 @@ Clasificación por defecto: **PUBLICO** solo si hay autorización explícita.
 Metadatos mínimos al publicar una imagen nueva: título, derechos, alt text, clasificación, uso permitido.
 
 No versionar fotografías de miembros ni capturas de templo sin mandato documental.
+
+Regenerar variantes: `python3 script/process_brand_assets.py`

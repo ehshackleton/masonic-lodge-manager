@@ -176,7 +176,7 @@ module Backoffice
                   format_currency(tx.amount)
                 ]
               end,
-              widths: [ 58, 52, 72, 120, 68 ]
+              widths: [ 2.4, 0.9, 1.2, 2.0, 1.1 ]
             )
           end
         end
@@ -248,7 +248,7 @@ module Backoffice
                   format_currency(row[:contributed_amount])
                 ]
               end,
-              widths: [ 130, 58, 58, 72 ]
+              widths: [ 2.4, 0.9, 0.9, 1.1 ]
             )
           end
         end

@@ -22,7 +22,7 @@ module Backoffice
       load_brothers_for_export
       rows = @brothers_for_export.map do |brother|
         contact = brother.email.presence || brother.mobile_phone.presence || "-"
-        %(<Row><Cell><Data ss:Type="String">#{ERB::Util.h(brother.registry_number.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.full_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.symbolic_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.current_degree&.name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.membership_status.to_s.humanize)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(contact)}</Data></Cell></Row>)
+        %(<Row><Cell><Data ss:Type="String">#{ERB::Util.h(brother.registry_number.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.full_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.current_degree&.name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(brother.membership_status.to_s.humanize)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(contact)}</Data></Cell></Row>)
       end.join("\n")
 
       xml = <<~XML
@@ -37,7 +37,6 @@ module Backoffice
               <Row>
                 <Cell><Data ss:Type="String">Registro</Data></Cell>
                 <Cell><Data ss:Type="String">Hermano</Data></Cell>
-                <Cell><Data ss:Type="String">Nombre simbolico</Data></Cell>
                 <Cell><Data ss:Type="String">Grado</Data></Cell>
                 <Cell><Data ss:Type="String">Estado</Data></Cell>
                 <Cell><Data ss:Type="String">Contacto</Data></Cell>
@@ -73,19 +72,18 @@ module Backoffice
         else
           report.table(
             pdf,
-            headers: %w[Registro Hermano Simbolico Grado Estado Contacto],
+            headers: [ "Registro", "Hermano", "Grado", "Estado", "Contacto" ],
             rows: @brothers_for_export.map do |brother|
               contact = brother.email.presence || brother.mobile_phone.presence || "-"
               [
                 brother.registry_number,
                 brother.full_name,
-                brother.symbolic_name.presence || "-",
                 brother.current_degree&.name || "-",
                 brother.membership_status.to_s.humanize,
                 contact
               ]
             end,
-            widths: [ 58, 130, 72, 58, 52, 110 ]
+            widths: [ 1.0, 2.6, 1.0, 1.0, 2.0 ]
           )
         end
       end

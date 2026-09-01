@@ -83,7 +83,7 @@ module Backoffice
                 c.confidentiality_level.humanize
               ]
             end,
-            widths: [ 58, 150, 52, 52, 68 ]
+            widths: [ 0.9, 2.8, 1.0, 0.9, 1.1 ]
           )
         end
       end

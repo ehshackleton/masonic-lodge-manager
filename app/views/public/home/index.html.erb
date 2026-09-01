@@ -1,94 +1,113 @@
 <% content_for :title, "Inicio | Amenti Diez N°31" %>
 
-<section class="relative mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-12">
-  <div class="amenti-panel amenti-panel-gold relative overflow-hidden rounded-[1.75rem]">
-    <div class="pointer-events-none absolute inset-0 opacity-[0.18] amenti-mosaic"></div>
-    <div class="pointer-events-none absolute -left-16 top-0 h-80 w-80 rounded-full bg-brand/25 blur-3xl"></div>
+<section class="relative mx-auto max-w-7xl px-4 pb-8 pt-4 sm:px-6 sm:pt-6 sm:pb-8 lg:pt-10">
+  <div class="hero-shell amenti-panel amenti-panel-gold relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 hero-shell-pattern opacity-[0.35]"></div>
+    <div class="pointer-events-none absolute -left-24 top-0 h-96 w-96 rounded-full bg-brand/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl"></div>
 
-    <div class="relative grid items-stretch lg:grid-cols-[1.15fr_0.85fr]">
-      <div class="amenti-rise flex flex-col justify-center px-8 py-12 sm:px-12 sm:py-16">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300/90">
-          Respetable Logia Simbólica · N°31
-        </p>
-        <h1 class="font-display mt-5 text-5xl leading-[1.05] text-ink sm:text-6xl lg:text-[4.25rem]">
-          Desde 1960,<br class="hidden sm:block"> labramos la piedra que somos.
-        </h1>
-        <p class="mt-6 max-w-xl text-base leading-relaxed text-zinc-300 sm:text-lg">
-          Somos la R∴L∴S∴ Amenti Diez N°31, adscrita a la Gran Logia Mixta de Chile en el Valle de Santiago.
-          Aquí cultivamos memoria, fraternidad y trabajo interior, con una presencia pública sobria.
-        </p>
-        <div class="mt-9 flex flex-wrap gap-3">
-          <a href="/historia" class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-night transition hover:bg-amber-200">Nuestra historia</a>
-          <a href="/espiritu-amentino" class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold">Quiénes somos</a>
-          <a href="/insignia" class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold">Nuestra insignia</a>
+    <div class="relative grid items-center lg:grid-cols-[1.08fr_0.92fr]">
+      <div class="amenti-rise flex flex-col justify-center px-5 py-9 sm:px-11 sm:py-14 lg:py-16">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-line" aria-hidden="true"></span>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.26em] text-amber-300/90">
+            Respetable Logia Simbólica · N°31
+          </p>
         </div>
+
+        <h1 class="font-display mt-6 max-w-xl text-[2.65rem] leading-[1.04] text-ink sm:text-6xl lg:text-[3.65rem]">
+          Desde 1960, labramos la piedra que somos.
+        </h1>
+
+        <p class="mt-5 max-w-lg text-[15px] leading-relaxed text-zinc-400 sm:text-base">
+          Somos la R∴L∴S∴ Amenti Diez N°31, adscrita a la Gran Logia Mixta de Chile en el Valle de Santiago.
+          Cultivamos memoria, fraternidad y trabajo interior con una presencia pública sobria.
+        </p>
+
+        <dl class="hero-meta mt-7 grid max-w-lg grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+          <% [["1960", "Fundación"], ["N°31", "Logia"], ["GLMCh", "Jurisdicción"]].each do |value, label| %>
+            <div class="hero-meta-item rounded-xl px-3 py-2.5 sm:py-2.5">
+              <dt class="font-display text-base text-amber-200/95 sm:text-lg"><%= value %></dt>
+              <dd class="mt-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-500 sm:tracking-[0.16em]"><%= label %></dd>
+            </div>
+          <% end %>
+        </dl>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/historia" class="btn-primary rounded-full px-6 py-3 text-sm font-semibold">Nuestra historia</a>
+          <a href="/espiritu-amentino" class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold">Quiénes somos</a>
+        </div>
+        <p class="mt-4 text-sm text-zinc-500">
+          <a href="/insignia" class="text-amber-300/90 transition hover:text-amber-200">Ver insignia institucional →</a>
+        </p>
       </div>
 
       <% if amenti_hero_logo_path %>
-        <div class="hero-logo-panel amenti-rise amenti-rise-delay-1 relative flex items-center justify-center border-t px-8 py-10 lg:border-l lg:border-t-0 lg:px-10 lg:py-12">
-          <%= image_tag amenti_hero_logo_path,
-                        alt: "Insignia de la R∴L∴S∴ Amenti Diez N°31",
-                        class: "hero-logo-image relative z-10 w-full max-w-[280px] rounded-[1.35rem] sm:max-w-[320px]",
-                        width: 320,
-                        height: 320,
-                        decoding: "async" %>
+        <div class="hero-logo-panel amenti-rise amenti-rise-delay-1 relative flex items-center justify-center border-t px-6 py-10 sm:px-10 sm:py-12 lg:border-l lg:border-t-0 lg:py-14">
+          <div class="hero-medallion relative flex items-center justify-center">
+            <div class="hero-medallion-plate absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <div class="hero-medallion-ring absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <div class="hero-medallion-glow absolute inset-0 rounded-full" aria-hidden="true"></div>
+            <%= image_tag amenti_hero_logo_dark_path || amenti_hero_logo_path,
+                          alt: "Insignia de la R∴L∴S∴ Amenti Diez N°31",
+                          class: "hero-logo-image relative z-10 w-full max-w-[240px] object-contain sm:max-w-[280px] lg:max-w-[300px]",
+                          width: 300,
+                          height: 300,
+                          decoding: "async",
+                          data: {
+                            logo_dark: amenti_hero_logo_dark_path || amenti_hero_logo_path,
+                            logo_light: amenti_hero_logo_light_path || amenti_master_light_path || amenti_hero_logo_path
+                          } %>
+          </div>
+          <p class="hero-logo-caption absolute bottom-5 left-0 right-0 text-center text-[10px] font-medium uppercase tracking-[0.2em]">
+            Insignia maestra · uso institucional
+          </p>
         </div>
       <% end %>
     </div>
   </div>
 </section>
 
-<section class="mx-auto max-w-7xl px-6 pb-10">
+<section class="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
+  <div class="section-heading mb-6">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-300/85">Nuestra casa</p>
+    <h2 class="font-display mt-2 text-3xl text-ink sm:text-4xl">Tres pilares de identidad</h2>
+  </div>
+
   <div class="grid gap-4 md:grid-cols-3">
-    <article class="amenti-rise amenti-rise-delay-1 amenti-panel rounded-2xl p-6 transition hover:border-amber-300/30">
-      <div class="mb-5 flex items-center gap-3">
-        <% if amenti_seal_path %>
-          <%= image_tag amenti_seal_path, alt: "", class: "h-12 w-12 rounded-full object-cover amenti-mark-ring", width: 48, height: 48, loading: "lazy" %>
-        <% end %>
-        <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Identidad</h2>
-      </div>
-      <p class="text-sm leading-relaxed text-zinc-400">
-        Nos llamamos Amenti porque evocamos tránsito, equilibrio y memoria. Buscamos una referencia
-        elegante y contemporánea: verdad, armonía y cadena de unión, lejos de toda caricatura.
-      </p>
-    </article>
-
-    <article class="amenti-rise amenti-rise-delay-2 amenti-panel rounded-2xl p-6 transition hover:border-amber-300/30">
-      <div class="mb-5 flex items-center gap-3">
-        <% if amenti_mark_path %>
-          <%= image_tag amenti_mark_path, alt: "", class: "h-12 w-12 rounded-full object-cover amenti-mark-ring", width: 48, height: 48, loading: "lazy" %>
-        <% end %>
-        <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Fundación</h2>
-      </div>
-      <p class="text-sm leading-relaxed text-zinc-400">
-        Levantamos nuestras columnas el 4 de agosto de 1960. Desde 1982 somos la Logia N°31
-        de la Gran Logia Mixta de Chile, y conservamos “Diez” en el nombre como memoria de origen.
-      </p>
-    </article>
-
-    <article class="amenti-rise amenti-rise-delay-3 amenti-panel rounded-2xl p-6 transition hover:border-amber-300/30">
-      <div class="mb-5 flex items-center gap-3">
-        <div class="flex h-12 w-12 items-center justify-center rounded-full border border-amber-300/35 bg-accent/10 font-display text-lg text-amber-200">31</div>
-        <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Trabajo</h2>
-      </div>
-      <p class="text-sm leading-relaxed text-zinc-400">
-        Ordenamos nuestra formación, secretaría y fraternidad con respeto a lo público,
-        a lo interno y a lo confidencial. Cada generación continúa el oficio.
-      </p>
-    </article>
+    <% [
+      [amenti_seal_path, "Identidad", "Evocamos tránsito, equilibrio y memoria con una referencia elegante: verdad, armonía y cadena de unión."],
+      [amenti_mark_path, "Fundación", "Levantamos nuestras columnas el 4 de agosto de 1960. Desde 1982 somos la Logia N°31 de la Gran Logia Mixta de Chile."],
+      [nil, "Trabajo", "Ordenamos formación, secretaría y fraternidad con respeto a lo público, lo interno y lo confidencial."]
+    ].each_with_index do |(icon_path, title, copy), index| %>
+      <article class="feature-card amenti-rise amenti-panel rounded-2xl p-6 <%= "amenti-rise-delay-#{index + 1}" %>">
+        <div class="mb-5 flex items-center gap-3">
+          <% if icon_path %>
+            <span class="feature-icon">
+              <%= image_tag icon_path, alt: "", class: "h-full w-full object-contain p-2", width: 40, height: 40, loading: "lazy" %>
+            </span>
+          <% else %>
+            <span class="feature-icon font-display text-lg text-amber-200">31</span>
+          <% end %>
+          <h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300"><%= title %></h3>
+        </div>
+        <p class="text-sm leading-relaxed text-zinc-400"><%= copy %></p>
+      </article>
+    <% end %>
   </div>
 </section>
 
-<section class="mx-auto max-w-7xl px-6 pb-16">
-  <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+<section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+  <div class="section-heading mb-6 flex flex-wrap items-end justify-between gap-4">
     <div>
-      <h2 class="font-display text-3xl text-ink sm:text-4xl">Ambientes de nuestro trabajo</h2>
-      <p class="mt-2 max-w-2xl text-sm text-zinc-400">
-        Compartimos imágenes de ambientación autorizadas. No documentamos el interior del templo
-        ni sustituimos el patrimonio fotográfico que requiere consentimiento explícito.
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-300/85">Presencia visual</p>
+      <h2 class="font-display mt-2 text-3xl text-ink sm:text-4xl">Ambientes de nuestro trabajo</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+        Imágenes de ambientación autorizadas. No documentamos el interior del templo
+        ni sustituimos patrimonio fotográfico que requiera consentimiento explícito.
       </p>
     </div>
-    <a href="/sobre-nosotros" class="text-sm font-semibold text-amber-300 hover:underline">Conócenos →</a>
+    <a href="/sobre-nosotros" class="text-sm font-semibold text-amber-300 hover:text-amber-200">Conócenos →</a>
   </div>
 
   <div class="grid gap-4 md:grid-cols-3">
@@ -96,19 +115,19 @@
       ["/images/galeria_templo.webp", "Templo y ceremonia", "Así enmarcamos nuestro trabajo ritual.", "Ambientación visual — templo y ceremonia"],
       ["/images/galeria_biblioteca.webp", "Biblioteca y estudio", "Aquí sostenemos la formación y el estudio permanente.", "Ambientación visual — biblioteca y estudio"],
       ["/images/galeria_comunidad.webp", "Comunidad fraterna", "Cuidamos el vínculo social y el servicio institucional.", "Ambientación visual — comunidad fraterna"]
-    ].each_with_index do |(src, title, copy, alt), i| %>
-      <article class="amenti-panel group overflow-hidden rounded-2xl">
-        <div class="relative h-48 overflow-hidden bg-zinc-950">
+    ].each do |src, title, copy, alt| %>
+      <article class="gallery-card amenti-panel group overflow-hidden rounded-2xl">
+        <div class="relative h-52 overflow-hidden bg-zinc-950">
           <%= image_tag src,
                         alt: alt,
-                        class: "absolute inset-0 h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100",
+                        class: "absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100#{' object-[center_30%]' if src.include?('galeria_templo')}",
                         loading: "lazy",
                         decoding: "async" %>
           <div class="gallery-overlay absolute inset-0"></div>
         </div>
         <div class="p-5">
-          <h3 class="font-display text-2xl text-ink"><%= title %></h3>
-          <p class="mt-1 text-sm text-zinc-400"><%= copy %></p>
+          <h3 class="font-display text-xl text-ink sm:text-2xl"><%= title %></h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-zinc-400"><%= copy %></p>
         </div>
       </article>
     <% end %>

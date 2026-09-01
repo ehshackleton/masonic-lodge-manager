@@ -130,7 +130,7 @@ module Backoffice
               pdf,
               headers: %w[Hermano Saldo Antiguedad],
               rows: rows.map { |row| [ row[:brother].full_name, format_currency(row[:balance]), "#{row[:aging_days]} dias" ] },
-              widths: [ 200, 90, 80 ]
+              widths: [ 2.6, 1.2, 1.0 ]
             )
           end
         end
@@ -187,7 +187,7 @@ module Backoffice
                 "#{row[:aging_days]} dias"
               ]
             end,
-            widths: [ 120, 58, 72, 58, 62 ]
+            widths: [ 2.2, 0.9, 1.2, 0.9, 1.0 ]
           )
         end
       end

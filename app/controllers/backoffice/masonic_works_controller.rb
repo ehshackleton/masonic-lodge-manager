@@ -24,14 +24,8 @@ module Backoffice
       @period_from = parse_date(params[:period_from]) || Date.current.beginning_of_month
       @period_to = parse_date(params[:period_to]) || Date.current.end_of_month
 
-      @masonic_works = MasonicWork.includes(:brother, :degree, :reviewer_user)
+      @masonic_works = works_list_scope
                                   .order(Arel.sql("due_on ASC NULLS LAST, created_at DESC"))
-      @masonic_works = @masonic_works.where(status: @status) if @status.present?
-      @masonic_works = @masonic_works.where(brother_id: @brother_id) if @brother_id.present?
-      if @q.present?
-        pattern = "%#{@q.downcase}%"
-        @masonic_works = @masonic_works.where("LOWER(title) LIKE :q OR LOWER(topic) LIKE :q", q: pattern)
-      end
 
       load_productivity_dashboard
       build_monthly_productivity_series
@@ -40,7 +34,7 @@ module Backoffice
     def export_excel
       load_works_for_export
       rows = @works_for_export.map do |work|
-        %(<Row><Cell><Data ss:Type="String">#{ERB::Util.h(work.title.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.brother&.full_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.status.humanize)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.assigned_on.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.due_on.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.reviewer_user&.email.to_s)}</Data></Cell></Row>)
+        %(<Row><Cell><Data ss:Type="String">#{ERB::Util.h(work.title.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.brother&.full_name.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.status.humanize)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.assigned_on.to_s)}</Data></Cell><Cell><Data ss:Type="String">#{ERB::Util.h(work.due_on.to_s)}</Data></Cell></Row>)
       end.join("\n")
       xml = <<~XML
         <?xml version="1.0"?>
@@ -57,7 +51,6 @@ module Backoffice
                 <Cell><Data ss:Type="String">Estado</Data></Cell>
                 <Cell><Data ss:Type="String">Asignacion</Data></Cell>
                 <Cell><Data ss:Type="String">Compromiso</Data></Cell>
-                <Cell><Data ss:Type="String">Revisor</Data></Cell>
               </Row>
               #{rows}
             </Table>
@@ -123,17 +116,17 @@ module Backoffice
         else
           report.table(
             pdf,
-            headers: %w[Fecha Trabajo Revisor Estado Comentarios],
+            headers: %w[Trabajo Revisor Fecha Estado Comentarios],
             rows: @reviews_for_export.map do |review|
               [
-                review.reviewed_on,
                 review.masonic_work&.title,
                 review.reviewer_user&.email,
+                review.reviewed_on,
                 review.status.humanize,
                 review.comments.presence || "-"
               ]
             end,
-            widths: [ 52, 110, 90, 52, 96 ]
+            widths: [ 2.2, 1.5, 0.9, 0.9, 2.0 ]
           )
         end
       end
@@ -180,7 +173,7 @@ module Backoffice
             rows: @monthly_productivity_series.map do |row|
               [ row[:label], row[:created], row[:approved], row[:presented] ]
             end,
-            widths: [ 120, 80, 80, 80 ]
+            widths: [ 1.4, 0.9, 0.9, 0.9 ]
           )
         end
 
@@ -191,18 +184,17 @@ module Backoffice
           else
             report.table(
               pdf,
-              headers: %w[Trabajo Hermano Estado Asignacion Compromiso Revisor],
+              headers: %w[Trabajo Hermano Estado Asignacion Compromiso],
               rows: works.map do |work|
                 [
                   work.title,
                   work.brother&.full_name,
                   work.status.humanize,
                   work.assigned_on || "-",
-                  work.due_on || "-",
-                  work.reviewer_user&.email || "-"
+                  work.due_on || "-"
                 ]
               end,
-              widths: [ 120, 90, 52, 58, 58, 90 ]
+              widths: [ 2.8, 1.8, 1.0, 1.0, 1.0 ]
             )
           end
         end
@@ -396,19 +388,26 @@ module Backoffice
       @monthly_productivity_max = 1 if @monthly_productivity_max.zero?
     end
 
+    def works_list_scope
+      scope = MasonicWork.includes(:brother, :degree, :reviewer_user)
+      scope = scope.where(status: filter_param(:status)) if filter_param(:status).present?
+      scope = scope.where(brother_id: filter_param(:brother_id)) if filter_param(:brother_id).present?
+
+      q = filter_param(:q)
+      if q.present?
+        pattern = "%#{q.downcase}%"
+        scope = scope.where("LOWER(title) LIKE :q OR LOWER(topic) LIKE :q", q: pattern)
+      end
+
+      scope
+    end
+
+    def filter_param(key)
+      params[key].to_s.strip
+    end
+
     def load_works_for_export
-      @works_for_export = MasonicWork.includes(:brother, :reviewer_user).order(created_at: :desc)
-      @works_for_export = @works_for_export.where(status: params[:status]) if params[:status].present?
-      @works_for_export = @works_for_export.where(brother_id: params[:brother_id]) if params[:brother_id].present?
-      if params[:q].present?
-        pattern = "%#{params[:q].to_s.strip.downcase}%"
-        @works_for_export = @works_for_export.where("LOWER(title) LIKE :q OR LOWER(topic) LIKE :q", q: pattern)
-      end
-      from = parse_date(params[:period_from])
-      to = parse_date(params[:period_to])
-      if from.present? && to.present?
-        @works_for_export = @works_for_export.where(created_at: from.beginning_of_day..to.end_of_day)
-      end
+      @works_for_export = works_list_scope.order(Arel.sql("due_on ASC NULLS LAST, created_at DESC"))
     end
 
     def load_reviews_for_export
@@ -432,9 +431,9 @@ module Backoffice
         meta_lines: [
           "Emitido: #{I18n.l(Date.current, format: :long)}",
           "Registros: #{@works_for_export.size}",
-          ("Estado: #{params[:status]}" if params[:status].present?),
-          ("Hermano ID: #{params[:brother_id]}" if params[:brother_id].present?),
-          ("Busqueda: #{params[:q]}" if params[:q].present?)
+          ("Estado: #{filter_param(:status)}" if filter_param(:status).present?),
+          ("Hermano ID: #{filter_param(:brother_id)}" if filter_param(:brother_id).present?),
+          ("Busqueda: #{filter_param(:q)}" if filter_param(:q).present?)
         ].compact,
         emitted_by: current_user.full_name
       ).render do |report, pdf|
@@ -453,7 +452,7 @@ module Backoffice
                 work.due_on || "-"
               ]
             end,
-            widths: [ 145, 100, 52, 58, 58 ]
+            widths: [ 2.8, 1.8, 1.0, 1.0, 1.0 ]
           )
         end
       end
