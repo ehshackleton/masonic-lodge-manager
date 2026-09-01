@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "digest"
+
 module BrandHelper
   MASTER_LOGO = %w[logo-amenti.png logo-amenti-light.png logo-amenti.jpg].freeze
   MASTER_LIGHT = %w[logo-amenti-light.png logo-amenti.png].freeze
@@ -11,7 +13,11 @@ module BrandHelper
 
   def amenti_asset_path(*candidates)
     found = candidates.flatten.find { |name| File.exist?(Rails.root.join("public/images", name)) }
-    found && "/images/#{found}"
+    return unless found
+
+    file = Rails.root.join("public/images", found)
+    version = Digest::SHA256.file(file).hexdigest.first(12)
+    "/images/#{found}?v=#{version}"
   end
 
   def amenti_master_logo_path
