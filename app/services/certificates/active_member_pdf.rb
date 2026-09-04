@@ -160,7 +160,9 @@ module Certificates
 
     def draw_footer(pdf)
       pdf.move_down 16
-      pdf.text "Documento administrativo emitido por Secretaría. No sustituye resoluciones del Taller ni de la Gran Logia.",
+      pdf.text "Este documento acredita exclusivamente la condición registral indicada y no sustituye " \
+               "resoluciones del Taller ni de la Gran Logia Mixta de Chile. Su autenticidad puede " \
+               "verificarse mediante el código QR y el folio incorporados.",
                align: :center,
                size: 8,
                color: MUTED
@@ -174,17 +176,17 @@ module Certificates
       name = @brother.full_name
       degree = @brother.current_degree.name
       <<~TEXT.squish
-        La #{@lodge.name}, del #{@lodge.orient.presence || "Valle de Santiago"},
-        adscrita a la #{@lodge.jurisdiction.presence || "Gran Logia Mixta de Chile"},
-        certifica que el Q∴H∴ #{name} es miembro activo de esta Respetable Logia,
-        encontrándose en grado de #{degree} y en regularidad institucional
-        según los registros vigentes de Secretaría a la fecha de emisión.
+        Por medio del presente, la #{institutional_lodge_name}, del #{institutional_orient}
+        y adscrita a la #{institutional_jurisdiction}, certifica que el Q∴H∴ #{name}
+        se encuentra registrado como miembro activo y regular de este Taller,
+        ostentando actualmente el grado de #{degree}, conforme a los antecedentes
+        vigentes de Secretaría a la fecha de emisión.
       TEXT
     end
 
     def member_details
       lines = []
-      lines << "Registro logial: #{@brother.registry_number}"
+      lines << "Número de registro logial: #{@brother.registry_number}"
       lines << "Grado actual: #{@brother.current_degree.name}"
       lines << "Fecha de iniciación: #{format_date(@brother.initiation_date)}" if @brother.initiation_date.present?
       lines << "Nombre simbólico: #{@brother.symbolic_name}" if @brother.symbolic_name.present?
@@ -192,17 +194,42 @@ module Certificates
     end
 
     def issuance_paragraph
-      "El presente documento se expide a solicitud de Secretaría para fines institucionales " \
-        "autorizados, en #{@lodge.orient.presence || 'Santiago de Chile'}, " \
+      "Se extiende el presente certificado para los fines institucionales que correspondan, " \
+        "en el #{institutional_orient}, " \
         "a #{format_date(@issued_on)}."
     end
 
     def lodge_subtitle
       parts = []
       parts << "N°#{@lodge.number}" if @lodge.number.present?
-      parts << @lodge.jurisdiction if @lodge.jurisdiction.present?
-      parts << @lodge.orient if @lodge.orient.present?
+      parts << institutional_jurisdiction
+      parts << institutional_orient
       parts.compact.join(" · ")
+    end
+
+    def institutional_lodge_name
+      name = @lodge.name.to_s.squish
+      name = "Amenti Diez N°#{@lodge.number.presence || '31'}" if name.blank?
+      name = name.gsub(/\bSimbolica\b/i, "Simbólica")
+      return name if name.match?(/\ARespetable Logia/i)
+
+      "Respetable Logia Simbólica #{name}"
+    end
+
+    def institutional_orient
+      orient = @lodge.orient.to_s.squish
+      return "Valle de Santiago" if orient.blank? || orient.match?(/Santiago/i)
+      return orient if orient.match?(/\AValle\b/i)
+
+      "Valle de #{orient}"
+    end
+
+    def institutional_jurisdiction
+      jurisdiction = @lodge.jurisdiction.to_s.squish
+      return "Gran Logia Mixta de Chile" if jurisdiction.blank? || jurisdiction.casecmp?("Chile")
+      return jurisdiction if jurisdiction.match?(/\AGran Logia/i)
+
+      "Gran Logia Mixta de #{jurisdiction}"
     end
 
     def signature_line(name)
@@ -233,7 +260,7 @@ module Certificates
     end
 
     def format_date(value)
-      I18n.l(value, format: :long)
+      I18n.with_locale(:es) { I18n.l(value, format: :long) }
     rescue I18n::ArgumentError
       value.to_s
     end
